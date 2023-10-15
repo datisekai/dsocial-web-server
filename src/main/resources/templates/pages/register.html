@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="register" method="POST">
+            <div>TODO write content</div>
+            <input type="text" name="email"/>
+            <input type="password" name="password"/>
+            <input type="password" name="confirmPassword"/>
+            <input type="text" name="name"/>
+            <input type="submit" value="đăng ký" name="register" />
+            <div class="mb-3">
+                <p style="color:red;" th:text="${error}"></p>
+            </div>
+            <img th:src="${Image}" style="aspect-ratio:1/1" th:alt="alt">
+        </form>
+    </body>
+</html>
