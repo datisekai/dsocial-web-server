@@ -25,6 +25,9 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+    public User findByEmailAndPassword(String email, String password) {
+        return userRepository.findByEmailAndPassword(email, password);
+    }
 
     public User updateUser(Object id) {
         Optional<User> optionalUser = userRepository.findById(id);

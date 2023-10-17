@@ -19,6 +19,15 @@ import java.util.Date;
 @Entity
 @Table(name = "User")
 public class User {
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public User() {
+    }
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
