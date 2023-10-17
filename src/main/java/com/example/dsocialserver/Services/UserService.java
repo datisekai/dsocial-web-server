@@ -28,8 +28,13 @@ public class UserService {
     public User findByEmailAndPassword(String email, String password) {
         return userRepository.findByEmailAndPassword(email, password);
     }
+    public User findById(Object id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        User user = optionalUser.get();
+        return user;
+    }
 
-    public User updateUser(Object id) {
+    public User updateisActiveUser(Object id) {
         Optional<User> optionalUser = userRepository.findById(id);
         User list = null;
         if (optionalUser.isPresent()) {
@@ -39,7 +44,18 @@ public class UserService {
             // ...
             list= userRepository.save(user);
         }
-        
+        return list;
+    }
+    public User updatePasswordUser(Object id, String password) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        User list = null;
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            // Cập nhật các trường của đối tượng user
+            user.setPassword(password);
+            // ...
+            list= userRepository.save(user);
+        }
         return list;
     }
 

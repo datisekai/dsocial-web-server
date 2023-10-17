@@ -20,21 +20,21 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
     private static final String SECRET_KEY = "haiduong"; // Thay thế bằng secret key thực của bạn
-    private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
+//    private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
 
-    public String generateToken(String username) {
+    public static String generateToken(long subject, long EXPIRATION_TIME) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(subject+"")
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
-    public static String createJWT(String subject) {
+    public static String createJWT(long subject) {
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(subject+"")
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();

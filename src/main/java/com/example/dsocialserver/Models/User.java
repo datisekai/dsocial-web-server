@@ -56,7 +56,7 @@ public class User {
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedat;
-
+    
     // Getters and setters
     // Constructors
     // Other helper methods

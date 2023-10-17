@@ -10,8 +10,8 @@ import com.example.dsocialserver.Services.UserService;
 import com.example.dsocialserver.until.JwtTokenProvider;
 import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.until.JwtTokenProvider.decodeJWT;
+import static com.example.dsocialserver.until.JwtTokenProvider.generateToken;
 import static com.example.dsocialserver.until.JwtTokenProvider.isLogin;
-import static com.example.dsocialserver.until.JwtTokenProvider.isTokenExpired;
 import static com.example.dsocialserver.until.MD5.MD5;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSonCustomResponse;
@@ -33,12 +33,8 @@ import java.util.Date;
 import com.example.dsocialserver.until.StatusUntilIndex;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.mail.MailException;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -56,22 +52,24 @@ public class UserController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private final CustomResponse jsonRes = new CustomResponse();
-
+    private String codeForgotPassword= "";
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String indexRegister(HttpServletRequest request, HttpSession session
     //            , @RequestHeader("Authorization") String authorization
     ) {
+//        String token = session.getAttribute("authorization").toString();
+//        System.out.println(""+isLogin(token));
         return "pages/register";
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity register(HttpServletRequest request, HttpSession session //            , @RequestHeader("Authorization") String authorization
-            , @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("name") String name, @RequestParam("confirmPassword") String confirmPassword, Model model) {
-        String contextPath = request.getContextPath();
-        String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
-        String token = null;
+            ,
+             @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("name") String name, @RequestParam("confirmPassword") String confirmPassword, Model model) {
         try {
-
+            String contextPath = request.getContextPath();
+            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
+            String token = null;
 //        ----------------------------------
             User isExist = userService.findByEmail(email);
             if (isExist != null) {
@@ -86,7 +84,7 @@ public class UserController {
 
 //        ----------------------------------
             if (!"".equals(user.getEmail())) {
-                String codeEmail = createJWT(user.getId() + "");
+                String codeEmail = createJWT(user.getId());
                 Date currentDate = new Date();
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("haiduong09876@gmail.com");
@@ -109,26 +107,24 @@ public class UserController {
     @RequestMapping(value = "/register/authentication/{codeEmail}", method = RequestMethod.GET)
     public ResponseEntity indexAuthentication(HttpSession session,
             @PathVariable("codeEmail") String codeEmail) {
-        String token = null;
         try {
-            if (session.getAttribute("email") != null) {
-                return new ResponseEntity<>("redirect:/", HttpStatus.FOUND);
-            }
-
+            String token = null;
             Claims id = decodeJWT(codeEmail);
-            User user = userService.updateUser(id.getSubject());
-            if (user.getIsactive() == 0) {
-                token = jwtTokenProvider.generateToken(user.getEmail());
-            } else {
+            User user = userService.findById(id.getSubject());
+            if (user.getIsactive() != 0) {
                 jsonRes.setRes(false, "Email đã được xác thực trước đó");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
+            } else {
+                user = userService.updateisActiveUser(id.getSubject());
+                token = generateToken(user.getId(),86400000);
             }
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", "true");
             responseData.put("mesage", "Đăng ký thành công");
             responseData.put("token", token);
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.set("Authorization", token);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", token);
+            session.setAttribute("authorization", token);
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
@@ -144,11 +140,8 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity login(HttpSession session,
             HttpServletRequest request, @RequestParam("email") String email, @RequestParam("password") String password, Model model) {
-        String token = null;
-        String contextPath = request.getContextPath();
-        String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
         try {
-
+            String token = null;
 //        ----------------------------------
             String hashPassword = MD5(password);
             User user = userService.findByEmailAndPassword(email, hashPassword);
@@ -156,15 +149,15 @@ public class UserController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", "false");
                 responseData.put("mesage", "Sai tài khoản hoặc mật khẩu");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
             } else {
                 if (user.getIsactive() == 0) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", "false");
                     responseData.put("mesage", "Tài khoản chưa được xác thực");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
                 } else {
-                    token = jwtTokenProvider.generateToken(user.getEmail());
+                    token = generateToken(user.getId(),86400000);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", "true");
                     responseData.put("mesage", "Đăng nhập thành công");
@@ -184,6 +177,85 @@ public class UserController {
                 }
             }
         } catch (MailException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+
+    @RequestMapping(value = "/forgotpassword1", method = RequestMethod.GET)
+    public String indexForgotPassword1(HttpSession session //            , @RequestHeader("Authorization") String authorization
+    ) {
+        return "pages/forgot1";
+    }
+
+    @RequestMapping(value = "/forgotpassword1", method = RequestMethod.POST)
+    public ResponseEntity forgotpassword1(HttpSession session,
+            HttpServletRequest request, @RequestParam("email") String email, Model model) {
+        try {
+            String contextPath = request.getContextPath();
+            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
+            User user = userService.findByEmail(email);
+            if (user == null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", "false");
+                responseData.put("mesage", "Gmail không tồn tại");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+            } else {
+                if (user.getIsactive() == 0) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", "false");
+                    responseData.put("mesage", "Tài khoản chưa được xác thực");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+                } else {
+                    String codeEmail = generateToken(user.getId(), 300000);
+                    Date currentDate = new Date();
+                    SimpleMailMessage message = new SimpleMailMessage();
+                    message.setFrom("haiduong09876@gmail.com");
+                    message.setTo(email);
+                    message.setText("Nhấn vào link để đổi mật khẩu: " + basePath + "forgotpassword2/" + codeEmail
+                            + "\nGặp vấn đề liên hệ với Dsocial.");
+                    message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
+                    mailSender.send(message);
+                    jsonRes.setRes(true, "Link đổi mật khẩu đã được gửi qua email có hiệu lực trong 5 phút");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSonCustomResponse(jsonRes));
+                }
+            }
+        } catch (MailException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+
+    @RequestMapping(value = "/forgotpassword2/{codeEmail}", method = RequestMethod.GET)
+    public String indexForgotPassword2(HttpSession session //            , @RequestHeader("Authorization") String authorization
+            ,
+             @PathVariable("codeEmail") String codeEmail
+    ) {
+        codeForgotPassword=codeEmail;
+        return "pages/forgot2";
+    }
+
+    @RequestMapping(value = "/forgotpassword2", method = RequestMethod.POST)
+    public ResponseEntity forgotpassword2(HttpSession session,
+            HttpServletRequest request, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword, Model model) {
+        try {
+            String token= null;
+            Claims id = decodeJWT(codeForgotPassword);
+            String hashPassword = MD5(password);
+            User user = userService.updatePasswordUser(id.getSubject(), hashPassword);
+            if (user != null) {
+                token = generateToken(user.getId(), 86400000);
+            } else {
+                jsonRes.setRes(false, "Thời gian đổi mật khẩu đã hết");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
+            }
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", "true");
+            responseData.put("mesage", "Đổi mật khẩu thành công");
+            responseData.put("token", token);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", token);
+            session.setAttribute("authorization", token);
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
