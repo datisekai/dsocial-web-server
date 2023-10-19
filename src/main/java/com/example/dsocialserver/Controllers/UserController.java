@@ -52,7 +52,8 @@ public class UserController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private final CustomResponse jsonRes = new CustomResponse();
-    private String codeForgotPassword= "";
+    private String codeForgotPassword = "";
+
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String indexRegister(HttpServletRequest request, HttpSession session
     //            , @RequestHeader("Authorization") String authorization
@@ -65,8 +66,14 @@ public class UserController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity register(HttpServletRequest request, HttpSession session //            , @RequestHeader("Authorization") String authorization
             ,
-             @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("name") String name, @RequestParam("confirmPassword") String confirmPassword, Model model) {
+             Model model) {
         try {
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            if (email == null || password == null || name == null) {
+                return StatusUntilIndex.showMissing();
+            }
             String contextPath = request.getContextPath();
             String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
             String token = null;
@@ -105,9 +112,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register/authentication/{codeEmail}", method = RequestMethod.GET)
-    public ResponseEntity indexAuthentication(HttpSession session,
-            @PathVariable("codeEmail") String codeEmail) {
+    public ResponseEntity indexAuthentication(HttpSession session, @PathVariable("codeEmail") String codeEmail, HttpServletRequest request) {
         try {
+            if (codeEmail == null) {
+                return StatusUntilIndex.showMissing();
+            }
             String token = null;
             Claims id = decodeJWT(codeEmail);
             User user = userService.findById(id.getSubject());
@@ -116,14 +125,22 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
             } else {
                 user = userService.updateisActiveUser(id.getSubject());
-                token = generateToken(user.getId(),86400000);
+                token = generateToken(user.getId(), 86400000);
             }
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", "true");
             responseData.put("mesage", "Đăng ký thành công");
             responseData.put("token", token);
+            responseData.put("email", user.getEmail());
+            responseData.put("name", user.getName());
+            responseData.put("avatar", user.getAvatar());
+            responseData.put("bio", user.getBio());
+            responseData.put("birthday", user.getBirthday());
+            responseData.put("coverimage", user.getCoverimage());
+            responseData.put("othername", user.getOthername());
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", token);
+
             session.setAttribute("authorization", token);
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (Exception e) {
@@ -139,8 +156,13 @@ public class UserController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity login(HttpSession session,
-            HttpServletRequest request, @RequestParam("email") String email, @RequestParam("password") String password, Model model) {
+            HttpServletRequest request, Model model) {
         try {
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            if (email == null || password == null) {
+                return StatusUntilIndex.showMissing();
+            }
             String token = null;
 //        ----------------------------------
             String hashPassword = MD5(password);
@@ -157,7 +179,7 @@ public class UserController {
                     responseData.put("mesage", "Tài khoản chưa được xác thực");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
                 } else {
-                    token = generateToken(user.getId(),86400000);
+                    token = generateToken(user.getId(), 86400000);
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", "true");
                     responseData.put("mesage", "Đăng nhập thành công");
@@ -189,8 +211,12 @@ public class UserController {
 
     @RequestMapping(value = "/forgotpassword1", method = RequestMethod.POST)
     public ResponseEntity forgotpassword1(HttpSession session,
-            HttpServletRequest request, @RequestParam("email") String email, Model model) {
+            HttpServletRequest request, Model model) {
         try {
+            String email = request.getParameter("email");
+            if (email == null) {
+                return StatusUntilIndex.showMissing();
+            }
             String contextPath = request.getContextPath();
             String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
             User user = userService.findByEmail(email);
@@ -227,17 +253,24 @@ public class UserController {
     @RequestMapping(value = "/forgotpassword2/{codeEmail}", method = RequestMethod.GET)
     public String indexForgotPassword2(HttpSession session //            , @RequestHeader("Authorization") String authorization
             ,
-             @PathVariable("codeEmail") String codeEmail
+             HttpServletRequest request, @PathVariable("codeEmail") String codeEmail
     ) {
-        codeForgotPassword=codeEmail;
+        if (codeEmail == null) {
+            return "pages/home";
+        }
+        codeForgotPassword = codeEmail;
         return "pages/forgot2";
     }
 
     @RequestMapping(value = "/forgotpassword2", method = RequestMethod.POST)
     public ResponseEntity forgotpassword2(HttpSession session,
-            HttpServletRequest request, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword, Model model) {
+            HttpServletRequest request, Model model) {
         try {
-            String token= null;
+            String password = request.getParameter("password");
+            if (password == null) {
+                return StatusUntilIndex.showMissing();
+            }
+            String token = null;
             Claims id = decodeJWT(codeForgotPassword);
             String hashPassword = MD5(password);
             User user = userService.updatePasswordUser(id.getSubject(), hashPassword);
@@ -251,8 +284,16 @@ public class UserController {
             responseData.put("success", "true");
             responseData.put("mesage", "Đổi mật khẩu thành công");
             responseData.put("token", token);
+            responseData.put("email", user.getEmail());
+            responseData.put("name", user.getName());
+            responseData.put("avatar", user.getAvatar());
+            responseData.put("bio", user.getBio());
+            responseData.put("birthday", user.getBirthday());
+            responseData.put("coverimage", user.getCoverimage());
+            responseData.put("othername", user.getOthername());
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", token);
+
             session.setAttribute("authorization", token);
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (Exception e) {

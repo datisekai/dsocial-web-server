@@ -16,20 +16,45 @@ import jakarta.persistence.Table;
  * @author haidu
  */
 @Entity
-@Table(name = "GroupUser")
+@Table(name = "groupuser")
 public class GroupUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
+
+    @Column(nullable = false, name = "groupid")
+    private int groupId;
 
     @Column(nullable = false)
-    private Long groupId;
-
-    @Column(nullable = false)
-    private Long userId;
+    private int userid;
 
     // Getters and setters
     // Constructors
     // Other helper methods
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
+    
 }
 
