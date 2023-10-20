@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface GroupRepository extends CrudRepository<Group, Object>{
-    Page<Group> findAll(Pageable pageable);
+public interface GroupRepository extends CrudRepository<Group, Object> {
+
+    Page<Group> findByIsactiveNot(Pageable pageable, int isactive);
 }

@@ -75,7 +75,7 @@ public class GroupService {
     
     public Page<Group> getGroupList(int page, int limit) {
         Pageable pageable= PageRequest.of(page, limit);
-        return groupRepository.findAll(pageable);
+        return groupRepository.findByIsactiveNot(pageable, 0);
     }
     
 }
