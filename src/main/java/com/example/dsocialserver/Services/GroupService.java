@@ -29,9 +29,12 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
     
-    @Autowired
-    private GroupUserRepository groupUserRepository;
-
+     public Group findById(Object id) {
+        Optional<Group> optionalUser = groupRepository.findById(id);
+        Group group = optionalUser.get();
+        return group;
+    }
+     
     public Group createGroup(String grourpName, int userId, String avatar, String coverImage) {
         Group gr = new Group();
         gr.setName(grourpName);

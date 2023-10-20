@@ -74,7 +74,7 @@ public class UserController {
             data.put("coverimage", user.getCoverimage());
             data.put("othername", user.getOthername());
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", "true");
+            responseData.put("success", true);
             responseData.put("message", "Authorization");
             responseData.put("data", data);
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
@@ -88,7 +88,7 @@ public class UserController {
     public ResponseEntity register(HttpServletRequest request, HttpSession session //            , @RequestHeader("Authorization") String authorization
             ,
              Model model) {
-        try {          
+        try {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String name = request.getParameter("name");
@@ -150,11 +150,9 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
             user = userService.updateisActiveUser(id.getSubject());
-            Map<String, Object> responseData = new HashMap<>();
             if (user != null) {
-                responseData.put("success", true);
-                responseData.put("message", "Đăng ký thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                jsonRes.setRes(true, "Đăng ký thành công");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
         } catch (Exception e) {
@@ -171,25 +169,29 @@ public class UserController {
             if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
                 return StatusUntilIndex.showMissing();
             }
+            if (!isValidEmail(email)) {
+                jsonRes.setRes(false, "Sai định dạng email");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
+            }
+            if (!isValidPassword(password)) {
+                jsonRes.setRes(false, "Password phải trên 5 ký tự");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
+            }
             String token = null;
 //        ----------------------------------
             String hashPassword = MD5(password);
             User user = userService.findByEmailAndPassword(email, hashPassword);
             if (user == null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", "false");
-                responseData.put("message", "Sai tài khoản hoặc mật khẩu");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+                jsonRes.setRes(false, "Sai tài khoản hoặc mật khẩu");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             } else {
                 if (user.getIsactive() == 0) {
-                    Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("success", "false");
-                    responseData.put("message", "Tài khoản chưa được xác thực");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+                    jsonRes.setRes(false, "Tài khoản chưa được xác thực");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
                 } else {
-                    token = generateToken(user.getId(), 86400000); //86400000
+                    token = generateToken(user.getId(), 60000); //86400000 300000
                     Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("success", "true");
+                    responseData.put("success", true);
                     responseData.put("message", "Đăng nhập thành công");
                     responseData.put("token", token);
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
@@ -198,12 +200,6 @@ public class UserController {
         } catch (MailException e) {
             return StatusUntilIndex.showInternal(e);
         }
-    }
-
-    @RequestMapping(value = "/forgotpassword1", method = RequestMethod.GET)
-    public String indexForgotPassword1(HttpSession session //            , @RequestHeader("Authorization") String authorization
-    ) {
-        return "pages/forgot1";
     }
 
     @RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
@@ -216,10 +212,8 @@ public class UserController {
             }
             User user = userService.findByEmail(email);
             if (user == null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", "false");
-                responseData.put("message", "Email không tồn tại");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+                jsonRes.setRes(false, "Email không tồn tại");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
             String codeEmail = generateToken(user.getId(), 300000);
             Date currentDate = new Date();
@@ -253,10 +247,8 @@ public class UserController {
                 jsonRes.setRes(false, "Thời gian đổi mật khẩu đã hết");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", "true");
-            responseData.put("message", "Đổi mật khẩu thành công");
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            jsonRes.setRes(true, "Đổi mật khẩu thành công");
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }

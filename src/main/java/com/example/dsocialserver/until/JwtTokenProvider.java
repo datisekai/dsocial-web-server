@@ -12,7 +12,9 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -60,13 +62,20 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException ex) {
-            // Handle invalid or expired JWT tokens
-            return false;
-        }
+    public static String isLogin(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String bearerToken = authorizationHeader.substring(7); // Loại bỏ phần "Bearer "
+                // Bạn có thể sử dụng giá trị của bearerToken ở đây
+                if (isTokenExpired(bearerToken) == 0) {
+//                    return showNotAuthorized();
+                    return "tokenExpired";
+                }
+                return "tokenNotExpired";
+            } else {
+                // Trường hợp không tìm thấy hoặc không hợp lệ
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
+                return "Invalid";
+            }
     }
 }
