@@ -6,22 +6,25 @@ package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.Group;
+import com.example.dsocialserver.Models.Pagination;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.GroupService;
 import com.example.dsocialserver.until.FileStorageService;
 import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.until.MD5.MD5;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
-import static com.example.dsocialserver.until.ParseJSon.ParseJSonCustomResponse;
 import com.example.dsocialserver.until.StatusUntilIndex;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -49,12 +52,33 @@ public class GroupController {
     private final CustomResponse jsonRes = new CustomResponse();
 
     @RequestMapping(value = "/group", method = RequestMethod.GET)
-    public String indexGroup(HttpServletRequest request, HttpSession session
+    public ResponseEntity indexGroup(HttpServletRequest request, HttpSession session
     //            , @RequestHeader("Authorization") String authorization
+            ,  @RequestParam(defaultValue = "0") int page
+            , @RequestParam(defaultValue = "10") int limit
     ) {
 //        String token = session.getAttribute("authorization").toString();
 //        System.out.println(""+isLogin(token));
-        return "pages/group";
+//        return "pages/group";
+        try {
+            Page<Group> gr = groupService.getGroupList(page, limit);
+            Pagination p= new Pagination();
+            p.setTotalPage(gr.getTotalPages());
+            p.setCurrentPage(page);
+            p.setNextPage(p.getCurrentPage()<p.getTotalPage() ? (p.getCurrentPage() + 1)+"" : null);
+            p.setPerPage(limit);
+            p.setPrevPage(p.currentPage >1 ? (p.currentPage-1)+"": null);
+            Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", "true");
+                responseData.put("data",  gr.getContent());
+                responseData.put("totalPage", gr.getTotalPages());
+                responseData.put("currentPage", page);
+                responseData.put("currentPage", page);
+                responseData.put("pagination", p);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (Exception e) {
+             return StatusUntilIndex.showInternal(e);
+        }
     }
 
     @RequestMapping(value = "/group/add", method = RequestMethod.POST)
@@ -132,7 +156,7 @@ public class GroupController {
             if (group != null) {
 //                System.out.println(""+FileStorageService.getRelativeUploadPath("noCoverImage.png"));
                 jsonRes.setRes(true, "Update nhóm thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSonCustomResponse(jsonRes));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
         } catch (MailException e) {
@@ -148,7 +172,7 @@ public class GroupController {
             Group group = groupService.deleteGroupById(2);
             if (group !=null) {
                 jsonRes.setRes(true, "Xóa nhóm thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSonCustomResponse(jsonRes));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
         } catch (MailException e) {

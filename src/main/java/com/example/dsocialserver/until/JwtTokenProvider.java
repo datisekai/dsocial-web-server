@@ -6,8 +6,12 @@ package com.example.dsocialserver.until;
 
 import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -44,30 +48,23 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwt).getBody();
     }
     
-    public static boolean isTokenExpired(String token) {
+    public static int isTokenExpired(String token) {
         try {
             Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-            return claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            return true; // Nếu có lỗi khi parse token, coi như token đã hết hạn
-        }
-    }
-    public static ResponseEntity isLogin(String token) {
-        if (token!=null) {
-            if(isTokenExpired(token)){
-                return showNotAuthorized();
-            }else{
-                return ResponseEntity.ok("isLogin"); 
+            if(claims.getExpiration().before(new Date())== false){
+                return Integer.parseInt(decodeJWT(token).getSubject());
             }
+            return 0;
+        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
+            return 0; // Nếu có lỗi khi parse token, coi như token đã hết hạn
         }
-        return showNotAuthorized();
     }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
             return true;
-        } catch (Exception ex) {
+        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException ex) {
             // Handle invalid or expired JWT tokens
             return false;
         }

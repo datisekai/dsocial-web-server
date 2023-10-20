@@ -5,8 +5,11 @@
 package com.example.dsocialserver.Repositorys;
 
 import com.example.dsocialserver.Models.Group;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,5 +18,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GroupRepository extends CrudRepository<Group, Object>{
-    
+    Page<Group> findAll(Pageable pageable);
 }

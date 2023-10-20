@@ -14,6 +14,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,6 +68,11 @@ public class GroupService {
             list = groupRepository.save(gr);
         }
         return list;
+    }
+    
+    public Page<Group> getGroupList(int page, int limit) {
+        Pageable pageable= PageRequest.of(page, limit);
+        return groupRepository.findAll(pageable);
     }
     
 }

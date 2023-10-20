@@ -7,14 +7,12 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.UserService;
-import com.example.dsocialserver.until.JwtTokenProvider;
 import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.until.JwtTokenProvider.decodeJWT;
 import static com.example.dsocialserver.until.JwtTokenProvider.generateToken;
-import static com.example.dsocialserver.until.JwtTokenProvider.isLogin;
+import static com.example.dsocialserver.until.JwtTokenProvider.isTokenExpired;
 import static com.example.dsocialserver.until.MD5.MD5;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
-import static com.example.dsocialserver.until.ParseJSon.ParseJSonCustomResponse;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -28,11 +26,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 import com.example.dsocialserver.until.StatusUntilIndex;
+import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
+import static com.example.dsocialserver.until.Validator.isValidEmail;
+import static com.example.dsocialserver.until.Validator.isValidPassword;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mail.MailException;
 
@@ -50,38 +51,65 @@ public class UserController {
     private JavaMailSender mailSender;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    private final CustomResponse jsonRes = new CustomResponse();
-    private String codeForgotPassword = "";
+    private Environment environment;
 
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String indexRegister(HttpServletRequest request, HttpSession session
-    //            , @RequestHeader("Authorization") String authorization
-    ) {
-//        String token = session.getAttribute("authorization").toString();
-//        System.out.println(""+isLogin(token));
-        return "pages/register";
+    private final CustomResponse jsonRes = new CustomResponse();
+
+    @RequestMapping(value = "/user/me", method = RequestMethod.GET)
+    public ResponseEntity indexme(HttpServletRequest request, HttpSession session) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String bearerToken = authorizationHeader.substring(7); // Loại bỏ phần "Bearer "
+            // Bạn có thể sử dụng giá trị của bearerToken ở đây
+            if (isTokenExpired(bearerToken) == 0) {
+                return showNotAuthorized();
+            }
+            User user = userService.findById(isTokenExpired(bearerToken));
+            Map<String, Object> data = new HashMap<>();
+            data.put("email", user.getEmail());
+            data.put("name", user.getName());
+            data.put("avatar", user.getAvatar());
+            data.put("bio", user.getBio());
+            data.put("birthday", user.getBirthday());
+            data.put("coverimage", user.getCoverimage());
+            data.put("othername", user.getOthername());
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", "true");
+            responseData.put("message", "Authorization");
+            responseData.put("data", data);
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } else {
+            // Trường hợp không tìm thấy hoặc không hợp lệ
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
+        }
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity register(HttpServletRequest request, HttpSession session //            , @RequestHeader("Authorization") String authorization
             ,
              Model model) {
-        try {
+        try {          
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String name = request.getParameter("name");
-            if (email == null || password == null || name == null) {
+            if (email == null || password == null || name == null || email.isEmpty() || password.isEmpty() || name.isEmpty()) {
                 return StatusUntilIndex.showMissing();
+            }
+            if (!isValidEmail(email)) {
+                jsonRes.setRes(false, "Sai định dạng email");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
+            }
+            if (!isValidPassword(password)) {
+                jsonRes.setRes(false, "Password phải trên 5 ký tự");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
             String contextPath = request.getContextPath();
             String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
-            String token = null;
 //        ----------------------------------
             User isExist = userService.findByEmail(email);
             if (isExist != null) {
                 jsonRes.setRes(false, "Email đã được sử dụng");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
 
 //        ----------------------------------
@@ -100,12 +128,10 @@ public class UserController {
                         + "\nCảm ơn bạn đã tham gia website mạng xã hội Dsocial.");
                 message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
                 mailSender.send(message);
-            } else {
-                return StatusUntilIndex.showMissing();
+                jsonRes.setRes(true, "Xác thực email đã gửi về email của bạn");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
-            jsonRes.setRes(true, "Xác thực email đã gửi về email của bạn");
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSonCustomResponse(jsonRes));
-
+            return StatusUntilIndex.showMissing();
         } catch (MailException e) {
             return StatusUntilIndex.showInternal(e);
         }
@@ -117,41 +143,23 @@ public class UserController {
             if (codeEmail == null) {
                 return StatusUntilIndex.showMissing();
             }
-            String token = null;
             Claims id = decodeJWT(codeEmail);
             User user = userService.findById(id.getSubject());
             if (user.getIsactive() != 0) {
                 jsonRes.setRes(false, "Email đã được xác thực trước đó");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
-            } else {
-                user = userService.updateisActiveUser(id.getSubject());
-                token = generateToken(user.getId(), 86400000);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
+            user = userService.updateisActiveUser(id.getSubject());
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", "true");
-            responseData.put("mesage", "Đăng ký thành công");
-            responseData.put("token", token);
-            responseData.put("email", user.getEmail());
-            responseData.put("name", user.getName());
-            responseData.put("avatar", user.getAvatar());
-            responseData.put("bio", user.getBio());
-            responseData.put("birthday", user.getBirthday());
-            responseData.put("coverimage", user.getCoverimage());
-            responseData.put("othername", user.getOthername());
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", token);
-
-            session.setAttribute("authorization", token);
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            if (user != null) {
+                responseData.put("success", true);
+                responseData.put("message", "Đăng ký thành công");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
-    }
-
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String indexLogin(HttpSession session //            , @RequestHeader("Authorization") String authorization
-    ) {
-        return "pages/login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -160,7 +168,7 @@ public class UserController {
         try {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
-            if (email == null || password == null) {
+            if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
                 return StatusUntilIndex.showMissing();
             }
             String token = null;
@@ -170,31 +178,20 @@ public class UserController {
             if (user == null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", "false");
-                responseData.put("mesage", "Sai tài khoản hoặc mật khẩu");
+                responseData.put("message", "Sai tài khoản hoặc mật khẩu");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
             } else {
                 if (user.getIsactive() == 0) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", "false");
-                    responseData.put("mesage", "Tài khoản chưa được xác thực");
+                    responseData.put("message", "Tài khoản chưa được xác thực");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
                 } else {
-                    token = generateToken(user.getId(), 86400000);
+                    token = generateToken(user.getId(), 86400000); //86400000
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", "true");
-                    responseData.put("mesage", "Đăng nhập thành công");
+                    responseData.put("message", "Đăng nhập thành công");
                     responseData.put("token", token);
-                    responseData.put("email", user.getEmail());
-                    responseData.put("name", user.getName());
-                    responseData.put("avatar", user.getAvatar());
-                    responseData.put("bio", user.getBio());
-                    responseData.put("birthday", user.getBirthday());
-                    responseData.put("coverimage", user.getCoverimage());
-                    responseData.put("othername", user.getOthername());
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.set("Authorization", token);
-
-                    session.setAttribute("authorization", token);
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
             }
@@ -209,92 +206,56 @@ public class UserController {
         return "pages/forgot1";
     }
 
-    @RequestMapping(value = "/forgotpassword1", method = RequestMethod.POST)
+    @RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
     public ResponseEntity forgotpassword1(HttpSession session,
             HttpServletRequest request, Model model) {
         try {
             String email = request.getParameter("email");
-            if (email == null) {
+            if (email == null || email.isEmpty()) {
                 return StatusUntilIndex.showMissing();
             }
-            String contextPath = request.getContextPath();
-            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
             User user = userService.findByEmail(email);
             if (user == null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", "false");
-                responseData.put("mesage", "Gmail không tồn tại");
+                responseData.put("message", "Email không tồn tại");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
-            } else {
-                if (user.getIsactive() == 0) {
-                    Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("success", "false");
-                    responseData.put("mesage", "Tài khoản chưa được xác thực");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
-                } else {
-                    String codeEmail = generateToken(user.getId(), 300000);
-                    Date currentDate = new Date();
-                    SimpleMailMessage message = new SimpleMailMessage();
-                    message.setFrom("haiduong09876@gmail.com");
-                    message.setTo(email);
-                    message.setText("Nhấn vào link để đổi mật khẩu: " + basePath + "forgotpassword2/" + codeEmail
-                            + "\nGặp vấn đề liên hệ với Dsocial.");
-                    message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
-                    mailSender.send(message);
-                    jsonRes.setRes(true, "Link đổi mật khẩu đã được gửi qua email có hiệu lực trong 5 phút");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSonCustomResponse(jsonRes));
-                }
             }
+            String codeEmail = generateToken(user.getId(), 300000);
+            Date currentDate = new Date();
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("haiduong09876@gmail.com");
+            message.setTo(email);
+            message.setText("Nhấn vào link để đổi mật khẩu: " + environment.getProperty("fe.url") + "/resetpassword?token=" + codeEmail
+                    + "\nGặp vấn đề liên hệ với Dsocial.");
+            message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
+            mailSender.send(message);
+            jsonRes.setRes(true, "Link đổi mật khẩu đã được gửi qua email có hiệu lực trong 5 phút");
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
         } catch (MailException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
 
-    @RequestMapping(value = "/forgotpassword2/{codeEmail}", method = RequestMethod.GET)
-    public String indexForgotPassword2(HttpSession session //            , @RequestHeader("Authorization") String authorization
-            ,
-             HttpServletRequest request, @PathVariable("codeEmail") String codeEmail
-    ) {
-        if (codeEmail == null) {
-            return "pages/home";
-        }
-        codeForgotPassword = codeEmail;
-        return "pages/forgot2";
-    }
-
-    @RequestMapping(value = "/forgotpassword2", method = RequestMethod.POST)
+    @RequestMapping(value = "/resetpassword", method = RequestMethod.POST)
     public ResponseEntity forgotpassword2(HttpSession session,
             HttpServletRequest request, Model model) {
         try {
             String password = request.getParameter("password");
-            if (password == null) {
+            String token = request.getParameter("token");
+            if (password == null || token == null || password.isEmpty() || token.isEmpty()) {
                 return StatusUntilIndex.showMissing();
             }
-            String token = null;
-            Claims id = decodeJWT(codeForgotPassword);
+            Claims id = decodeJWT(token);
             String hashPassword = MD5(password);
             User user = userService.updatePasswordUser(id.getSubject(), hashPassword);
-            if (user != null) {
-                token = generateToken(user.getId(), 86400000);
-            } else {
+            if (user == null) {
                 jsonRes.setRes(false, "Thời gian đổi mật khẩu đã hết");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSonCustomResponse(jsonRes));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", "true");
-            responseData.put("mesage", "Đổi mật khẩu thành công");
-            responseData.put("token", token);
-            responseData.put("email", user.getEmail());
-            responseData.put("name", user.getName());
-            responseData.put("avatar", user.getAvatar());
-            responseData.put("bio", user.getBio());
-            responseData.put("birthday", user.getBirthday());
-            responseData.put("coverimage", user.getCoverimage());
-            responseData.put("othername", user.getOthername());
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", token);
-
-            session.setAttribute("authorization", token);
+            responseData.put("message", "Đổi mật khẩu thành công");
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
