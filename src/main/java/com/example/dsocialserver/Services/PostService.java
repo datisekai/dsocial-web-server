@@ -24,9 +24,12 @@ public class PostService {
     private PostRepository postRepository;
 
     public Post findById(Object id) {
-        Optional<Post> optionalUser = postRepository.findById(id);
-        Post post = optionalUser.get();
-        return post;
+        Optional<Post> optional = postRepository.findById(id);
+        Post list = null;
+        if (optional.isPresent()) {
+            list = optional.get();
+        }
+        return list;
     }
 
     public Post createGroup(String html, int authorid, int groupid) {

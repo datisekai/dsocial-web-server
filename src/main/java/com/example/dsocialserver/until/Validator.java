@@ -23,4 +23,13 @@ public class Validator {
     public static boolean isValidPassword(String password) {
         return password.length() >= 6;
     }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Integer.valueOf(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

@@ -25,8 +25,11 @@ public class GroupService {
     
      public Group findById(Object id) {
         Optional<Group> optional = groupRepository.findById(id);
-        Group group = optional.get();
-        return group;
+        Group list= null;
+        if (optional.isPresent()) {
+            list = optional.get();
+        }
+        return list;
     }
      
     public Group createGroup(String grourpName, int userId, String avatar, String coverImage) {
@@ -39,13 +42,13 @@ public class GroupService {
         return groupRepository.save(gr);
     }
 
-    public Group updateGroup(String groupName, int id, String avatar, String coverImage, int userId) {
+    public Group updateGroup(String name, int id, String avatar, String coverImage, int userId) {
         Optional<Group> optional = groupRepository.findById(id);
         Group list = null;
         if (optional.isPresent()) {
             Group gr = optional.get();
             // Cập nhật các trường của đối tượng user
-            gr.setName(groupName);
+            gr.setName(name);
             gr.setAvatar(avatar);
             gr.setCoverimage(coverImage);
             gr.setUserid(userId);

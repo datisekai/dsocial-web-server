@@ -9,6 +9,7 @@ import com.example.dsocialserver.Models.Group;
 import com.example.dsocialserver.Models.Pagination;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.GroupService;
+import com.example.dsocialserver.Services.UserService;
 import com.example.dsocialserver.until.FileStorageService;
 import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.until.JwtTokenProvider.isLogin;
@@ -17,6 +18,7 @@ import static com.example.dsocialserver.until.MD5.MD5;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
 import com.example.dsocialserver.until.StatusUntilIndex;
 import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
+import static com.example.dsocialserver.until.Validator.isNumeric;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -47,11 +49,14 @@ public class GroupController {
 
     @Autowired
     private GroupService groupService;
-
+    
+    @Autowired
+    private UserService userService;
+     
     private final CustomResponse jsonRes = new CustomResponse();
 
     @RequestMapping(value = "/group", method = RequestMethod.GET)
-    public ResponseEntity indexGroup(HttpServletRequest request, HttpSession session) {
+    public ResponseEntity indexGroup(HttpServletRequest request, HttpSession session, @RequestParam Map<String, String> req) {
         try {
             String isLogin = isLogin(request);
             if ("tokenExpired".equals(isLogin)) {
@@ -103,6 +108,13 @@ public class GroupController {
                 if (name == null || avatar == null || coverImage == null || userId == null || name.isEmpty() || avatar.isEmpty() || coverImage.isEmpty() || userId.isEmpty()) {
                     return StatusUntilIndex.showMissing();
                 }
+                if (!isNumeric(userId)){
+                    return StatusUntilIndex.showMissing();
+                }
+                User user = userService.findById(userId);
+                if(user==null){
+                    return StatusUntilIndex.showMissing();
+                }
 //        ----------------------------------
 
                 Group group = groupService.createGroup(name, 68, avatar, coverImage);
@@ -128,7 +140,7 @@ public class GroupController {
         }
     }
 
-    @RequestMapping(value = "/group/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/group/update/", method = RequestMethod.POST)
     public ResponseEntity groupUpdate(HttpServletRequest request, HttpSession session,
             Model model) throws IOException {
         try {
@@ -142,6 +154,25 @@ public class GroupController {
                 String coverImage = request.getParameter("coverImage");
                 String userId = request.getParameter("userId");
                 if (name == null || avatar == null || coverImage == null || userId == null || name.isEmpty() || avatar.isEmpty() || coverImage.isEmpty() || userId.isEmpty()) {
+                    return StatusUntilIndex.showMissing();
+                }
+                if (!isNumeric(userId) || !isNumeric(id)){
+                    return StatusUntilIndex.showMissing();
+                }
+                Group gr = groupService.findById(id);
+                
+                if(gr==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(gr.getIsActive()==0){
+                    return StatusUntilIndex.showMissing();
+                }
+                
+                User user = userService.findById(userId);
+                if(user==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(user.getIsactive()==0){
                     return StatusUntilIndex.showMissing();
                 }
 //        ----------------------------------

@@ -25,13 +25,18 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
     public User findByEmailAndPassword(String email, String password) {
         return userRepository.findByEmailAndPassword(email, password);
     }
+
     public User findById(Object id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.get();
-        return user;
+        User list = null;
+        if (optionalUser.isPresent()) {
+            list = optionalUser.get();
+        }
+        return list;
     }
 
     public User updateisActiveUser(Object id) {
@@ -42,10 +47,11 @@ public class UserService {
             // Cập nhật các trường của đối tượng user
             user.setIsactive(1);
             // ...
-            list= userRepository.save(user);
+            list = userRepository.save(user);
         }
         return list;
     }
+
     public User updatePasswordUser(Object id, String password) {
         Optional<User> optionalUser = userRepository.findById(id);
         User list = null;
@@ -54,7 +60,7 @@ public class UserService {
             // Cập nhật các trường của đối tượng user
             user.setPassword(password);
             // ...
-            list= userRepository.save(user);
+            list = userRepository.save(user);
         }
         return list;
     }

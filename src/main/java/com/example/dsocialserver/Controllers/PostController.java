@@ -5,13 +5,18 @@
 package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Models.Group;
 import com.example.dsocialserver.Models.Pagination;
 import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Models.User;
+import com.example.dsocialserver.Services.GroupService;
 import com.example.dsocialserver.Services.PostService;
+import com.example.dsocialserver.Services.UserService;
 import static com.example.dsocialserver.until.JwtTokenProvider.isLogin;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
 import com.example.dsocialserver.until.StatusUntilIndex;
 import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
+import static com.example.dsocialserver.until.Validator.isNumeric;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -36,6 +41,12 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private GroupService groupService;
 
     private final CustomResponse jsonRes = new CustomResponse();
 
@@ -91,6 +102,23 @@ public class PostController {
                 if (html == null || authorId == null || groupId == null || html.isEmpty() || authorId.isEmpty() || groupId.isEmpty()) {
                     return StatusUntilIndex.showMissing();
                 }
+                if (!isNumeric(authorId) || !isNumeric(groupId)){
+                    return StatusUntilIndex.showMissing();
+                }
+                User user = userService.findById(authorId);
+                if(user==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(user.getIsactive()==0){
+                    return StatusUntilIndex.showMissing();
+                }
+                Group group = groupService.findById(groupId);
+                if(group==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(group.getIsActive()==0){
+                    return StatusUntilIndex.showMissing();
+                }
 //        ----------------------------------
 
                 Post post = postService.createGroup(html, Integer.parseInt(authorId), Integer.parseInt(groupId));
@@ -128,6 +156,31 @@ public class PostController {
                 String authorId = request.getParameter("authorId");
                 String groupId = request.getParameter("groupId");
                 if (html == null || authorId == null || groupId == null || html.isEmpty() || authorId.isEmpty() || groupId.isEmpty()) {
+                    return StatusUntilIndex.showMissing();
+                }
+                
+                if (!isNumeric(authorId) || !isNumeric(groupId) || !isNumeric(id)){
+                    return StatusUntilIndex.showMissing();
+                }
+                Post p =postService.findById(id);
+                if(p == null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(p.getIsactive()==0){
+                    return StatusUntilIndex.showMissing();
+                }
+                User user = userService.findById(authorId);
+                if(user==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(user.getIsactive()==0){
+                    return StatusUntilIndex.showMissing();
+                }
+                Group group = groupService.findById(groupId);
+                if(group==null){
+                    return StatusUntilIndex.showMissing();
+                }
+                if(group.getIsActive()==0){
                     return StatusUntilIndex.showMissing();
                 }
 //        ----------------------------------
