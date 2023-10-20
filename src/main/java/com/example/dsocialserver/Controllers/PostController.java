@@ -5,26 +5,17 @@
 package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
-import com.example.dsocialserver.Models.Group;
 import com.example.dsocialserver.Models.Pagination;
-import com.example.dsocialserver.Models.User;
-import com.example.dsocialserver.Services.GroupService;
-import com.example.dsocialserver.until.FileStorageService;
-import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
+import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Services.PostService;
 import static com.example.dsocialserver.until.JwtTokenProvider.isLogin;
-import static com.example.dsocialserver.until.JwtTokenProvider.isTokenExpired;
-import static com.example.dsocialserver.until.MD5.MD5;
 import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
 import com.example.dsocialserver.until.StatusUntilIndex;
 import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,23 +26,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author haidu
  */
 @Controller
-public class GroupController {
+public class PostController {
 
     @Autowired
-    private GroupService groupService;
+    private PostService postService;
 
     private final CustomResponse jsonRes = new CustomResponse();
 
-    @RequestMapping(value = "/group", method = RequestMethod.GET)
-    public ResponseEntity indexGroup(HttpServletRequest request, HttpSession session) {
+    @RequestMapping(value = "/post", method = RequestMethod.GET)
+    public ResponseEntity indexPost(HttpServletRequest request, HttpSession session) {
         try {
             String isLogin = isLogin(request);
             if ("tokenExpired".equals(isLogin)) {
@@ -68,18 +57,18 @@ public class GroupController {
                 if ("".equals(limit)) {
                     limit = "10";
                 }
-                Page<Group> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
-                Pagination p = new Pagination();
-                p.setTotalPage(gr.getTotalPages());
-                p.setCurrentPage(Integer.parseInt(page));
-                p.setNextPage(p.getCurrentPage() < p.getTotalPage() ? (p.getCurrentPage() + 1) + "" : null);
-                p.setPerPage(gr.getNumberOfElements());
-                p.setPrevPage(p.getCurrentPage() > 1 ? (p.getCurrentPage() - 1) + "" : null);
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.getContent());
-                responseData.put("pagination", p);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                Page<Post> po = postService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
+                    Pagination p = new Pagination();
+                    p.setTotalPage(po.getTotalPages());
+                    p.setCurrentPage(Integer.parseInt(page));
+                    p.setNextPage(p.getCurrentPage() < p.getTotalPage() ? (p.getCurrentPage() + 1) + "" : null);
+                    p.setPerPage(po.getNumberOfElements());
+                    p.setPrevPage(p.getCurrentPage() > 1 ? (p.getCurrentPage() - 1) + "" : null);
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("data", po.getContent());
+                    responseData.put("pagination", p);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));         
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
             }
@@ -88,34 +77,32 @@ public class GroupController {
         }
     }
 
-    @RequestMapping(value = "/group/add", method = RequestMethod.POST)
-    public ResponseEntity groupAdd(HttpServletRequest request, HttpSession session,
+    @RequestMapping(value = "/post/add", method = RequestMethod.POST)
+    public ResponseEntity postAdd(HttpServletRequest request, HttpSession session,
             Model model) throws IOException {
         try {
             String isLogin = isLogin(request);
             if ("tokenExpired".equals(isLogin)) {
                 return showNotAuthorized();
             } else if ("tokenNotExpired".equals(isLogin)) {
-                String name = request.getParameter("name");
-                String avatar = request.getParameter("avatar");
-                String coverImage = request.getParameter("coverImage");
-                String userId = request.getParameter("userId");
-                if (name == null || avatar == null || coverImage == null || userId == null || name.isEmpty() || avatar.isEmpty() || coverImage.isEmpty() || userId.isEmpty()) {
+                String html = request.getParameter("html");
+                String authorId = request.getParameter("authorId");
+                String groupId = request.getParameter("groupId");
+                if (html == null || authorId == null || groupId == null || html.isEmpty() || authorId.isEmpty() || groupId.isEmpty()) {
                     return StatusUntilIndex.showMissing();
                 }
 //        ----------------------------------
 
-                Group group = groupService.createGroup(name, 68, avatar, coverImage);
-                if (group != null) {
+                Post post = postService.createGroup(html, Integer.parseInt(authorId), Integer.parseInt(groupId));
+                if (post != null) {
                     Map<String, Object> data = new HashMap<>();
-                    data.put("id", group.getId());
-                    data.put("name", group.getName());
-                    data.put("avatar", group.getAvatar());
-                    data.put("coverImage", group.getCoverimage());
-                    data.put("userId", group.getUserid());
+                    data.put("id", post.getId());
+                    data.put("html", post.getHtml());
+                    data.put("authorId", post.getAuthorid());
+                    data.put("groupId", post.getGroupid());
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
-                    responseData.put("message", "Tạo nhóm thành công");
+                    responseData.put("message", "Thêm bài viết thành công");
                     responseData.put("data", data);
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
@@ -128,7 +115,7 @@ public class GroupController {
         }
     }
 
-    @RequestMapping(value = "/group/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/post/update", method = RequestMethod.POST)
     public ResponseEntity groupUpdate(HttpServletRequest request, HttpSession session,
             Model model) throws IOException {
         try {
@@ -137,26 +124,24 @@ public class GroupController {
                 return showNotAuthorized();
             } else if ("tokenNotExpired".equals(isLogin)) {
                 String id = request.getParameter("id");
-                String name = request.getParameter("name");
-                String avatar = request.getParameter("avatar");
-                String coverImage = request.getParameter("coverImage");
-                String userId = request.getParameter("userId");
-                if (name == null || avatar == null || coverImage == null || userId == null || name.isEmpty() || avatar.isEmpty() || coverImage.isEmpty() || userId.isEmpty()) {
+                String html = request.getParameter("html");
+                String authorId = request.getParameter("authorId");
+                String groupId = request.getParameter("groupId");
+                if (html == null || authorId == null || groupId == null || html.isEmpty() || authorId.isEmpty() || groupId.isEmpty()) {
                     return StatusUntilIndex.showMissing();
                 }
 //        ----------------------------------
 
-                Group group = groupService.updateGroup(name, Integer.parseInt(id), avatar, coverImage, Integer.parseInt(userId));
-                if (group != null) {
+                Post post = postService.updateGroup(Integer.parseInt(id), html, Integer.parseInt(authorId), Integer.parseInt(groupId));
+                if (post != null) {
                     Map<String, Object> data = new HashMap<>();
-                    data.put("id", group.getId());
-                    data.put("name", group.getName());
-                    data.put("avatar", group.getAvatar());
-                    data.put("coverImage", group.getCoverimage());
-                    data.put("userId", group.getUserid());
+                    data.put("id", post.getId());
+                    data.put("html", post.getHtml());
+                    data.put("authorId", post.getAuthorid());
+                    data.put("groupId", post.getGroupid());
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
-                    responseData.put("message", "Cập nhật nhóm thành công");
+                    responseData.put("message", "Cập nhật bài viết thành công");
                     responseData.put("data", data);
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
@@ -169,7 +154,7 @@ public class GroupController {
         }
     }
 
-    @RequestMapping(value = "/group/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/post/delete", method = RequestMethod.POST)
     public ResponseEntity groupDelete(HttpServletRequest request, HttpSession session,
             Model model) throws IOException {
         try {
@@ -181,16 +166,16 @@ public class GroupController {
                 if (id == null || id.isEmpty()) {
                     return StatusUntilIndex.showMissing();
                 }
-                Group g = groupService.findById(id);
-                if (g != null) {
-                    if (g.getIsActive() != 0) {
-                        Group group = groupService.deleteGroupById(Integer.parseInt(id));
+                Post p = postService.findById(id);
+                if (p != null) {
+                    if (p.getIsactive() != 0) {
+                        Post group = postService.deleteGroupById(Integer.parseInt(id));
                         if (group != null) {
-                            jsonRes.setRes(true, "Xóa nhóm thành công");
+                            jsonRes.setRes(true, "Xóa bài viết thành công");
                             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
                         }
                     }
-                    jsonRes.setRes(false, "Nhóm không tồn tại");
+                    jsonRes.setRes(false, "Bài viết không tồn tại");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
                 }
                 return StatusUntilIndex.showMissing();

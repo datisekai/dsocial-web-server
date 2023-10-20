@@ -5,13 +5,7 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Group;
-import com.example.dsocialserver.Models.GroupUser;
-import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositorys.GroupRepository;
-import com.example.dsocialserver.Repositorys.GroupUserRepository;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,8 +24,8 @@ public class GroupService {
     private GroupRepository groupRepository;
     
      public Group findById(Object id) {
-        Optional<Group> optionalUser = groupRepository.findById(id);
-        Group group = optionalUser.get();
+        Optional<Group> optional = groupRepository.findById(id);
+        Group group = optional.get();
         return group;
     }
      
@@ -45,15 +39,16 @@ public class GroupService {
         return groupRepository.save(gr);
     }
 
-    public Group updateGroup(String groupName, int id, String avatar, String coverImage) {
-        Optional<Group> optionalGroup = groupRepository.findById(id);
+    public Group updateGroup(String groupName, int id, String avatar, String coverImage, int userId) {
+        Optional<Group> optional = groupRepository.findById(id);
         Group list = null;
-        if (optionalGroup.isPresent()) {
-            Group gr = optionalGroup.get();
+        if (optional.isPresent()) {
+            Group gr = optional.get();
             // Cập nhật các trường của đối tượng user
             gr.setName(groupName);
             gr.setAvatar(avatar);
             gr.setCoverimage(coverImage);
+            gr.setUserid(userId);
             // ...
             list = groupRepository.save(gr);
         }
@@ -61,10 +56,10 @@ public class GroupService {
     }
 
     public Group deleteGroupById(int id) {
-      Optional<Group> optionalGroup = groupRepository.findById(id);
+      Optional<Group> optional = groupRepository.findById(id);
         Group list = null;
-        if (optionalGroup.isPresent()) {
-            Group gr = optionalGroup.get();
+        if (optional.isPresent()) {
+            Group gr = optional.get();
             // Cập nhật các trường của đối tượng user
             gr.setIsActive(0);
             // ...

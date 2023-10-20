@@ -34,7 +34,6 @@ import static com.example.dsocialserver.until.Validator.isValidPassword;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
 import org.springframework.mail.MailException;
 
 /**
