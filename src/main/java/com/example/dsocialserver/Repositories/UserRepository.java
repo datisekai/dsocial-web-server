@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.example.dsocialserver.Repositorys;
+package com.example.dsocialserver.Repositories;
 
-import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Models.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface HomeRepository extends CrudRepository<Post, Object>{
-    
+public interface UserRepository extends CrudRepository<User, Object>{
+    User findByEmail(String email);
+    User findByEmailAndPassword(String email, String password);
 }

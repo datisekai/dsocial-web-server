@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -17,34 +18,47 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "`Group`")
-public class Group {
+@Table(name = "`Groups`")
+public class Groups {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
+    @NotBlank(message = "name is required")
     private String name;
-    
+
     @Column(nullable = false)
     private String avatar;
     
-    private String coverimage;
-    
+    private String cover_image;
+
     @Column(nullable = false)
-    private int userid;
-    
-    private int isactive;
+    private int user_id;
+
+    private int is_active;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date createdat;
+    private Date created_at;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedat;
+    private Date updated_at;
 
     // Getters and setters
     // Constructors
     // Other helper methods
+
+    public Groups( String name, String avatar, String cover_image, int user_id, int is_active) {
+        this.name = name;
+        this.avatar = avatar;
+        this.cover_image = cover_image;
+        this.user_id = user_id;
+        this.is_active = is_active;
+    }
+
+    public Groups() {
+    }
 
     public int getId() {
         return id;
@@ -70,44 +84,44 @@ public class Group {
         this.avatar = avatar;
     }
 
-    public String getCoverimage() {
-        return coverimage;
+    public String getCover_image() {
+        return cover_image;
     }
 
-    public void setCoverimage(String coverimage) {
-        this.coverimage = coverimage;
+    public void setCover_image(String cover_image) {
+        this.cover_image = cover_image;
     }
 
-    public int getUserid() {
-        return userid;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserid(int userid) {
-        this.userid = userid;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
-    public int getIsActive() {
-        return isactive;
+    public int getIs_active() {
+        return is_active;
     }
 
-    public void setIsActive(int isactive) {
-        this.isactive = isactive;
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
     }
 
-    public Date getCreatedAt() {
-        return createdat;
+    public Date getCreated_at() {
+        return created_at;
     }
 
-    public void setCreatedAt(Date createdat) {
-        this.createdat = createdat;
+    public void setCreated_at(Date created_at) {
+        this.created_at = created_at;
     }
 
-    public Date getUpdatedAt() {
-        return updatedat;
+    public Date getUpdated_at() {
+        return updated_at;
     }
 
-    public void setUpdatedAt(Date updatedat) {
-        this.updatedat = updatedat;
+    public void setUpdated_at(Date updated_at) {
+        this.updated_at = updated_at;
     }
     
 }

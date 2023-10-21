@@ -4,8 +4,8 @@
  */
 package com.example.dsocialserver.Services;
 
-import com.example.dsocialserver.Models.Group;
-import com.example.dsocialserver.Repositorys.GroupRepository;
+import com.example.dsocialserver.Models.Groups;
+import com.example.dsocialserver.Repositories.GroupRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,57 +23,57 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
     
-     public Group findById(Object id) {
-        Optional<Group> optional = groupRepository.findById(id);
-        Group list= null;
+     public Groups findById(Object id) {
+        Optional<Groups> optional = groupRepository.findById(id);
+        Groups list= null;
         if (optional.isPresent()) {
             list = optional.get();
         }
         return list;
     }
      
-    public Group createGroup(String grourpName, int userId, String avatar, String coverImage) {
-        Group gr = new Group();
+    public Groups createGroup(String grourpName, int userId, String avatar, String coverImage) {
+        Groups gr = new Groups();
         gr.setName(grourpName);
-        gr.setUserid(userId);
+        gr.setUser_id(userId);
         gr.setAvatar(avatar);
-        gr.setCoverimage(coverImage);
-        gr.setIsActive(1);
+        gr.setCover_image(coverImage);
+        gr.setIs_active(1);
         return groupRepository.save(gr);
     }
 
-    public Group updateGroup(String name, int id, String avatar, String coverImage, int userId) {
-        Optional<Group> optional = groupRepository.findById(id);
-        Group list = null;
+    public Groups updateGroup(String name, int id, String avatar, String coverImage, int userId) {
+        Optional<Groups> optional = groupRepository.findById(id);
+        Groups list = null;
         if (optional.isPresent()) {
-            Group gr = optional.get();
+            Groups gr = optional.get();
             // Cập nhật các trường của đối tượng user
             gr.setName(name);
             gr.setAvatar(avatar);
-            gr.setCoverimage(coverImage);
-            gr.setUserid(userId);
+            gr.setCover_image(coverImage);
+            gr.setUser_id(userId);
             // ...
             list = groupRepository.save(gr);
         }
         return list;
     }
 
-    public Group deleteGroupById(int id) {
-      Optional<Group> optional = groupRepository.findById(id);
-        Group list = null;
+    public Groups deleteGroupById(int id) {
+      Optional<Groups> optional = groupRepository.findById(id);
+        Groups list = null;
         if (optional.isPresent()) {
-            Group gr = optional.get();
+            Groups gr = optional.get();
             // Cập nhật các trường của đối tượng user
-            gr.setIsActive(0);
+            gr.setIs_active(0);
             // ...
             list = groupRepository.save(gr);
         }
         return list;
     }
     
-    public Page<Group> getGroupList(int page, int limit) {
+    public Page<Groups> getGroupList(int page, int limit) {
         Pageable pageable= PageRequest.of(page, limit);
-        return groupRepository.findByIsactiveNot(pageable, 0);
+        return groupRepository.findAll(pageable);
     }
     
 }

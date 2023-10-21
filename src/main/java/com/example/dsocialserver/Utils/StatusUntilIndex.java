@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.example.dsocialserver.until;
+package com.example.dsocialserver.Utils;
 
 import com.example.dsocialserver.Models.CustomResponse;
-import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
+import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

@@ -5,7 +5,7 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Post;
-import com.example.dsocialserver.Repositorys.PostRepository;
+import com.example.dsocialserver.Repositories.PostRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,9 +35,9 @@ public class PostService {
     public Post createGroup(String html, int authorid, int groupid) {
         Post po = new Post();
         po.setHtml(html);
-        po.setAuthorid(authorid);
-        po.setGroupid(groupid);
-        po.setIsactive(1);
+        po.setAuthor_id(authorid);
+        po.setGroup_id(groupid);
+        po.setIs_active(1);
         return postRepository.save(po);
     }
 
@@ -48,8 +48,8 @@ public class PostService {
             Post po = optional.get();
             // Cập nhật các trường của đối tượng user
             po.setHtml(html);
-            po.setAuthorid(authorId);
-            po.setGroupid(groupId);
+            po.setAuthor_id(authorId);
+            po.setGroup_id(groupId);
             // ...
             list = postRepository.save(po);
         }
@@ -62,7 +62,7 @@ public class PostService {
         if (optionalGroup.isPresent()) {
             Post po = optionalGroup.get();
             // Cập nhật các trường của đối tượng user
-            po.setIsactive(0);
+            po.setIs_active(0);
             // ...
             list = postRepository.save(po);
         }
@@ -71,6 +71,6 @@ public class PostService {
 
     public Page<Post> getGroupList(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        return postRepository.findByIsactiveNot(pageable, 0);
+        return postRepository.findAll(pageable);
     }
 }

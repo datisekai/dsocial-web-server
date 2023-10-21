@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Services;
 
-import com.example.dsocialserver.Repositorys.HomeRepository;
+import com.example.dsocialserver.Repositories.HomeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

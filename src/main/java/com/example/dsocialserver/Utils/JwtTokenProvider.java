@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.example.dsocialserver.until;
+package com.example.dsocialserver.Utils;
 
-import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
+import static com.example.dsocialserver.Utils.StatusUntilIndex.showNotAuthorized;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -60,22 +60,5 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
             return 0; // Nếu có lỗi khi parse token, coi như token đã hết hạn
         }
-    }
-
-    public static String isLogin(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                String bearerToken = authorizationHeader.substring(7); // Loại bỏ phần "Bearer "
-                // Bạn có thể sử dụng giá trị của bearerToken ở đây
-                if (isTokenExpired(bearerToken) == 0) {
-//                    return showNotAuthorized();
-                    return "tokenExpired";
-                }
-                return "tokenNotExpired";
-            } else {
-                // Trường hợp không tìm thấy hoặc không hợp lệ
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
-                return "Invalid";
-            }
     }
 }

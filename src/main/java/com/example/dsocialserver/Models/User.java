@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.*;
 import java.util.Date;
 
 /**
@@ -33,29 +34,40 @@ public class User {
     private int id;
 
     @Column(unique = true)
+    @Email
+    @NotBlank
+    @NotNull
+    @NotEmpty
     private String email;
-
+    
     @Column(length = 255)
+    @Size(min = 6)
+    @NotBlank
+    @NotNull
+    @NotEmpty
     private String password;
 
     @Column(nullable = false)
+    @NotBlank
+    @NotNull
+    @NotEmpty
     private String name;
 
-    private String othername;
+    private String other_name;
     private String bio;
     private Date birthday;
 
     @Column(nullable = false)
     private String avatar;
     
-    private String coverimage;
-    private int isactive;
+    private String cover_image;
+    private int is_active;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date createdat;
+    private Date created_at;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedat;
+    private Date updated_at;
     
     // Getters and setters
     // Constructors
@@ -93,12 +105,12 @@ public class User {
         this.name = name;
     }
 
-    public String getOthername() {
-        return othername;
+    public String getOther_name() {
+        return other_name;
     }
 
-    public void setOthername(String othername) {
-        this.othername = othername;
+    public void setOther_name(String other_name) {
+        this.other_name = other_name;
     }
 
     public String getBio() {
@@ -125,36 +137,36 @@ public class User {
         this.avatar = avatar;
     }
 
-    public String getCoverimage() {
-        return coverimage;
+    public String getCover_image() {
+        return cover_image;
     }
 
-    public void setCoverimage(String coverimage) {
-        this.coverimage = coverimage;
+    public void setCover_image(String cover_image) {
+        this.cover_image = cover_image;
     }
 
-    public int getIsactive() {
-        return isactive;
+    public int getIs_active() {
+        return is_active;
     }
 
-    public void setIsactive(int isactive) {
-        this.isactive = isactive;
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
     }
 
-    public Date getCreatedat() {
-        return createdat;
+    public Date getCreated_at() {
+        return created_at;
     }
 
-    public void setCreatedat(Date createdat) {
-        this.createdat = createdat;
+    public void setCreated_at(Date created_at) {
+        this.created_at = created_at;
     }
 
-    public Date getUpdatedat() {
-        return updatedat;
+    public Date getUpdated_at() {
+        return updated_at;
     }
 
-    public void setUpdatedat(Date updatedat) {
-        this.updatedat = updatedat;
+    public void setUpdated_at(Date updated_at) {
+        this.updated_at = updated_at;
     }
    
 }

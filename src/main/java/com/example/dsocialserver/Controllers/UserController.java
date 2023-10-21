@@ -7,40 +7,47 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.UserService;
-import static com.example.dsocialserver.until.JwtTokenProvider.createJWT;
-import static com.example.dsocialserver.until.JwtTokenProvider.decodeJWT;
-import static com.example.dsocialserver.until.JwtTokenProvider.generateToken;
-import static com.example.dsocialserver.until.JwtTokenProvider.isTokenExpired;
-import static com.example.dsocialserver.until.MD5.MD5;
-import static com.example.dsocialserver.until.ParseJSon.ParseJSon;
+import static com.example.dsocialserver.Utils.JwtTokenProvider.createJWT;
+import static com.example.dsocialserver.Utils.JwtTokenProvider.decodeJWT;
+import static com.example.dsocialserver.Utils.JwtTokenProvider.generateToken;
+import static com.example.dsocialserver.Utils.JwtTokenProvider.isTokenExpired;
+import static com.example.dsocialserver.Utils.MD5.MD5;
+import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
+import com.example.dsocialserver.Utils.StatusUntilIndex;
+import static com.example.dsocialserver.Utils.StatusUntilIndex.showNotAuthorized;
+import static com.example.dsocialserver.Utils.Validator.isValidEmail;
+import static com.example.dsocialserver.Utils.Validator.isValidPassword;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Date;
-import com.example.dsocialserver.until.StatusUntilIndex;
-import static com.example.dsocialserver.until.StatusUntilIndex.showNotAuthorized;
-import static com.example.dsocialserver.until.Validator.isValidEmail;
-import static com.example.dsocialserver.until.Validator.isValidPassword;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.*;
 
 /**
  *
  * @author haidu
  */
-@Controller
+@RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -54,8 +61,8 @@ public class UserController {
 
     private final CustomResponse jsonRes = new CustomResponse();
 
-    @RequestMapping(value = "/user/me", method = RequestMethod.GET)
-    public ResponseEntity indexme(HttpServletRequest request, HttpSession session) {
+    @GetMapping("/me")
+    public ResponseEntity getInfoUser(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String bearerToken = authorizationHeader.substring(7); // Loại bỏ phần "Bearer "
@@ -70,8 +77,8 @@ public class UserController {
             data.put("avatar", user.getAvatar());
             data.put("bio", user.getBio());
             data.put("birthday", user.getBirthday());
-            data.put("coverimage", user.getCoverimage());
-            data.put("othername", user.getOthername());
+            data.put("coverimage", user.getCover_image());
+            data.put("othername", user.getOther_name());
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("message", "Authorization");
@@ -83,25 +90,15 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity register(HttpServletRequest request, HttpSession session //            , @RequestHeader("Authorization") String authorization
-            ,
-             Model model) {
+    @PostMapping("/register")
+    public ResponseEntity register(
+            @RequestBody @Valid User user,
+            HttpServletRequest request
+    ) {
         try {
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            String name = request.getParameter("name");
-            if (email == null || password == null || name == null || email.isEmpty() || password.isEmpty() || name.isEmpty()) {
-                return StatusUntilIndex.showMissing();
-            }
-            if (!isValidEmail(email)) {
-                jsonRes.setRes(false, "Sai định dạng email");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }
-            if (!isValidPassword(password)) {
-                jsonRes.setRes(false, "Password phải trên 5 ký tự");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }
+            String email = user.getEmail();
+            String password = user.getPassword();
+            String name = user.getName();
             String contextPath = request.getContextPath();
             String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
 //        ----------------------------------
@@ -114,16 +111,16 @@ public class UserController {
 //        ----------------------------------
             String avatar = "https://ui-avatars.com/api/?name=" + name;
             String hashPassword = MD5(password);
-            User user = userService.createUser(email, hashPassword, name, avatar);
+            User u = userService.createUser(email, hashPassword, name, avatar);
 
 //        ----------------------------------
-            if (!"".equals(user.getEmail())) {
-                String codeEmail = createJWT(user.getId());
+            if (!"".equals(u.getEmail())) {
+                String codeEmail = createJWT(u.getId());
                 Date currentDate = new Date();
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("haiduong09876@gmail.com");
-                message.setTo(email);
-                message.setText("Nhấn vào link để xác thực email: " + basePath + "register/authentication/" + codeEmail
+                message.setTo(u.getEmail());
+                message.setText("Nhấn vào link để xác thực email: " + basePath + "user/register/authentication/" + codeEmail
                         + "\nCảm ơn bạn đã tham gia website mạng xã hội Dsocial.");
                 message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
                 mailSender.send(message);
@@ -136,15 +133,15 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/register/authentication/{codeEmail}", method = RequestMethod.GET)
-    public ResponseEntity indexAuthentication(HttpSession session, @PathVariable("codeEmail") String codeEmail, HttpServletRequest request) {
+    @GetMapping("/register/authentication/{codeEmail}")
+    public ResponseEntity getCodeEmail(@PathVariable("codeEmail") String codeEmail) {
         try {
             if (codeEmail == null) {
                 return StatusUntilIndex.showMissing();
             }
             Claims id = decodeJWT(codeEmail);
             User user = userService.findById(id.getSubject());
-            if (user.getIsactive() != 0) {
+            if (user.getIs_active() != 0) {
                 jsonRes.setRes(false, "Email đã được xác thực trước đó");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
@@ -159,9 +156,8 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity login(HttpSession session,
-            HttpServletRequest request, Model model) {
+    @PostMapping("/login")
+    public ResponseEntity login(HttpServletRequest request) {
         try {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
@@ -184,7 +180,7 @@ public class UserController {
                 jsonRes.setRes(false, "Sai tài khoản hoặc mật khẩu");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             } else {
-                if (user.getIsactive() == 0) {
+                if (user.getIs_active() == 0) {
                     jsonRes.setRes(false, "Tài khoản chưa được xác thực");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
                 } else {
@@ -201,9 +197,8 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
-    public ResponseEntity forgotpassword1(HttpSession session,
-            HttpServletRequest request, Model model) {
+    @PostMapping("/forgotpassword")
+    public ResponseEntity getforgotpassword(HttpServletRequest request) {
         try {
             String email = request.getParameter("email");
             if (email == null || email.isEmpty()) {
@@ -230,9 +225,8 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/resetpassword", method = RequestMethod.POST)
-    public ResponseEntity forgotpassword2(HttpSession session,
-            HttpServletRequest request, Model model) {
+    @PostMapping("/resetpassword")
+    public ResponseEntity resetpassword(HttpServletRequest request) {
         try {
             String password = request.getParameter("password");
             String token = request.getParameter("token");
@@ -251,5 +245,18 @@ public class UserController {
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

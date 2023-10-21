@@ -5,7 +5,7 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.User;
-import com.example.dsocialserver.Repositorys.UserRepository;
+import com.example.dsocialserver.Repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +45,7 @@ public class UserService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             // Cập nhật các trường của đối tượng user
-            user.setIsactive(1);
+            user.setIs_active(1);
             // ...
             list = userRepository.save(user);
         }

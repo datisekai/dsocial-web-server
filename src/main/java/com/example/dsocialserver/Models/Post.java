@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.util.Date;
+
 /**
  *
  * @author haidu
@@ -18,6 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "Post")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -26,23 +28,22 @@ public class Post {
     private String html;
 
     @Column(nullable = false)
-    private int authorid;
+    private int author_id;
 
     @Column(columnDefinition = "int default 0")
-    private int groupid;
+    private int group_id;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date createdat;
+    private Date created_at;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updatedat;
-    
-    private int isactive;
+    private Date updated_at;
+
+    private int is_active;
 
     // Getters and setters
     // Constructors
     // Other helper methods
-
     public int getId() {
         return id;
     }
@@ -59,46 +60,44 @@ public class Post {
         this.html = html;
     }
 
-    public int getAuthorid() {
-        return authorid;
+    public int getAuthor_id() {
+        return author_id;
     }
 
-    public void setAuthorid(int authorid) {
-        this.authorid = authorid;
+    public void setAuthor_id(int author_id) {
+        this.author_id = author_id;
     }
 
-    public int getGroupid() {
-        return groupid;
+    public int getGroup_id() {
+        return group_id;
     }
 
-    public void setGroupid(int groupid) {
-        this.groupid = groupid;
-    }  
-
-    public Date getCreatedat() {
-        return createdat;
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
     }
 
-    public void setCreatedat(Date createdat) {
-        this.createdat = createdat;
+    public Date getCreated_at() {
+        return created_at;
     }
 
-    public Date getUpdatedat() {
-        return updatedat;
+    public void setCreated_at(Date created_at) {
+        this.created_at = created_at;
     }
 
-    public void setUpdatedat(Date updatedat) {
-        this.updatedat = updatedat;
+    public Date getUpdated_at() {
+        return updated_at;
     }
 
-    public int getIsactive() {
-        return isactive;
+    public void setUpdated_at(Date updated_at) {
+        this.updated_at = updated_at;
     }
 
-    public void setIsactive(int isactive) {
-        this.isactive = isactive;
+    public int getIs_active() {
+        return is_active;
     }
-    
-    
+
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
+    }
+
 }
-

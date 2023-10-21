@@ -4,55 +4,79 @@
  */
 package com.example.dsocialserver.Models;
 
+import org.springframework.data.domain.Page;
+
 /**
  *
  * @author haidu
  */
 public class Pagination {
-    public int totalPage;
-    public int currentPage;
-    public int perPage;
-    public String nextPage;
-    public String prevPage;
 
-    public int getTotalPage() {
-        return totalPage;
+    public int total_page;
+    public int current_page;
+    public int per_page;
+    public String next_page;
+    public String prev_page;
+
+    public Pagination(int total_page, int current_page, int per_page, String next_page, String prev_page) {
+        this.total_page = total_page;
+        this.current_page = current_page;
+        this.per_page = per_page;
+        this.next_page = next_page;
+        this.prev_page = prev_page;
     }
 
-    public void setTotalPage(int totalPage) {
-        this.totalPage = totalPage;
+    public static Pagination getPagination(String page, String limit, Page gr) {
+        Pagination p = new Pagination();
+        p.setTotal_page(gr.getTotalPages());
+        p.setCurrent_page(Integer.parseInt(page));
+        p.setNext_page(p.getCurrent_page() < p.getTotal_page() ? (p.getCurrent_page() + 1) + "" : null);
+        p.setPer_page(gr.getNumberOfElements());
+        p.setPrev_page(p.getCurrent_page() > 1 ? (p.getCurrent_page() - 1) + "" : null);
+        return p;
     }
 
-    public int getCurrentPage() {
-        return currentPage;
+    public Pagination() {
     }
 
-    public void setCurrentPage(int currentPage) {
-        this.currentPage = currentPage;
+    public int getTotal_page() {
+        return total_page;
     }
 
-    public int getPerPage() {
-        return perPage;
+    public void setTotal_page(int total_page) {
+        this.total_page = total_page;
     }
 
-    public void setPerPage(int perPage) {
-        this.perPage = perPage;
+    public int getCurrent_page() {
+        return current_page;
     }
 
-    public String getNextPage() {
-        return nextPage;
+    public void setCurrent_page(int current_page) {
+        this.current_page = current_page;
     }
 
-    public void setNextPage(String nextPage) {
-        this.nextPage = nextPage;
+    public int getPer_page() {
+        return per_page;
     }
 
-    public String getPrevPage() {
-        return prevPage;
+    public void setPer_page(int per_page) {
+        this.per_page = per_page;
     }
 
-    public void setPrevPage(String prevPage) {
-        this.prevPage = prevPage;
+    public String getNext_page() {
+        return next_page;
     }
-    
+
+    public void setNext_page(String next_page) {
+        this.next_page = next_page;
+    }
+
+    public String getPrev_page() {
+        return prev_page;
+    }
+
+    public void setPrev_page(String prev_page) {
+        this.prev_page = prev_page;
+    }
+
 }

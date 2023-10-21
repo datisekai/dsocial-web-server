@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.example.dsocialserver.Repositorys;
+package com.example.dsocialserver.Repositories;
 
 import com.example.dsocialserver.Models.GroupUser;
 import java.util.Collection;
