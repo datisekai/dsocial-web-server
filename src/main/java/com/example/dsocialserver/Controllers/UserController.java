@@ -204,6 +204,10 @@ public class UserController {
             if (email == null || email.isEmpty()) {
                 return StatusUntilIndex.showMissing();
             }
+            if (!isValidEmail(email)) {
+                jsonRes.setRes(false, "Sai định dạng email");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
+            }           
             User user = userService.findByEmail(email);
             if (user == null) {
                 jsonRes.setRes(false, "Email không tồn tại");
@@ -232,6 +236,10 @@ public class UserController {
             String token = request.getParameter("token");
             if (password == null || token == null || password.isEmpty() || token.isEmpty()) {
                 return StatusUntilIndex.showMissing();
+            }
+            if (!isValidPassword(password)) {
+                jsonRes.setRes(false, "Password phải trên 5 ký tự");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
             Claims id = decodeJWT(token);
             String hashPassword = MD5(password);
