@@ -28,13 +28,14 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         List patterns= new ArrayList();
-        patterns.add("/user/login");
-        patterns.add("/user/register");
-        patterns.add("/user/register/authentication/{codeEmail}");
-        patterns.add("/user/forgotpassword");
-        patterns.add("/user/resetpassword");
+        patterns.add("/login");
+        patterns.add("/register");
+        patterns.add("/register/authentication/{codeEmail}");
+        patterns.add("/forgotpassword");
+        patterns.add("/resetpassword");
         registry.addInterceptor(loginInterceptor)
+                .excludePathPatterns(patterns)
                 .addPathPatterns("/**") // Apply the interceptor to all paths
-                .excludePathPatterns(patterns); // Exclude the login path from the interceptor
+                ; // Exclude the login path from the interceptor
     }
 }

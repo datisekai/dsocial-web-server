@@ -7,6 +7,10 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.UserService;
+import com.example.dsocialserver.Types.ForgotpasswordType;
+import com.example.dsocialserver.Types.LoginType;
+import com.example.dsocialserver.Types.RegisterType;
+import com.example.dsocialserver.Types.ResetpasswordType;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.decodeJWT;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.generateToken;
@@ -47,7 +51,7 @@ import org.springframework.web.bind.annotation.*;
  * @author haidu
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping()
 public class UserController {
 
     @Autowired
@@ -92,15 +96,13 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity register(
-            @RequestBody @Valid User user,
+            @RequestBody @Valid RegisterType user,
             HttpServletRequest request
     ) {
         try {
             String email = user.getEmail();
             String password = user.getPassword();
             String name = user.getName();
-            String contextPath = request.getContextPath();
-            String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/";
 //        ----------------------------------
             User isExist = userService.findByEmail(email);
             if (isExist != null) {
@@ -120,7 +122,7 @@ public class UserController {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("haiduong09876@gmail.com");
                 message.setTo(u.getEmail());
-                message.setText("Nhấn vào link để xác thực email: " + basePath + "user/register/authentication/" + codeEmail
+                message.setText("Nhấn vào link để xác thực email: " +  environment.getProperty("fe.url") + "/confirm-email?token=" + codeEmail
                         + "\nCảm ơn bạn đã tham gia website mạng xã hội Dsocial.");
                 message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
                 mailSender.send(message);
@@ -157,21 +159,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(HttpServletRequest request) {
+    public ResponseEntity login(@Valid @RequestBody LoginType us) {
         try {
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-                return StatusUntilIndex.showMissing();
-            }
-            if (!isValidEmail(email)) {
-                jsonRes.setRes(false, "Sai định dạng email");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }
-            if (!isValidPassword(password)) {
-                jsonRes.setRes(false, "Password phải trên 5 ký tự");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }
+            String email= us.getEmail();
+            String password= us.getPassword();
             String token = null;
 //        ----------------------------------
             String hashPassword = MD5(password);
@@ -184,7 +175,7 @@ public class UserController {
                     jsonRes.setRes(false, "Tài khoản chưa được xác thực");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
                 } else {
-                    token = generateToken(user.getId(), 60000); //86400000 300000
+                    token = generateToken(user.getId(), 86400000); //86400000 300000
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
                     responseData.put("message", "Đăng nhập thành công");
@@ -198,16 +189,9 @@ public class UserController {
     }
 
     @PostMapping("/forgotpassword")
-    public ResponseEntity getforgotpassword(HttpServletRequest request) {
+    public ResponseEntity getforgotpassword(@Valid @RequestBody ForgotpasswordType us) {
         try {
-            String email = request.getParameter("email");
-            if (email == null || email.isEmpty()) {
-                return StatusUntilIndex.showMissing();
-            }
-            if (!isValidEmail(email)) {
-                jsonRes.setRes(false, "Sai định dạng email");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }           
+            String email = us.getEmail();       
             User user = userService.findByEmail(email);
             if (user == null) {
                 jsonRes.setRes(false, "Email không tồn tại");
@@ -230,17 +214,11 @@ public class UserController {
     }
 
     @PostMapping("/resetpassword")
-    public ResponseEntity resetpassword(HttpServletRequest request) {
+    public ResponseEntity resetpassword(@Valid @RequestBody ResetpasswordType us) {
         try {
-            String password = request.getParameter("password");
-            String token = request.getParameter("token");
-            if (password == null || token == null || password.isEmpty() || token.isEmpty()) {
-                return StatusUntilIndex.showMissing();
-            }
-            if (!isValidPassword(password)) {
-                jsonRes.setRes(false, "Password phải trên 5 ký tự");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            }
+            String password = us.getPassword();
+            String token = us.getToken();
+      
             Claims id = decodeJWT(token);
             String hashPassword = MD5(password);
             User user = userService.updatePasswordUser(id.getSubject(), hashPassword);

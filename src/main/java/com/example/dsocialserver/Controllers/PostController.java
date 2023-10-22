@@ -7,6 +7,7 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Models.Pagination;
+import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.GroupService;
@@ -57,29 +58,14 @@ public class PostController {
     private final CustomResponse jsonRes = new CustomResponse();
 
     @GetMapping()
-    public ResponseEntity getAllPost(HttpServletRequest request, @RequestParam(value = "page", defaultValue = "1") String page,
+    public ResponseEntity getAllPost(@RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            if (page == null || limit == null) {
-                return StatusUntilIndex.showMissing();
-            }
-            if ("".equals(page)) {
-                page = "1";
-            }
-            if ("".equals(limit)) {
-                limit = "10";
-            }
-            Page<Post> po = postService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
-            Pagination p = new Pagination();
-            p.setTotal_page(po.getTotalPages());
-            p.setCurrent_page(Integer.parseInt(page));
-            p.setNext_page(p.getCurrent_page() < p.getTotal_page() ? (p.getCurrent_page() + 1) + "" : null);
-            p.setPer_page(po.getNumberOfElements());
-            p.setPrev_page(p.getCurrent_page() > 1 ? (p.getCurrent_page() - 1) + "" : null);
+            Page<Post> getListPost = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
-            responseData.put("data", po.getContent());
-            responseData.put("pagination", p);
+            responseData.put("data", getListPost.getContent());
+            responseData.put("pagination", getPagination(page, limit, getListPost));
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
@@ -115,7 +101,7 @@ public class PostController {
             }
 //        ----------------------------------
 
-            Post post = postService.createGroup(html, Integer.parseInt(authorId), Integer.parseInt(groupId));
+            Post post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId));
             if (post != null) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("id", post.getId());
@@ -170,7 +156,7 @@ public class PostController {
             }
 //        ----------------------------------
 
-            Post post = postService.updateGroup(Integer.parseInt(id), html, Integer.parseInt(authorId), Integer.parseInt(groupId));
+            Post post = postService.updatePost(Integer.parseInt(id), html, Integer.parseInt(authorId), Integer.parseInt(groupId));
             if (post != null) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("id", post.getId());
@@ -198,8 +184,8 @@ public class PostController {
             Post p = postService.findById(id);
             if (p != null) {
                 if (p.getIs_active() != 0) {
-                    Post group = postService.deleteGroupById(Integer.parseInt(id));
-                    if (group != null) {
+                    Post post = postService.deletePostById(Integer.parseInt(id));
+                    if (post != null) {
                         jsonRes.setRes(true, "Xóa bài viết thành công");
                         return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
                     }

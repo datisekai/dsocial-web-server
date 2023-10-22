@@ -34,8 +34,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         if (!isLoggedIn) {
             // User is not logged in, redirect to login page or return appropriate response
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            response.sendRedirect("/login");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+//            response.sendRedirect("/login");
             return false; // Stop further processing
         }
 

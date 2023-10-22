@@ -32,7 +32,7 @@ public class PostService {
         return list;
     }
 
-    public Post createGroup(String html, int authorid, int groupid) {
+    public Post createPost(String html, int authorid, int groupid) {
         Post po = new Post();
         po.setHtml(html);
         po.setAuthor_id(authorid);
@@ -41,7 +41,7 @@ public class PostService {
         return postRepository.save(po);
     }
 
-    public Post updateGroup(int id, String html, int authorId, int groupId) {
+    public Post updatePost(int id, String html, int authorId, int groupId) {
         Optional<Post> optional = postRepository.findById(id);
         Post list = null;
         if (optional.isPresent()) {
@@ -56,11 +56,11 @@ public class PostService {
         return list;
     }
 
-    public Post deleteGroupById(int id) {
-        Optional<Post> optionalGroup = postRepository.findById(id);
+    public Post deletePostById(int id) {
+        Optional<Post> optional = postRepository.findById(id);
         Post list = null;
-        if (optionalGroup.isPresent()) {
-            Post po = optionalGroup.get();
+        if (optional.isPresent()) {
+            Post po = optional.get();
             // Cập nhật các trường của đối tượng user
             po.setIs_active(0);
             // ...
@@ -69,8 +69,9 @@ public class PostService {
         return list;
     }
 
-    public Page<Post> getGroupList(int page, int limit) {
+    public Page<Post> getPostList(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
         return postRepository.findAll(pageable);
     }
+    
 }

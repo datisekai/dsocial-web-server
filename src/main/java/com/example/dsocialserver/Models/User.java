@@ -34,23 +34,12 @@ public class User {
     private int id;
 
     @Column(unique = true)
-    @Email
-    @NotBlank
-    @NotNull
-    @NotEmpty
     private String email;
     
     @Column(length = 255)
-    @Size(min = 6)
-    @NotBlank
-    @NotNull
-    @NotEmpty
     private String password;
 
     @Column(nullable = false)
-    @NotBlank
-    @NotNull
-    @NotEmpty
     private String name;
 
     private String other_name;
