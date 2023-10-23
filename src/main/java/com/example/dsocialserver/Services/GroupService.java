@@ -12,12 +12,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author haidu
  */
 @Service
+@Transactional
 public class GroupService {
 
     @Autowired
@@ -42,7 +44,7 @@ public class GroupService {
         return groupRepository.save(gr);
     }
 
-    public Groups updateGroup(String name, int id, String avatar, String coverImage, int userId) {
+    public Groups updateGroup(String name, Object id, String avatar, String coverImage, int userId) {
         Optional<Groups> optional = groupRepository.findById(id);
         Groups list = null;
         if (optional.isPresent()) {
@@ -58,19 +60,27 @@ public class GroupService {
         return list;
     }
 
-    public Groups deleteGroupById(int id) {
-      Optional<Groups> optional = groupRepository.findById(id);
-        Groups list = null;
-        if (optional.isPresent()) {
-            Groups gr = optional.get();
-            // Cập nhật các trường của đối tượng user
-            gr.setIs_active(0);
-            // ...
-            list = groupRepository.save(gr);
+    public boolean deleteGroupById(Object id) {
+//      Optional<Groups> optional = groupRepository.findById(id);
+//        Groups list = null;
+//        if (optional.isPresent()) {
+//            Groups gr = optional.get();
+//            // Cập nhật các trường của đối tượng user
+//            gr.setIs_active(0);
+//            // ...
+//            list = groupRepository.save(gr);
+//        }
+        try {
+            groupRepository.deleteGroupsAndPostAndPostImage(Integer.parseInt((String) id));
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        return list;
     }
-    
+    public Page<Groups> getMyGroupList(int page, int limit, int id){
+        Pageable pageable= PageRequest.of(page, limit);
+        return groupRepository.findAllByUserId(pageable, id);
+    }
     public Page<Groups> getGroupList(int page, int limit) {
         Pageable pageable= PageRequest.of(page, limit);
         return groupRepository.findAll(pageable);

@@ -22,6 +22,19 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GroupRepository extends CrudRepository<Groups, Object> {
-    @Query("SELECT g FROM Groups g WHERE g.is_active != 0")
+    
+    @Query("SELECT g FROM Groups g WHERE g.user_id = :id")
+    Page<Groups> findAllByUserId(Pageable pageable, @Param("id") int id);
+    
+    @Query("SELECT g FROM Groups g WHERE g.is_active = 1")
     Page<Groups> findAll(Pageable pageable);
+    
+    @Modifying
+    @Query(value = "DELETE groups, groupuser, post, postimage, postcomment, "
+            + "postreaction FROM groups LEFT JOIN groupuser ON groups.id = "
+            + "groupuser.group_id LEFT JOIN post ON groups.id = post.group_id "
+            + "LEFT JOIN postimage ON post.id = postimage.post_id LEFT JOIN "
+            + "postreaction ON post.id = postreaction.post_id LEFT JOIN postcomment "
+            + "ON post.id = postcomment.post_id WHERE groups.id = :id", nativeQuery = true)
+    void deleteGroupsAndPostAndPostImage(@Param("id") int id);
 }

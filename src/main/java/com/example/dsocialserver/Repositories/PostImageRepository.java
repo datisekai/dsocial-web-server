@@ -4,9 +4,7 @@
  */
 package com.example.dsocialserver.Repositories;
 
-import com.example.dsocialserver.Models.GroupUser;
-import java.util.Collection;
-import java.util.List;
+import com.example.dsocialserver.Models.PostImage;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,9 +16,8 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface GroupUserRepository extends CrudRepository<GroupUser, Object>{
-    void deleteAllByIdIn(List ids);
-    @Modifying
-    @Query(value = "DELETE FROM `groupuser` WHERE group_id= :group_id AND user_id= :user_id", nativeQuery = true)
-    void deleteByGroupIdAndUserId(@Param("group_id") int group_id, @Param("user_id") int user_id);
+public interface PostImageRepository extends CrudRepository<PostImage, Object> {
+//    @Modifying
+//    @Query("DELETE FROM `postimage` WHERE post_id= :post_id")
+//    void deleteAllByPostID(@Param("post_id") int post_id);
 }

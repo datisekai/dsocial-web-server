@@ -22,11 +22,11 @@ public class GroupUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, name = "groupid")
-    private int groupId;
+    @Column(nullable = false)
+    private int group_id;
 
     @Column(nullable = false)
-    private int userid;
+    private int user_id;
 
     // Getters and setters
     // Constructors
@@ -40,20 +40,20 @@ public class GroupUser {
         this.id = id;
     }
 
-    public int getGroupId() {
-        return groupId;
+    public int getGroup_id() {
+        return group_id;
     }
 
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
     }
 
-    public int getUserid() {
-        return userid;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserid(int userid) {
-        this.userid = userid;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
     
 }

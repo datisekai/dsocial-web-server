@@ -19,8 +19,6 @@ import static com.example.dsocialserver.Utils.MD5.MD5;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
 import static com.example.dsocialserver.Utils.StatusUntilIndex.showNotAuthorized;
-import static com.example.dsocialserver.Utils.Validator.isValidEmail;
-import static com.example.dsocialserver.Utils.Validator.isValidPassword;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +30,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Date;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -75,19 +67,22 @@ public class UserController {
                 return showNotAuthorized();
             }
             User user = userService.findById(isTokenExpired(bearerToken));
-            Map<String, Object> data = new HashMap<>();
-            data.put("email", user.getEmail());
-            data.put("name", user.getName());
-            data.put("avatar", user.getAvatar());
-            data.put("bio", user.getBio());
-            data.put("birthday", user.getBirthday());
-            data.put("coverimage", user.getCover_image());
-            data.put("othername", user.getOther_name());
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", true);
-            responseData.put("message", "Authorization");
-            responseData.put("data", data);
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            if (user != null) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("email", user.getEmail());
+                data.put("name", user.getName());
+                data.put("avatar", user.getAvatar());
+                data.put("bio", user.getBio());
+                data.put("birthday", user.getBirthday());
+                data.put("cover_image", user.getCover_image());
+                data.put("other_name", user.getOther_name());
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", "Authorization");
+                responseData.put("data", data);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+                return StatusUntilIndex.showMissing();
         } else {
             // Trường hợp không tìm thấy hoặc không hợp lệ
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
@@ -116,13 +111,13 @@ public class UserController {
             User u = userService.createUser(email, hashPassword, name, avatar);
 
 //        ----------------------------------
-            if (!"".equals(u.getEmail())) {
+            if (u != null) {
                 String codeEmail = createJWT(u.getId());
                 Date currentDate = new Date();
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("haiduong09876@gmail.com");
                 message.setTo(u.getEmail());
-                message.setText("Nhấn vào link để xác thực email: " +  environment.getProperty("fe.url") + "/confirm-email?token=" + codeEmail
+                message.setText("Nhấn vào link để xác thực email: " + environment.getProperty("fe.url") + "/confirm-email?token=" + codeEmail
                         + "\nCảm ơn bạn đã tham gia website mạng xã hội Dsocial.");
                 message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
                 mailSender.send(message);
@@ -161,8 +156,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@Valid @RequestBody LoginType us) {
         try {
-            String email= us.getEmail();
-            String password= us.getPassword();
+            String email = us.getEmail();
+            String password = us.getPassword();
             String token = null;
 //        ----------------------------------
             String hashPassword = MD5(password);
@@ -191,7 +186,7 @@ public class UserController {
     @PostMapping("/forgotpassword")
     public ResponseEntity getforgotpassword(@Valid @RequestBody ForgotpasswordType us) {
         try {
-            String email = us.getEmail();       
+            String email = us.getEmail();
             User user = userService.findByEmail(email);
             if (user == null) {
                 jsonRes.setRes(false, "Email không tồn tại");
@@ -218,7 +213,7 @@ public class UserController {
         try {
             String password = us.getPassword();
             String token = us.getToken();
-      
+
             Claims id = decodeJWT(token);
             String hashPassword = MD5(password);
             User user = userService.updatePasswordUser(id.getSubject(), hashPassword);
