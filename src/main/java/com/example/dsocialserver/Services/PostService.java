@@ -48,7 +48,6 @@ public class PostService {
         Post po = new Post();
         po.setHtml(html);
         po.setAuthor_id(authorid);
-        po.setGroup_id(0);
         po.setGroup_id(group_id);
         po.setIs_active(1);
         Post list = postRepository.save(po);

@@ -23,8 +23,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupRepository extends CrudRepository<Groups, Object> {
     
-    @Query("SELECT g FROM Groups g WHERE g.user_id = :id")
-    Page<Groups> findAllByUserId(Pageable pageable, @Param("id") int id);
+    @Query("SELECT g FROM Groups g WHERE g.user_id = :userId")
+    Page<Groups> findAllByUserId(Pageable pageable, @Param("userId") int userId);
     
     @Query("SELECT g FROM Groups g WHERE g.is_active = 1")
     Page<Groups> findAll(Pageable pageable);

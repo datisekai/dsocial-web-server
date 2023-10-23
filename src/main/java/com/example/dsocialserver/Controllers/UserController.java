@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author haidu
  */
+@CrossOrigin
 @RestController
 @RequestMapping()
 public class UserController {
@@ -66,23 +67,16 @@ public class UserController {
             if (isTokenExpired(bearerToken) == 0) {
                 return showNotAuthorized();
             }
-            User user = userService.findById(isTokenExpired(bearerToken));
+            Map<String, Object> user = userService.getInfoUser(isTokenExpired(bearerToken));
             if (user != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("email", user.getEmail());
-                data.put("name", user.getName());
-                data.put("avatar", user.getAvatar());
-                data.put("bio", user.getBio());
-                data.put("birthday", user.getBirthday());
-                data.put("cover_image", user.getCover_image());
-                data.put("other_name", user.getOther_name());
+
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Authorization");
-                responseData.put("data", data);
+                responseData.put("data", user);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
-                return StatusUntilIndex.showMissing();
+            return StatusUntilIndex.showMissing();
         } else {
             // Trường hợp không tìm thấy hoặc không hợp lệ
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
@@ -165,19 +159,18 @@ public class UserController {
             if (user == null) {
                 jsonRes.setRes(false, "Sai tài khoản hoặc mật khẩu");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-            } else {
-                if (user.getIs_active() == 0) {
-                    jsonRes.setRes(false, "Tài khoản chưa được xác thực");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
-                } else {
-                    token = generateToken(user.getId(), 86400000); //86400000 300000
-                    Map<String, Object> responseData = new HashMap<>();
-                    responseData.put("success", true);
-                    responseData.put("message", "Đăng nhập thành công");
-                    responseData.put("token", token);
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-                }
             }
+            if (user.getIs_active() == 0) {
+                jsonRes.setRes(false, "Tài khoản chưa được xác thực");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
+            }
+            token = generateToken(user.getId(), 86400000); //86400000 300000
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("message", "Đăng nhập thành công");
+            responseData.put("token", token);
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+
         } catch (MailException e) {
             return StatusUntilIndex.showInternal(e);
         }
@@ -207,6 +200,7 @@ public class UserController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    ///register/a
 
     @PostMapping("/resetpassword")
     public ResponseEntity resetpassword(@Valid @RequestBody ResetpasswordType us) {

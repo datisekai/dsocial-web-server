@@ -9,6 +9,7 @@ import com.example.dsocialserver.Models.Groups;
 import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Services.GroupService;
 import com.example.dsocialserver.Types.GroupsType;
+import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author haidu
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/group")
 public class GroupController {
@@ -46,7 +50,7 @@ public class GroupController {
     private GroupService groupService;
 
     private final CustomResponse jsonRes = new CustomResponse();
-    
+
     // lấy ra tất cả nhóm
     @GetMapping()
     public ResponseEntity getAllGroups(@RequestParam(value = "page", defaultValue = "1") String page,
@@ -65,15 +69,16 @@ public class GroupController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     // lấy ra những nhóm của người dùng
-    @GetMapping("/{user_id}")
-    public ResponseEntity getAllMyGroups(@PathVariable("user_id") String user_id, @RequestParam(value = "page", defaultValue = "1") String page,
+    @GetMapping("/joined")
+    public ResponseEntity getAllMyGroups(@RequestHeader("Authorization") String authorizationHeader, 
+            @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
-//            , @RequestBody User user
     ) {
         try {
-//            int id= user.getId();
-            Page<Groups> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(user_id));
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Page<Groups> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             if (gr != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -86,28 +91,23 @@ public class GroupController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    
+
     @PostMapping()
-    public ResponseEntity createGroup(@Valid @RequestBody GroupsType gr) throws IOException {
+    public ResponseEntity createGroup(@RequestHeader("Authorization") String authorizationHeader,
+            @Valid @RequestBody GroupsType gr) throws IOException {
         try {
             String name = gr.getName();
             String avatar = gr.getAvatar();
             String coverImage = gr.getCoverImage();
-            int userId = gr.getUserId();
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 
 //        ----------------------------------
-            Groups group = groupService.createGroup(name, userId, avatar, coverImage);
+            Map<String, Object> group = groupService.createGroup(name, Integer.parseInt(userId), avatar, coverImage);
             if (group != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("id", group.getId());
-                data.put("name", group.getName());
-                data.put("avatar", group.getAvatar());
-                data.put("cover_image", group.getCover_image());
-                data.put("user_id", group.getUser_id());
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tạo nhóm thành công");
-                responseData.put("data", data);
+                responseData.put("data", group);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -123,21 +123,14 @@ public class GroupController {
             String name = gr.getName();
             String avatar = gr.getAvatar();
             String coverImage = gr.getCoverImage();
-            int userId = gr.getUserId();
 //        ----------------------------------
 
-            Groups group = groupService.updateGroup(name, id, avatar, coverImage, userId);
+            Map<String, Object> group = groupService.updateGroup(name, id, avatar, coverImage);
             if (group != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("id", group.getId());
-                data.put("name", group.getName());
-                data.put("avatar", group.getAvatar());
-                data.put("cover_mage", group.getCover_image());
-                data.put("user_id", group.getUser_id());
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Cập nhật nhóm thành công");
-                responseData.put("data", data);
+                responseData.put("data", group);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -149,12 +142,12 @@ public class GroupController {
     @DeleteMapping("/{id}")
     public ResponseEntity deleteGroup(@PathVariable("id") String id) throws IOException {
         try {
-          
-                boolean group = groupService.deleteGroupById(id);
-                if (group) {
-                    jsonRes.setRes(true, "Xóa nhóm thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
-                }
+
+            boolean group = groupService.deleteGroupById(id);
+            if (group) {
+                jsonRes.setRes(true, "Xóa nhóm thành công");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            }
             return StatusUntilIndex.showMissing();
         } catch (MailException e) {
             return StatusUntilIndex.showInternal(e);

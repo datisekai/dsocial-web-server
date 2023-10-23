@@ -11,6 +11,7 @@ import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Services.PostService;
 import com.example.dsocialserver.Types.PostImageType;
 import com.example.dsocialserver.Types.PostType;
+import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author haidu
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/post")
 public class PostController {
@@ -50,61 +54,77 @@ public class PostController {
     private PostService postService;
 
     private final CustomResponse jsonRes = new CustomResponse();
+
     // lấy ra tất cả bài viết
     @GetMapping()
     public ResponseEntity getAllPost(@RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Page<Post> getListPost = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", true);
-            responseData.put("data", getListPost.getContent());
-            responseData.put("pagination", getPagination(page, limit, getListPost));
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            Page<Post> post = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
+            if (post != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", post.getContent());
+                responseData.put("pagination", getPagination(page, limit, post));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     // lấy ra tất cả bài viết của group
-    @GetMapping("/group/{group_id}")
-    public ResponseEntity getAllPostGroup(@PathVariable("group_id") String group_id, @RequestParam(value = "page", defaultValue = "1") String page,
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity getAllPostGroup(@PathVariable("groupId") String groupId, @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Page<Post> getListPost = postService.getPostListGroup(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(group_id));
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", true);
-            responseData.put("data", getListPost.getContent());
-            responseData.put("pagination", getPagination(page, limit, getListPost));
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            Page<Post> post = postService.getPostListGroup(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(groupId));
+            if (post != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", post.getContent());
+                responseData.put("pagination", getPagination(page, limit, post));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     // lấy ra tất cả bài viết của người dùng
-    @GetMapping("/me/{user_id}")
-    public ResponseEntity getAllPostUser(@PathVariable("user_id") String user_id, @RequestParam(value = "page", defaultValue = "1") String page,
+    @GetMapping("/me")
+    public ResponseEntity getAllPostUser(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Page<Post> getListPost = postService.getPostListUser(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(user_id));
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", true);
-            responseData.put("data", getListPost.getContent());
-            responseData.put("pagination", getPagination(page, limit, getListPost));
-            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Page<Post> post = postService.getPostListUser(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            if (post != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", post.getContent());
+                responseData.put("pagination", getPagination(page, limit, post));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     @PostMapping
-    public ResponseEntity createPost(@RequestBody @Valid PostType pst) throws IOException {
+    public ResponseEntity createPost(@RequestHeader("Authorization") String authorizationHeader, 
+            @RequestBody @Valid PostType pst) throws IOException {
         try {
             String html = pst.getHtml();
-            int authorId = pst.getAuthorId();
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             List<PostImage> imagage = pst.getImage();
             int groupId = pst.getGroupId();
 //        ----------------------------------
 
-            Map<String, Object> post = postService.createPost(html, authorId, groupId, imagage);
+            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), groupId, imagage);
             if (post != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);

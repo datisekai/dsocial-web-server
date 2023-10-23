@@ -6,6 +6,8 @@ package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Repositories.GroupRepository;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,40 +26,53 @@ public class GroupService {
 
     @Autowired
     private GroupRepository groupRepository;
-    
-     public Groups findById(Object id) {
+
+    public Groups findById(Object id) {
         Optional<Groups> optional = groupRepository.findById(id);
-        Groups list= null;
+        Groups list = null;
         if (optional.isPresent()) {
             list = optional.get();
         }
         return list;
     }
-     
-    public Groups createGroup(String grourpName, int userId, String avatar, String coverImage) {
+
+    public Map<String, Object> createGroup(String grourpName, int userId, String avatar, String coverImage) {
         Groups gr = new Groups();
         gr.setName(grourpName);
         gr.setUser_id(userId);
         gr.setAvatar(avatar);
         gr.setCover_image(coverImage);
         gr.setIs_active(1);
-        return groupRepository.save(gr);
+        Groups list = groupRepository.save(gr);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", list.getId());
+        data.put("name", list.getName());
+        data.put("avatar", list.getAvatar());
+        data.put("cover_image", list.getCover_image());
+        data.put("user_id", list.getUser_id());
+
+        return data;
     }
 
-    public Groups updateGroup(String name, Object id, String avatar, String coverImage, int userId) {
+    public Map<String, Object> updateGroup(String name, Object id, String avatar, String coverImage) {
+        Map<String, Object> data = new HashMap<>();
         Optional<Groups> optional = groupRepository.findById(id);
-        Groups list = null;
         if (optional.isPresent()) {
             Groups gr = optional.get();
             // Cập nhật các trường của đối tượng user
             gr.setName(name);
             gr.setAvatar(avatar);
             gr.setCover_image(coverImage);
-            gr.setUser_id(userId);
             // ...
-            list = groupRepository.save(gr);
+            Groups list = groupRepository.save(gr);
+            data.put("id", list.getId());
+            data.put("name", list.getName());
+            data.put("avatar", list.getAvatar());
+            data.put("cover_image", list.getCover_image());
+            data.put("user_id", list.getUser_id());
         }
-        return list;
+        return data;
     }
 
     public boolean deleteGroupById(Object id) {
@@ -73,17 +88,19 @@ public class GroupService {
         try {
             groupRepository.deleteGroupsAndPostAndPostImage(Integer.parseInt((String) id));
             return true;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
-    public Page<Groups> getMyGroupList(int page, int limit, int id){
-        Pageable pageable= PageRequest.of(page, limit);
-        return groupRepository.findAllByUserId(pageable, id);
+
+    public Page<Groups> getMyGroupList(int page, int limit, int userId) {
+        Pageable pageable = PageRequest.of(page, limit);
+        return groupRepository.findAllByUserId(pageable, userId);
     }
+
     public Page<Groups> getGroupList(int page, int limit) {
-        Pageable pageable= PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page, limit);
         return groupRepository.findAll(pageable);
     }
-    
+
 }

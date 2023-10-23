@@ -17,7 +17,7 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "PostComment")
+@Table(name = "postcomment")
 public class PostComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

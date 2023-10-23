@@ -61,4 +61,8 @@ public class JwtTokenProvider {
             return 0; // Nếu có lỗi khi parse token, coi như token đã hết hạn
         }
     }
+    public static Claims getIDByBearer(String authorizationHeader){
+         String bearerToken = authorizationHeader.substring(7);
+         return decodeJWT(bearerToken);
+    }
 }

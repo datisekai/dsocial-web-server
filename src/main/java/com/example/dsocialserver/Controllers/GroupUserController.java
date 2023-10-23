@@ -8,6 +8,7 @@ import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.GroupUser;
 import com.example.dsocialserver.Services.GroupUserService;
 import com.example.dsocialserver.Types.GroupUserType;
+import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
 import jakarta.validation.Valid;
@@ -20,11 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author haidu
  */
+@CrossOrigin
 @RestController
-@RequestMapping("/groupuser")
+@RequestMapping("/group-user")
 public class GroupUserController {
 
     @Autowired
@@ -43,22 +47,19 @@ public class GroupUserController {
     private final CustomResponse jsonRes = new CustomResponse();
     
     @PostMapping()
-    public ResponseEntity joinGroupUser(@Valid @RequestBody GroupUserType gr) throws IOException {
+    public ResponseEntity joinGroupUser(@RequestHeader("Authorization") String authorizationHeader,
+            @Valid @RequestBody GroupUserType gr) throws IOException {
         try {
             int groupId= gr.getGroupId();
-            int userId= gr.getUserId();
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 
 //        ----------------------------------
-            GroupUser group = groupUserService.joinGroupUser(groupId, userId);
-            if (group != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("id", group.getId());
-                data.put("group_id", group.getGroup_id());
-                data.put("user_id", group.getUser_id());
+            Map<String, Object> groupUser = groupUserService.joinGroupUser(groupId, Integer.parseInt(userId));
+            if (groupUser != null) {               
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tham gia nhóm thành công");
-                responseData.put("data", data);
+                responseData.put("data", groupUser);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -67,11 +68,12 @@ public class GroupUserController {
         }
     }
 
-    @DeleteMapping("/{group_id}")
-    public ResponseEntity deleteGroup(@PathVariable("group_id") String group_id, @Valid @RequestBody GroupUserType gr) throws IOException {
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity outGroupUser(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("groupId") String groupId) throws IOException {
         try {
-            int userId= gr.getUserId();
-                boolean group = groupUserService.outGroupUser(Integer.parseInt(group_id), userId);
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+                boolean group = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
                 if (group) {
                     jsonRes.setRes(true, "Rời nhóm thành công");
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
