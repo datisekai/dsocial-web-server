@@ -17,7 +17,7 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "Room")
+@Table(name = "room")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -37,9 +37,9 @@ public class GroupUserService {
         return data;
     }
 
-    public boolean outGroupUser(int group_id, int user_id) {
+    public boolean outGroupUser(int id) {
         try {
-            groupUserRepository.deleteByGroupIdAndUserId(group_id, user_id);
+            groupUserRepository.deleteById(id);
             return true;
         } catch (Exception e) {
             return false;

@@ -18,7 +18,7 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "`Groups`")
+@Table(name = "`groups`")
 public class Groups {
 
     @Id

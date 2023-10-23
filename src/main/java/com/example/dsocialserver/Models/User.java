@@ -18,7 +18,7 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 public class User {
 
     public User(String email, String password) {

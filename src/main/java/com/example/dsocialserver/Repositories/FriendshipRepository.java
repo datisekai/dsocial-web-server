@@ -4,10 +4,9 @@
  */
 package com.example.dsocialserver.Repositories;
 
-import com.example.dsocialserver.Models.PostComment;
+import com.example.dsocialserver.Models.Friendship;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -18,12 +17,7 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface PostCommentRepository extends CrudRepository<PostComment, Object> {
-
-    @Query(value="SELECT * FROM postcomment WHERE postcomment.author_id = :authorId", nativeQuery = true)
-    Page<PostComment> findAllPostCommentByAuthorId(Pageable pageable, @Param("authorId") int authorId);
-
-    @Modifying
-    @Query(value = "DELETE FROM postcomment WHERE postcomment.id= :id", nativeQuery = true)
-    void deletePostComentById(@Param("id") int id);
+public interface FriendshipRepository extends CrudRepository<Friendship, Object>{
+    @Query(value="SELECT * FROM friendship WHERE friendship.user_id = :userId AND friendship.is_active=1", nativeQuery = true)
+    Page<Friendship> findAllFriendshipByUserId(Pageable pageable, @Param("userId") int userId);
 }

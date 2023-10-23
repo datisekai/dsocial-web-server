@@ -10,7 +10,7 @@ import java.util.Date;
  * @author haidu
  */
 @Entity
-@Table(name = "RoomUser")
+@Table(name = "roomuser")
 public class RoomUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

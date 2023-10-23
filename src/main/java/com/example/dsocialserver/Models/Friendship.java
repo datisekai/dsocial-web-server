@@ -16,23 +16,55 @@ import jakarta.persistence.Table;
  * @author haidu
  */
 @Entity
-@Table(name = "Friendship")
+@Table(name = "friendship")
 public class Friendship {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(nullable = false)
-    private Long userId;
+    private int user_id;
 
     @Column(nullable = false)
-    private Long friendId;
+    private int friend_id;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean isActive;
+    private int is_Active;
 
     // Getters and setters
     // Constructors
     // Other helper methods
-}
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+
+    public int getFriend_id() {
+        return friend_id;
+    }
+
+    public void setFriend_id(int friend_id) {
+        this.friend_id = friend_id;
+    }
+
+    public int getIs_Active() {
+        return is_Active;
+    }
+
+    public void setIs_Active(int is_Active) {
+        this.is_Active = is_Active;
+    }
+
+}

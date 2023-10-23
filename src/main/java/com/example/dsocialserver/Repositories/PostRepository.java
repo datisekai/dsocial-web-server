@@ -21,13 +21,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepository extends CrudRepository<Post, Object> {
     
-    @Query("SELECT p FROM Post p WHERE p.author_id = :id")
+    @Query(value="SELECT * FROM post WHERE post.author_id = :id", nativeQuery = true)
     Page<Post> findAllByUserId(Pageable pageable, @Param("id") int id);
     
-    @Query("SELECT p FROM Post p WHERE p.group_id = :id")
+    @Query(value="SELECT * FROM post WHERE post.group_id = :id", nativeQuery = true)
     Page<Post> findAllByGroupId(Pageable pageable, @Param("id") int id);
 
-    @Query("SELECT p FROM Post p WHERE p.is_active = 1")
+    @Query(value="SELECT * FROM post WHERE post.is_active = 1", nativeQuery = true)
     Page<Post> findAll(Pageable pageable);
 
     @Modifying
