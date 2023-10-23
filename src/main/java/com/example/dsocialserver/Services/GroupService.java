@@ -59,8 +59,7 @@ public class GroupService {
         Map<String, Object> data = new HashMap<>();
         Optional<Groups> optional = groupRepository.findById(id);
         if (optional.isPresent()) {
-            Groups gr = optional.get();
-            // Cập nhật các trường của đối tượng user
+            Groups gr = optional.get();         
             gr.setName(name);
             gr.setAvatar(avatar);
             gr.setCover_image(coverImage);
@@ -75,7 +74,7 @@ public class GroupService {
         return data;
     }
 
-    public boolean deleteGroupById(Object id) {
+    public boolean deleteGroup(Object id) {
 //      Optional<Groups> optional = groupRepository.findById(id);
 //        Groups list = null;
 //        if (optional.isPresent()) {
@@ -86,7 +85,7 @@ public class GroupService {
 //            list = groupRepository.save(gr);
 //        }
         try {
-            groupRepository.deleteGroupsAndPostAndPostImage(Integer.parseInt((String) id));
+            groupRepository.deleteGroups(Integer.parseInt((String) id));
             return true;
         } catch (NumberFormatException e) {
             return false;

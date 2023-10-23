@@ -50,11 +50,11 @@ public class GroupUserController {
     public ResponseEntity joinGroupUser(@RequestHeader("Authorization") String authorizationHeader,
             @Valid @RequestBody GroupUserType gr) throws IOException {
         try {
-            int groupId= gr.getGroupId();
+            String groupId= gr.getGroupId();
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 
 //        ----------------------------------
-            Map<String, Object> groupUser = groupUserService.joinGroupUser(groupId, Integer.parseInt(userId));
+            Map<String, Object> groupUser = groupUserService.joinGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
             if (groupUser != null) {               
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -63,7 +63,7 @@ public class GroupUserController {
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
@@ -79,7 +79,7 @@ public class GroupUserController {
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
                 }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

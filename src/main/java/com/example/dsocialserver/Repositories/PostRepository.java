@@ -5,6 +5,7 @@
 package com.example.dsocialserver.Repositories;
 
 import com.example.dsocialserver.Models.Post;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,9 +31,9 @@ public interface PostRepository extends CrudRepository<Post, Object> {
     Page<Post> findAll(Pageable pageable);
 
     @Modifying
-    @Query(value = "DELETE postimage, post, postreaction, postcomment FROM postimage "
-            + "JOIN post ON postimage.post_id = post.id JOIN postreaction "
-            + "ON postreaction.post_id = post.id JOIN postcomment ON "
-            + "postcomment.post_id = post.id WHERE post.id = :id", nativeQuery = true)
-    void deletePostAndPostImage(@Param("id") int id);
+    @Query(value = "DELETE post, postimage, postreaction, postcomment "
+            + "FROM post LEFT JOIN postimage ON post.id = postimage.post_id "
+            + "LEFT JOIN postreaction ON post.id = postreaction.post_id LEFT "
+            + "JOIN postcomment ON post.id = postcomment.post_id WHERE post.id = :id", nativeQuery = true)
+    void deletePost(@Param("id") int id);
 }

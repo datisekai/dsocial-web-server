@@ -19,10 +19,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PostCommentRepository extends CrudRepository<PostComment, Object> {
-    
+
     @Query("SELECT pc FROM PostComment pc WHERE pc.author_id = :authorId")
-Page<PostComment> findAllPostCommentByAuthorId(Pageable pageable, @Param("authorId") int authorId);
-    
+    Page<PostComment> findAllPostCommentByAuthorId(Pageable pageable, @Param("authorId") int authorId);
+
     @Modifying
     @Query(value = "DELETE FROM postcomment WHERE postcomment.id= :id", nativeQuery = true)
     void deletePostComentById(@Param("id") int id);

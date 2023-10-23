@@ -8,7 +8,6 @@ import com.example.dsocialserver.Models.Post;
 import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Repositories.PostImageRepository;
 import com.example.dsocialserver.Repositories.PostRepository;
-import com.example.dsocialserver.Types.PostImageType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,13 +99,13 @@ public class PostService {
         return data;
     }
 
-    public boolean deletePostById(Object id) {
-        try {
-            postRepository.deletePostAndPostImage(Integer.parseInt((String) id));
+    public boolean deletePost(Object id) {
+//        try {
+            postRepository.deletePost(Integer.parseInt((String) id));
             return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+//        } catch (NumberFormatException e) {
+//            return false;
+//        }
 
     }
 

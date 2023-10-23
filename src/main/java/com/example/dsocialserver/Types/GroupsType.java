@@ -26,8 +26,6 @@ public class GroupsType {
     @NotBlank
     @NotNull
     public String coverImage;
-    
-    public int userId;
 
     public String getName() {
         return name;
@@ -52,12 +50,4 @@ public class GroupsType {
     public void setCoverImage(String coverImage) {
         this.coverImage = coverImage;
     }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    } 
 }

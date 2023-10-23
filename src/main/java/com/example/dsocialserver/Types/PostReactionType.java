@@ -12,21 +12,16 @@ import jakarta.validation.constraints.NotNull;
  *
  * @author haidu
  */
-public class PostImageType {
+public class PostReactionType {
     @NotEmpty
     @NotBlank
     @NotNull
-    public String src;
-    
     public String postId;
-
-    public String getSrc() {
-        return src;
-    }
-
-    public void setSrc(String src) {
-        this.src = src;
-    }
+    
+    @NotEmpty
+    @NotBlank
+    @NotNull
+    public String icon;
 
     public String getPostId() {
         return postId;
@@ -35,6 +30,13 @@ public class PostImageType {
     public void setPostId(String postId) {
         this.postId = postId;
     }
-    
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
     
 }

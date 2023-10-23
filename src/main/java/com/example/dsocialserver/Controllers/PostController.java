@@ -9,7 +9,6 @@ import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
 import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Services.PostService;
-import com.example.dsocialserver.Types.PostImageType;
 import com.example.dsocialserver.Types.PostType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -121,10 +119,14 @@ public class PostController {
             String html = pst.getHtml();
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             List<PostImage> imagage = pst.getImage();
-            int groupId = pst.getGroupId();
+            String groupId = pst.getGroupId();
+            
+            if(groupId == null || "".equals(groupId)){
+                groupId="0";
+            }
 //        ----------------------------------
 
-            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), groupId, imagage);
+            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId), imagage);
             if (post != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -133,7 +135,7 @@ public class PostController {
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
@@ -156,7 +158,7 @@ public class PostController {
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
@@ -164,13 +166,13 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity groupDelete(@PathVariable("id") String id) throws IOException {
         try {
-            boolean post = postService.deletePostById(id);
+            boolean post = postService.deletePost(id);
             if (post == true) {
                 jsonRes.setRes(true, "Xóa bài viết thành công");
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

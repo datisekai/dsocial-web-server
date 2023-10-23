@@ -20,10 +20,8 @@ public class PostType {
     @NotBlank
     @NotNull
     public String html;
-
-    public int authorId;
     
-    public int groupId;
+    public String groupId;
     
     public List<PostImage> image;
     
@@ -39,21 +37,14 @@ public class PostType {
         this.html = html;
     }
 
-    public int getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(int authorId) {
-        this.authorId = authorId;
-    }
-
-    public int getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(int groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
+    
 
     public List<PostImage> getImage() {
         return image;

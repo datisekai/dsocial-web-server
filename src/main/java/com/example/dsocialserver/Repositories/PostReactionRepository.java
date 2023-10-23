@@ -4,8 +4,7 @@
  */
 package com.example.dsocialserver.Repositories;
 
-import com.example.dsocialserver.Models.PostImage;
-import java.util.List;
+import com.example.dsocialserver.Models.PostReaction;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -17,7 +16,8 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface PostImageRepository extends CrudRepository<PostImage, Object> {
-//    @Query(value = "SELECT p FROM postimage p WHERE p.post_id = :postId", nativeQuery = true)
-//    List<PostImage> findAllPostImageByPostId(@Param("postId") int postId);
+public interface PostReactionRepository extends CrudRepository<PostReaction, Object>{
+    @Modifying
+    @Query(value = "DELETE FROM postreaction WHERE postreaction.id= :id", nativeQuery = true)
+    void deletePostReactionById(@Param("id") int id);  
 }

@@ -171,7 +171,7 @@ public class UserController {
             responseData.put("token", token);
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
 
-        } catch (MailException e) {
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

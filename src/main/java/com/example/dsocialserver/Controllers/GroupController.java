@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -111,7 +110,7 @@ public class GroupController {
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
@@ -134,7 +133,7 @@ public class GroupController {
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
@@ -143,13 +142,13 @@ public class GroupController {
     public ResponseEntity deleteGroup(@PathVariable("id") String id) throws IOException {
         try {
 
-            boolean group = groupService.deleteGroupById(id);
+            boolean group = groupService.deleteGroup(id);
             if (group) {
                 jsonRes.setRes(true, "Xóa nhóm thành công");
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
-        } catch (MailException e) {
+        } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

@@ -51,7 +51,6 @@ public class PostCommentService {
         Optional<PostComment> optional = commentRepository.findById(id);
         if (optional.isPresent()) {
             PostComment gr = optional.get();
-            // Cập nhật các trường của đối tượng user
             gr.setContent(content);
             // ...
             PostComment list = commentRepository.save(gr);
@@ -64,7 +63,7 @@ public class PostCommentService {
         return data;
     }
 
-    public boolean deleteGroupById(Object id) {
+    public boolean deletePostComment(Object id) {
         try {
             commentRepository.deletePostComentById(Integer.parseInt((String) id));
             return true;
@@ -73,8 +72,8 @@ public class PostCommentService {
         }
     }
 
-    public Page<PostComment> getPostCommentList(int page, int limit, String author_id) {
-        Pageable pageable = PageRequest.of(page, limit);
-        return commentRepository.findAllPostCommentByAuthorId(pageable, Integer.parseInt(author_id));
-    }
+//    public Page<PostComment> getPostCommentList(int page, int limit, String author_id) {
+//        Pageable pageable = PageRequest.of(page, limit);
+//        return commentRepository.findAllPostCommentByAuthorId(pageable, Integer.parseInt(author_id));
+//    }
 }

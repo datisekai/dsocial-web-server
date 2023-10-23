@@ -7,33 +7,23 @@ package com.example.dsocialserver.Types;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 /**
  *
  * @author haidu
  */
 public class GroupUserType {
-    
-    public int groupId;
-    
-    public int userId;
+    @NotEmpty
+    @NotBlank
+    @NotNull
+    public String groupId;
 
-    public int getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(int groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-    
-    
+    }  
+      
 }

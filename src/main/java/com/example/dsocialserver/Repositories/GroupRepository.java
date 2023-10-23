@@ -36,5 +36,5 @@ public interface GroupRepository extends CrudRepository<Groups, Object> {
             + "LEFT JOIN postimage ON post.id = postimage.post_id LEFT JOIN "
             + "postreaction ON post.id = postreaction.post_id LEFT JOIN postcomment "
             + "ON post.id = postcomment.post_id WHERE groups.id = :id", nativeQuery = true)
-    void deleteGroupsAndPostAndPostImage(@Param("id") int id);
+    void deleteGroups(@Param("id") int id);
 }

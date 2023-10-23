@@ -5,12 +5,11 @@
 package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
-import com.example.dsocialserver.Services.PostCommentService;
-import com.example.dsocialserver.Types.PostCommentType;
+import com.example.dsocialserver.Services.PostReactionService;
+import com.example.dsocialserver.Types.PostReactionType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,34 +37,29 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/post-comment")
-public class PostCommentController {
+@RequestMapping("/post-reaction")
+public class PostReactionController {
 
     @Autowired
-    private PostCommentService commentService;
+    private PostReactionService postReactionService;
 
     private final CustomResponse jsonRes = new CustomResponse();
 
     @PostMapping
-    public ResponseEntity createPostComment(@RequestHeader("Authorization") String authorizationHeader, 
-            @RequestBody @Valid PostCommentType pst) throws IOException {
+    public ResponseEntity createPostReaction(@RequestHeader("Authorization") String authorizationHeader, 
+            @RequestBody @Valid PostReactionType pst) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String postId= pst.getPostId();
-            String parentId= pst.getParentId();
-            String content = pst.getContent();
-            
-           if(parentId == null || "".equals(parentId)){
-                parentId="0";
-            }
+            String icon = pst.getIcon();
 //        ----------------------------------
 
-            Map<String, Object> postComment = commentService.createPostComment(Integer.parseInt(postId), Integer.parseInt(authorId), content, Integer.parseInt(parentId));
-            if (postComment != null) {
+            Map<String, Object> postReaction = postReactionService.createPostReaction(Integer.parseInt(postId), Integer.parseInt(authorId), icon);
+            if (postReaction != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("message", "Thêm bình luận thành công");
-                responseData.put("data", postComment);
+                responseData.put("message", "Thêm cảm xúc thành công");
+                responseData.put("data", postReaction);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -75,18 +69,17 @@ public class PostCommentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updatePostComment(HttpServletRequest request,
-            @PathVariable("id") String id,
-            @RequestBody @Valid PostCommentType pst) throws IOException {
+    public ResponseEntity updatePostReaction(@PathVariable("id") String id,
+            @RequestBody @Valid PostReactionType pst) throws IOException {
         try {
-            String content = pst.getContent();
+            String icon = pst.getIcon();
 //        ----------------------------------
-            Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(id), content);
-            if (postComment != null) {
+            Map<String, Object> postReaction = postReactionService.updatePostReaction(Integer.parseInt(id), icon);
+            if (postReaction != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("message", "Cập nhật bình luận thành công");
-                responseData.put("data", postComment);
+                responseData.put("message", "Cập nhật cảm xúc thành công");
+                responseData.put("data", postReaction);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -96,11 +89,11 @@ public class PostCommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletePostComment(@PathVariable("id") String id) throws IOException {
+    public ResponseEntity deletePostReaction(@PathVariable("id") String id) throws IOException {
         try {
-            boolean post = commentService.deletePostComment(id);
-            if (post == true) {
-                jsonRes.setRes(true, "Xóa bình luận thành công");
+            boolean postReaction = postReactionService.deletePostReaction(id);
+            if (postReaction == true) {
+                jsonRes.setRes(true, "Xóa cảm xúc thành công");
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
