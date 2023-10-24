@@ -60,7 +60,7 @@ public class GroupController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(page, limit, gr));
+                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -69,7 +69,7 @@ public class GroupController {
         }
     }
 
-    // lấy ra những nhóm của người dùng
+    // lấy ra những nhóm của mình
     @GetMapping("/joined")
     public ResponseEntity getAllMyGroups(@RequestHeader("Authorization") String authorizationHeader, 
             @RequestParam(value = "page", defaultValue = "1") String page,
@@ -82,7 +82,7 @@ public class GroupController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(page, limit, gr));
+                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

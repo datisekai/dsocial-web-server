@@ -5,6 +5,7 @@
 package com.example.dsocialserver.Repositories;
 
 import com.example.dsocialserver.Models.PostReaction;
+import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -20,4 +21,7 @@ public interface PostReactionRepository extends CrudRepository<PostReaction, Obj
     @Modifying
     @Query(value = "DELETE FROM postreaction WHERE postreaction.id= :id", nativeQuery = true)
     void deletePostReactionById(@Param("id") int id);  
+    
+    @Query(value="SELECT postreaction.* FROM postreaction,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postreaction.post_id", nativeQuery = true)
+    List<PostReaction> findAllPostReactionByPostId(@Param("postId") int postId);
 }

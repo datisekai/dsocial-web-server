@@ -4,9 +4,14 @@
  */
 package com.example.dsocialserver.Services;
 
+import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Models.PostComment;
 import com.example.dsocialserver.Models.PostImage;
+import com.example.dsocialserver.Models.PostReaction;
+import com.example.dsocialserver.Repositories.PostCommentRepository;
 import com.example.dsocialserver.Repositories.PostImageRepository;
+import com.example.dsocialserver.Repositories.PostReactionRepository;
 import com.example.dsocialserver.Repositories.PostRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +35,12 @@ public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private PostReactionRepository postReactionRepository;
+
+    @Autowired
+    private PostCommentRepository postCommentRepository;
 
     @Autowired
     private PostImageRepository postImageRepository;
@@ -101,27 +112,59 @@ public class PostService {
 
     public boolean deletePost(Object id) {
 //        try {
-            postRepository.deletePost(Integer.parseInt((String) id));
-            return true;
+        postRepository.deletePost(Integer.parseInt((String) id));
+        return true;
 //        } catch (NumberFormatException e) {
 //            return false;
 //        }
 
     }
 
-    public Page<Post> getPostListUser(int page, int limit, int id) {
+    public Map<String, Object> getPostListUser(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        return postRepository.findAllByUserId(pageable, id);
+        Page<Post> list = postRepository.findAllByUserId(pageable, userId);
+        return reponsDataPost(page, limit, list);
     }
 
-    public Page<Post> getPostListGroup(int page, int limit, int id) {
+    public Map<String, Object> getPostListGroup(int page, int limit, int groupId) {
         Pageable pageable = PageRequest.of(page, limit);
-        return postRepository.findAllByGroupId(pageable, id);
+        Page<Post> list = postRepository.findAllByGroupId(pageable, groupId);
+        return reponsDataPost(page, limit, list);
     }
 
-    public Page<Post> getPostList(int page, int limit) {
+    public Map<String, Object> getPostList(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        return postRepository.findAll(pageable);
+        Page<Post> list = postRepository.findAll(pageable);
+
+        return reponsDataPost(page, limit, list);
+    }
+
+    public Map<String, Object> reponsDataPost(int page, int limit, Page<Post> list) {
+        List<Map<String, Object>> listdata = new ArrayList<>();
+
+        for (Post o : list.getContent()) {
+            Map<String, Object> data = new HashMap<>();
+            List<PostImage> listPostImage = postImageRepository.findAllPostImageByPostId(o.getId());
+            List<PostReaction> listPostreaction = postReactionRepository.findAllPostReactionByPostId(o.getId());
+            List<PostComment> listPostComment = postCommentRepository.findAllPostCommentByPostId(o.getId());
+
+            data.put("id", o.getId());
+            data.put("html", o.getHtml());
+            data.put("author_id", o.getAuthor_id());
+            data.put("group_id", o.getGroup_id());
+            data.put("created_at", o.getCreated_at());
+            data.put("image", listPostImage);
+            data.put("count_reaction", listPostreaction.size());
+            data.put("count_comment", listPostComment.size());
+            data.put("reaction", listPostreaction);
+            data.put("comment", listPostComment);
+            listdata.add(data);
+        }
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", listdata);
+        dataResult.put("pagination", getPagination(page, list));
+
+        return dataResult;
     }
 
 }

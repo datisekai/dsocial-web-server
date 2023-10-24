@@ -8,6 +8,7 @@ import com.example.dsocialserver.Models.PostComment;
 import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Models.PostReaction;
 import jakarta.validation.constraints.*;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class PostType {
 
+    public String id;
+    
     @NotEmpty
     @NotBlank
     @NotNull
@@ -23,12 +26,18 @@ public class PostType {
     
     public String groupId;
     
+    public String userId;
+    
     public List<PostImage> image;
     
     public List<PostReaction> reaction;
     
     public List<PostComment> comment;
 
+    public Date createdAt;
+    
+    public Date updatedAt;
+    
     public String getHtml() {
         return html;
     }
@@ -68,6 +77,38 @@ public class PostType {
 
     public void setComment(List<PostComment> comment) {
         this.comment = comment;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
     
 }

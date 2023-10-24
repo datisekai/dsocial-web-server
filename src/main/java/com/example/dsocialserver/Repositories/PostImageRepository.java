@@ -18,6 +18,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PostImageRepository extends CrudRepository<PostImage, Object> {
-//    @Query(value = "SELECT p FROM postimage p WHERE p.post_id = :postId", nativeQuery = true)
-//    List<PostImage> findAllPostImageByPostId(@Param("postId") int postId);
+    @Query(value = "SELECT * FROM postimage WHERE postimage.post_id = :postId", nativeQuery = true)
+    List<PostImage> findAllPostImageByPostId(@Param("postId") int postId);
 }

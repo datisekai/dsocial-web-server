@@ -57,9 +57,28 @@ public class UserController {
     private Environment environment;
 
     private final CustomResponse jsonRes = new CustomResponse();
+    
+    // lấy thông tin người khác
+    @GetMapping("/info/{userId}")
+    public ResponseEntity getInfoUser(@PathVariable("userId") String userId) {
+           try {
+            Map<String, Object> user = userService.getInfoUser(userId);
+            if (user != null) {
 
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", "Authorization");
+                responseData.put("data", user);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (Exception e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
     @GetMapping("/me")
-    public ResponseEntity getInfoUser(HttpServletRequest request) {
+    public ResponseEntity getInfoMe(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String bearerToken = authorizationHeader.substring(7); // Loại bỏ phần "Bearer "

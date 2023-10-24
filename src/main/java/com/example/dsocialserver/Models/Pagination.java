@@ -26,10 +26,10 @@ public class Pagination {
         this.prev_page = prev_page;
     }
 
-    public static Pagination getPagination(String page, String limit, Page gr) {
+    public static Pagination getPagination(int page, Page gr) {
         Pagination p = new Pagination();
         p.setTotal_page(gr.getTotalPages());
-        p.setCurrent_page(Integer.parseInt(page));
+        p.setCurrent_page(page + 1);
         p.setNext_page(p.getCurrent_page() < p.getTotal_page() ? (p.getCurrent_page() + 1) + "" : null);
         p.setPer_page(gr.getNumberOfElements());
         p.setPrev_page(p.getCurrent_page() > 1 ? (p.getCurrent_page() - 1) + "" : null);

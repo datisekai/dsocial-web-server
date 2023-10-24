@@ -6,6 +6,7 @@ package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.Friendship;
+import com.example.dsocialserver.Models.Groups;
 import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Services.FriendshipService;
 import com.example.dsocialserver.Types.FriendshipType;
@@ -62,7 +63,27 @@ public class FriendshipController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(page, limit, gr));
+                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    // lấy danh sách bạn bè của người khác
+    @GetMapping("/{userId}")
+    public ResponseEntity getAllYourFriend(@PathVariable("userId") String userId, 
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            Page<Friendship> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            if (gr != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", gr.getContent());
+                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

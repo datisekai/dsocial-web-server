@@ -5,8 +5,15 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Groups;
+import static com.example.dsocialserver.Models.Pagination.getPagination;
+import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Models.PostComment;
+import com.example.dsocialserver.Models.PostImage;
+import com.example.dsocialserver.Models.PostReaction;
 import com.example.dsocialserver.Repositories.GroupRepository;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,5 +108,31 @@ public class GroupService {
         Pageable pageable = PageRequest.of(page, limit);
         return groupRepository.findAll(pageable);
     }
-
+//    public Map<String, Object> reponsDataGroup(int page, int limit, Page<Groups> list) {
+//        List<Map<String, Object>> listdata = new ArrayList<>();
+//
+//        for (Groups o : list.getContent()) {
+//            Map<String, Object> data = new HashMap<>();
+//            List<PostImage> listPostImage = postImageRepository.findAllPostImageByPostId(o.getId());
+//            List<PostReaction> listPostreaction = postReactionRepository.findAllPostReactionByPostId(o.getId());
+//            List<PostComment> listPostComment = postCommentRepository.findAllPostCommentByPostId(o.getId());
+//
+//            data.put("id", o.getId());
+//            data.put("html", o.getHtml());
+//            data.put("author_id", o.getAuthor_id());
+//            data.put("group_id", o.getGroup_id());
+//            data.put("created_at", o.getCreated_at());
+//            data.put("image", listPostImage);
+//            data.put("count_reaction", listPostreaction.size());
+//            data.put("count_comment", listPostComment.size());
+//            data.put("reaction", listPostreaction);
+//            data.put("comment", listPostComment);
+//            listdata.add(data);
+//        }
+//        Map<String, Object> dataResult = new HashMap<>();
+//        dataResult.put("data", listdata);
+//        dataResult.put("pagination", getPagination(page, list));
+//
+//        return dataResult;
+//    }
 }

@@ -5,6 +5,7 @@
 package com.example.dsocialserver.Repositories;
 
 import com.example.dsocialserver.Models.PostComment;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +27,7 @@ public interface PostCommentRepository extends CrudRepository<PostComment, Objec
     @Modifying
     @Query(value = "DELETE FROM postcomment WHERE postcomment.id= :id", nativeQuery = true)
     void deletePostComentById(@Param("id") int id);
+    
+    @Query(value="SELECT postcomment.* FROM postcomment,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postcomment.post_id", nativeQuery = true)
+     List<PostComment> findAllPostCommentByPostId(@Param("postId") int postId);
 }
