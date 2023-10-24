@@ -26,8 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+
 import java.util.Date;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author haidu
  */
-@CrossOrigin
 @RestController
 @RequestMapping()
 public class UserController {
@@ -57,11 +55,11 @@ public class UserController {
     private Environment environment;
 
     private final CustomResponse jsonRes = new CustomResponse();
-    
+
     // lấy thông tin người khác
     @GetMapping("/info/{userId}")
     public ResponseEntity getInfoUser(@PathVariable("userId") String userId) {
-           try {
+        try {
             Map<String, Object> user = userService.getInfoUser(userId);
             if (user != null) {
 
@@ -76,7 +74,7 @@ public class UserController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    
+
     @GetMapping("/me")
     public ResponseEntity getInfoMe(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -105,32 +103,32 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity register(
             @RequestBody @Valid RegisterType user,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         try {
             String email = user.getEmail();
             String password = user.getPassword();
             String name = user.getName();
-//        ----------------------------------
+            // ----------------------------------
             User isExist = userService.findByEmail(email);
             if (isExist != null) {
                 jsonRes.setRes(false, "Email đã được sử dụng");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
 
-//        ----------------------------------
+            // ----------------------------------
             String avatar = "https://ui-avatars.com/api/?name=" + name;
             String hashPassword = MD5(password);
             User u = userService.createUser(email, hashPassword, name, avatar);
 
-//        ----------------------------------
+            // ----------------------------------
             if (u != null) {
                 String codeEmail = createJWT(u.getId());
                 Date currentDate = new Date();
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("haiduong09876@gmail.com");
                 message.setTo(u.getEmail());
-                message.setText("Nhấn vào link để xác thực email: " + environment.getProperty("fe.url") + "/confirm-email?token=" + codeEmail
+                message.setText("Nhấn vào link để xác thực email: " + environment.getProperty("fe.url")
+                        + "/confirm-email?token=" + codeEmail
                         + "\nCảm ơn bạn đã tham gia website mạng xã hội Dsocial.");
                 message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
                 mailSender.send(message);
@@ -172,7 +170,7 @@ public class UserController {
             String email = us.getEmail();
             String password = us.getPassword();
             String token = null;
-//        ----------------------------------
+            // ----------------------------------
             String hashPassword = MD5(password);
             User user = userService.findByEmailAndPassword(email, hashPassword);
             if (user == null) {
@@ -183,7 +181,7 @@ public class UserController {
                 jsonRes.setRes(false, "Tài khoản chưa được xác thực");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
-            token = generateToken(user.getId(), 86400000); //86400000 300000
+            token = generateToken(user.getId(), 86400000); // 86400000 300000
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("message", "Đăng nhập thành công");
@@ -209,7 +207,8 @@ public class UserController {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("haiduong09876@gmail.com");
             message.setTo(email);
-            message.setText("Nhấn vào link để đổi mật khẩu: " + environment.getProperty("fe.url") + "/resetpassword?token=" + codeEmail
+            message.setText("Nhấn vào link để đổi mật khẩu: " + environment.getProperty("fe.url")
+                    + "/resetpassword?token=" + codeEmail
                     + "\nGặp vấn đề liên hệ với Dsocial.");
             message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
             mailSender.send(message);
@@ -219,7 +218,7 @@ public class UserController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    ///register/a
+    /// register/a
 
     @PostMapping("/resetpassword")
     public ResponseEntity resetpassword(@Valid @RequestBody ResetpasswordType us) {
