@@ -51,96 +51,89 @@ public class FriendshipController {
     private FriendshipService friendshipService;
 
     private final CustomResponse jsonRes = new CustomResponse();
-    
+
     @GetMapping()
-    public ResponseEntity getAllMyFriend(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity getAllMyFriend(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Map<String, Object> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     @GetMapping("/requests")
-    public ResponseEntity getAllMyFriendRequests(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity getAllMyFriendRequests(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Map<String, Object> gr = friendshipService.getMyFriendshipRequestList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     // lấy danh sách bạn bè của người khác
     @GetMapping("/{userId}")
-    public ResponseEntity getAllYourFriend(@PathVariable("userId") String userId, 
+    public ResponseEntity getAllYourFriend(@PathVariable("userId") String userId,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
             Map<String, Object> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     @GetMapping("/search")
-    public ResponseEntity searchFriend(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity searchFriend(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit,
-            @RequestParam(value = "nameUser", defaultValue = "") String nameUser) throws IOException {
+            @RequestParam(value = "name", defaultValue = "") String name) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
 
-            Map<String, Object> gr = friendshipService.getSearchMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), nameUser);
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> gr = friendshipService.getSearchMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), name);
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    
+
     @PostMapping
-    public ResponseEntity createFriendRequest(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity createFriendRequest(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid FriendshipType pst) throws IOException {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            String friendId= pst.getFriendId();
+            String friendId = pst.getFriendId();
 //        ----------------------------------
 
             Map<String, Object> friendship = friendshipService.createFriendship(Integer.parseInt(userId), Integer.parseInt(friendId));
@@ -155,7 +148,7 @@ public class FriendshipController {
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
-    }   
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity submitFriend(@PathVariable("id") String id,

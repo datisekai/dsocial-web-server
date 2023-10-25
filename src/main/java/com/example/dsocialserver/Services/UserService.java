@@ -37,7 +37,8 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User list = optionalUser.get();
-
+            
+            data.put("id", list.getId());
             data.put("email", list.getEmail());
             data.put("name", list.getName());
             data.put("avatar", list.getAvatar());

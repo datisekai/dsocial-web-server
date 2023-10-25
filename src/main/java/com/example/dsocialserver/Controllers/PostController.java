@@ -59,14 +59,11 @@ public class PostController {
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             Map<String, Object> post = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
-            if (post != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", post.get("data"));
-                responseData.put("pagination", post.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", post.get("data"));
+            responseData.put("pagination", post.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
@@ -78,38 +75,36 @@ public class PostController {
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             Map<String, Object> post = postService.getPostListGroup(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(groupId));
-            if (post != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", post.get("data"));
-                responseData.put("pagination", post.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", post.get("data"));
+            responseData.put("pagination", post.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     // lấy ra tất cả bài viết của mình
-    @GetMapping("/me")
-    public ResponseEntity getAllPostMe(@RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam(value = "page", defaultValue = "1") String page,
-            @RequestParam(value = "limit", defaultValue = "10") String limit) {
-        try {
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> post = postService.getPostListUser(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (post != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", post.get("data"));
-                responseData.put("pagination", post.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
-        } catch (NumberFormatException e) {
-            return StatusUntilIndex.showInternal(e);
-        }
-    }
+//    @GetMapping("/me")
+//    public ResponseEntity getAllPostMe(@RequestHeader("Authorization") String authorizationHeader,
+//            @RequestParam(value = "page", defaultValue = "1") String page,
+//            @RequestParam(value = "limit", defaultValue = "10") String limit) {
+//        try {
+//            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+//            Map<String, Object> post = postService.getPostListUser(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+//            if (post != null) {
+//                Map<String, Object> responseData = new HashMap<>();
+//                responseData.put("success", true);
+//                responseData.put("data", post.get("data"));
+//                responseData.put("pagination", post.get("pagination"));
+//                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+//            }
+//            return StatusUntilIndex.showMissing();
+//        } catch (NumberFormatException e) {
+//            return StatusUntilIndex.showInternal(e);
+//        }
+//    }
     // lấy ra tất cả bài viết của nguoi dung
     @GetMapping("/user/{userId}")
     public ResponseEntity getAllPostUser(@PathVariable("userId") String userId,
@@ -117,18 +112,16 @@ public class PostController {
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             Map<String, Object> post = postService.getPostListUser(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (post != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", post.get("data"));
-                responseData.put("pagination", post.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", post.get("data"));
+            responseData.put("pagination", post.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     @PostMapping
     public ResponseEntity createPost(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid PostType pst) throws IOException {

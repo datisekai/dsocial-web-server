@@ -46,11 +46,11 @@ public class PostReactionController {
     private final CustomResponse jsonRes = new CustomResponse();
 
     @PostMapping
-    public ResponseEntity createPostReaction(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity createPostReaction(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid PostReactionType pst) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            String postId= pst.getPostId();
+            String postId = pst.getPostId();
             String icon = pst.getIcon();
 //        ----------------------------------
 

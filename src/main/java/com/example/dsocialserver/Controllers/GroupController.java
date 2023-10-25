@@ -56,14 +56,11 @@ public class GroupController {
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             Map<String, Object> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
@@ -71,21 +68,18 @@ public class GroupController {
 
     // lấy ra những nhóm của mình
     @GetMapping("/joined")
-    public ResponseEntity getAllMyGroups(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity getAllMyGroups(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Map<String, Object> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
-            if (gr != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("data", gr.get("data"));
-                responseData.put("pagination", gr.get("pagination"));
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }

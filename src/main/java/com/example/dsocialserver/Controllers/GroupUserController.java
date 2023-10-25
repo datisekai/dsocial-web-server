@@ -6,7 +6,9 @@ package com.example.dsocialserver.Controllers;
 
 import com.example.dsocialserver.Models.CustomResponse;
 import com.example.dsocialserver.Models.GroupUser;
+import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Services.GroupUserService;
+import com.example.dsocialserver.Types.GroupBossType;
 import com.example.dsocialserver.Types.GroupUserType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
@@ -45,17 +47,17 @@ public class GroupUserController {
     private GroupUserService groupUserService;
 
     private final CustomResponse jsonRes = new CustomResponse();
-    
+
     @PostMapping()
     public ResponseEntity joinGroupUser(@RequestHeader("Authorization") String authorizationHeader,
             @Valid @RequestBody GroupUserType gr) throws IOException {
         try {
-            String groupId= gr.getGroupId();
+            String groupId = gr.getGroupId();
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 
 //        ----------------------------------
             Map<String, Object> groupUser = groupUserService.joinGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
-            if (groupUser != null) {               
+            if (groupUser != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tham gia nhóm thành công");
@@ -68,29 +70,38 @@ public class GroupUserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity outGroupUser(@PathVariable("userId") String userId) throws IOException {
+    @DeleteMapping("/kick")
+    public ResponseEntity kickUserGroupUser(@Valid @RequestBody GroupBossType gr, @RequestHeader("Authorization") String authorizationHeader) throws IOException {
         try {
-//            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-                boolean friend = groupUserService.outGroupUser(Integer.parseInt(userId));
+            String userId_boss = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String groupId = gr.getGroupId();
+            String userId = gr.getUserId();
+            Groups isBoss = groupUserService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId_boss));
+            if (isBoss != null) {
+                boolean friend = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
                 if (friend) {
-                    jsonRes.setRes(true, "Rời nhóm thành công");
+                    jsonRes.setRes(true, "Đuổi thành viên thành công");
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
                 }
-            return StatusUntilIndex.showMissing();
+                return StatusUntilIndex.showMissing();
+            }
+            return StatusUntilIndex.showNotAuthorized();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     @DeleteMapping()
-    public ResponseEntity kickUserGroupUser(@RequestHeader("Authorization") String authorizationHeader) throws IOException {
+    public ResponseEntity outGroupUser(@Valid @RequestBody GroupUserType gr,
+            @RequestHeader("Authorization") String authorizationHeader) throws IOException {
         try {
+            String groupId = gr.getGroupId();
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-                boolean friend = groupUserService.outGroupUser(Integer.parseInt(userId));
-                if (friend) {
-                    jsonRes.setRes(true, "Rời nhóm thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
-                }
+            boolean friend = groupUserService.outGroupUser(Integer.parseInt(groupId),Integer.parseInt(userId));
+            if (friend) {
+                jsonRes.setRes(true, "Rời nhóm thành công");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            }
             return StatusUntilIndex.showMissing();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);

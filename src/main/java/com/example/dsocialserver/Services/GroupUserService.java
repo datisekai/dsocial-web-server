@@ -5,6 +5,8 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.GroupUser;
+import com.example.dsocialserver.Models.Groups;
+import com.example.dsocialserver.Repositories.GroupRepository;
 import com.example.dsocialserver.Repositories.GroupUserRepository;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,13 @@ public class GroupUserService {
 
     @Autowired
     private GroupUserRepository groupUserRepository;
-
+    
+    @Autowired
+    private GroupRepository groupRepository;
+    
+    public Groups findByIdAndUserId(int id, int userId){
+        return groupRepository.findByIdAndUserId(id, userId);
+    }
     public Map<String, Object> joinGroupUser(int group_id, int user_id) {
         GroupUser gu = new GroupUser();
         gu.setGroup_id(group_id);
@@ -37,9 +45,9 @@ public class GroupUserService {
         return data;
     }
 
-    public boolean outGroupUser(int id) {
+    public boolean outGroupUser(int id, int userId) {
         try {
-            groupUserRepository.deleteById(id);
+            groupUserRepository.deleteByGroupIdAndUserId(id, userId);
             return true;
         } catch (Exception e) {
             return false;

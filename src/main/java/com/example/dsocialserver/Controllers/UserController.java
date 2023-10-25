@@ -61,15 +61,11 @@ public class UserController {
     public ResponseEntity getInfoUser(@PathVariable("userId") String userId) {
         try {
             Map<String, Object> user = userService.getInfoUser(userId);
-            if (user != null) {
-
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Authorization");
-                responseData.put("data", user);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("message", "Authorization");
+            responseData.put("data", user);
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } catch (Exception e) {
             return StatusUntilIndex.showInternal(e);
         }
@@ -85,15 +81,11 @@ public class UserController {
                 return showNotAuthorized();
             }
             Map<String, Object> user = userService.getInfoUser(isTokenExpired(bearerToken));
-            if (user != null) {
-
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Authorization");
-                responseData.put("data", user);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
-            }
-            return StatusUntilIndex.showMissing();
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("message", "Authorization");
+            responseData.put("data", user);
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
         } else {
             // Trường hợp không tìm thấy hoặc không hợp lệ
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing Bearer Token");
