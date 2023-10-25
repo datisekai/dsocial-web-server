@@ -10,6 +10,7 @@ import com.example.dsocialserver.Models.Groups;
 import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Services.FriendshipService;
 import com.example.dsocialserver.Types.FriendshipType;
+import com.example.dsocialserver.Types.SearchType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import com.example.dsocialserver.Utils.StatusUntilIndex;
@@ -111,9 +112,31 @@ public class FriendshipController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    @GetMapping("/search")
+    public ResponseEntity searchFriend(@RequestHeader("Authorization") String authorizationHeader, 
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit,
+            @RequestParam(value = "nameUser", defaultValue = "") String nameUser) throws IOException {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+//        ----------------------------------
+
+            Map<String, Object> gr = friendshipService.getSearchMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), nameUser);
+            if (gr != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
     
     @PostMapping
-    public ResponseEntity createPostReaction(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity createFriendRequest(@RequestHeader("Authorization") String authorizationHeader, 
             @RequestBody @Valid FriendshipType pst) throws IOException {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
@@ -132,10 +155,10 @@ public class FriendshipController {
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
-    }
+    }   
 
     @PutMapping("/{id}")
-    public ResponseEntity updatePostReaction(@PathVariable("id") String id,
+    public ResponseEntity submitFriend(@PathVariable("id") String id,
             @RequestBody @Valid FriendshipType pst) throws IOException {
         try {
 //        ----------------------------------
@@ -154,7 +177,7 @@ public class FriendshipController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletePostReaction(@PathVariable("id") String id) throws IOException {
+    public ResponseEntity deleteFriend(@PathVariable("id") String id) throws IOException {
         try {
             boolean friendship = friendshipService.deleteFriendship(id);
             if (friendship == true) {

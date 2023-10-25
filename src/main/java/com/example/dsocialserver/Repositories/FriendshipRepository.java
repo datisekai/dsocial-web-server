@@ -18,6 +18,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface FriendshipRepository extends CrudRepository<Friendship, Object>{
+    @Query(value="SELECT * FROM friendship,(SELECT * FROM user WHERE user.name LIKE '% :name %' AND user.id != :userId) as temp WHERE (temp.id = friendship.user_id  OR temp.id= friendship.friend_id) AND friendship.is_active=1", nativeQuery = true)
+    Page<Friendship> findAllSearchFriendshipByUserId(Pageable pageable, @Param("userId") int userId, @Param("name") String name);
+    
     @Query(value="SELECT * FROM friendship WHERE friendship.user_id = :userId AND friendship.is_active=1", nativeQuery = true)
     Page<Friendship> findAllFriendshipByUserId(Pageable pageable, @Param("userId") int userId);
     
