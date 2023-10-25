@@ -68,13 +68,26 @@ public class GroupUserController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity outGroupUser(@RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable("id") String id) throws IOException {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity outGroupUser(@PathVariable("userId") String userId) throws IOException {
         try {
 //            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-                boolean group = groupUserService.outGroupUser(Integer.parseInt(id));
-                if (group) {
+                boolean friend = groupUserService.outGroupUser(Integer.parseInt(userId));
+                if (friend) {
+                    jsonRes.setRes(true, "Rời nhóm thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    @DeleteMapping()
+    public ResponseEntity kickUserGroupUser(@RequestHeader("Authorization") String authorizationHeader) throws IOException {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+                boolean friend = groupUserService.outGroupUser(Integer.parseInt(userId));
+                if (friend) {
                     jsonRes.setRes(true, "Rời nhóm thành công");
                     return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
                 }
