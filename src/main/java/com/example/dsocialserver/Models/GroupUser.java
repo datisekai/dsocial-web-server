@@ -27,18 +27,18 @@ public class GroupUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int group_id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int user_id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
     private User user_groupUsers;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", insertable=false, updatable=false)
     private Groups group_groupUsers;
     
     // Getters and setters

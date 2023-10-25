@@ -24,7 +24,7 @@ public class MessageReaction {
     @Column(nullable = false)
     private int message_id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int author_id;
 
     @Column(nullable = false)
@@ -37,7 +37,7 @@ public class MessageReaction {
     private Date updated_at;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", insertable=false, updatable=false)
     private User user_messageReactions;
 
     // Getters and setters

@@ -55,12 +55,12 @@ public class GroupController {
     public ResponseEntity getAllGroups(@RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Page<Groups> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
+            Map<String, Object> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
             if (gr != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -77,12 +77,12 @@ public class GroupController {
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Page<Groups> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             if (gr != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

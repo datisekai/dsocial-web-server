@@ -36,10 +36,10 @@ public class Post {
     @Column(nullable = false)
     private String html;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int author_id;
 
-    @Column(columnDefinition = "int default 0", insertable=false, updatable=false)
+    @Column(columnDefinition = "int default 0")
     private int group_id;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -60,11 +60,11 @@ public class Post {
     private List<PostReaction> postReactions = new ArrayList<>();
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", insertable=false, updatable=false)
     private User user_posts;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", insertable=false, updatable=false)
     private Groups group_posts;
     
     // Getters and setters

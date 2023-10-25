@@ -5,6 +5,7 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Friendship;
+import static com.example.dsocialserver.Models.Pagination.getPagination;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.dsocialserver.Repositories.FriendshipRepository;
+import static com.example.dsocialserver.Services.UserService.getUser;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,8 +71,30 @@ public class FriendshipService {
             return false;
         }
     }
-    public Page<Friendship> getMyFriendshipList(int page, int limit, int userId) {
+    public Map<String, Object> getMyFriendshipList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        return friendshipRepository.findAllFriendshipByUserId(pageable, userId);
+         Page<Friendship> list =friendshipRepository.findAllFriendshipByUserId(pageable, userId);
+         return reponsDataFriendship(page, list);
+    }
+     public Map<String, Object> getMyFriendshipRequestList(int page, int limit, int userId) {
+        Pageable pageable = PageRequest.of(page, limit);
+         Page<Friendship> list =friendshipRepository.findAllFriendshipRequestByUserId(pageable, userId);
+         return reponsDataFriendship(page, list);
+    }
+    public Map<String, Object> reponsDataFriendship(int page, Page<Friendship> list) {
+        List<Map<String, Object>> listdata = new ArrayList<>();
+        for (Friendship o : list.getContent()) {
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("id", o.getId());
+            data.put("user_request", getUser(o.getUser_user_friendships()));
+            data.put("friend", getUser(o.getUser_friend_friendships()));
+            listdata.add(data);
+        }
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", listdata);
+        dataResult.put("pagination", getPagination(page, list));
+
+        return dataResult;
     }
 }

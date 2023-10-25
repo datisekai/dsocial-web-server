@@ -28,10 +28,10 @@ public class PostReaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int post_id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int author_id;
 
     @Column(nullable = false)
@@ -44,11 +44,11 @@ public class PostReaction {
     private Date updated_at;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", insertable=false, updatable=false)
     private Post post_postReactions;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", insertable=false, updatable=false)
     private User user_postReactions;
     
     // Getters and setters

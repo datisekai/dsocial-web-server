@@ -12,7 +12,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -38,10 +40,10 @@ public class Groups {
 
     @Column(nullable = false)
     private String avatar;
-    
+
     private String cover_image;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int user_id;
 
     private int is_active;
@@ -51,22 +53,21 @@ public class Groups {
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updated_at;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user_groups;
-    
+
     @OneToMany(mappedBy = "group_posts", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    private User user;
     // Getters and setters
     // Constructors
     // Other helper methods
-
-    public Groups( String name, String avatar, String cover_image, int user_id, int is_active) {
+    public Groups(String name, String avatar, String cover_image, int user_id, int is_active) {
         this.name = name;
         this.avatar = avatar;
         this.cover_image = cover_image;
@@ -140,5 +141,5 @@ public class Groups {
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
     }
-    
+
 }

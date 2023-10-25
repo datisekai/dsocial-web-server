@@ -27,11 +27,11 @@ public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Column(nullable = false, insertable=false, updatable=false)
+    
+    @Column(nullable = false)
     private int user_id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int friend_id;
 
     private int is_Active;
@@ -54,7 +54,7 @@ public class Friendship {
     public void setId(int id) {
         this.id = id;
     }
-
+    
     public int getUser_id() {
         return user_id;
     }

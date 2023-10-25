@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.*;
 import java.util.ArrayList;
@@ -73,9 +74,6 @@ public class User {
     @OneToMany(mappedBy = "user_posts", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_groups", fetch = FetchType.LAZY)
-    private List<Groups> groups = new ArrayList<>();
-    
     @OneToMany(mappedBy = "user_groupUsers", fetch = FetchType.LAZY)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
@@ -90,6 +88,12 @@ public class User {
     
     @OneToMany(mappedBy = "user_messageReactions", fetch = FetchType.LAZY)
     private List<MessageReaction> messageReactions = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY)
+    private List<RoomUser> roomUsers = new ArrayList<>();
+    
+    @OneToOne(mappedBy = "user")
+    private Groups groups;
     // Getters and setters
     // Constructors
     // Other helper methods

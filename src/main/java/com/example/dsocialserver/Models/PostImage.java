@@ -29,14 +29,14 @@ public class PostImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int post_id;
 
     @Column(nullable = false)
     private String src;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", insertable=false, updatable=false)
     private Post post_postImages;
 
     // Getters and setters

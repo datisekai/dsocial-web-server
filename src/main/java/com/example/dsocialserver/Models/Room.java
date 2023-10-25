@@ -40,6 +40,9 @@ public class Room {
 
     @OneToMany(mappedBy = "room_messages", fetch = FetchType.LAZY)
     private List<Message> messages = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "room_roomUsers", fetch = FetchType.LAZY)
+    private List<RoomUser> roomUsers = new ArrayList<>();
     // Getters and setters
 
     public int getId() {

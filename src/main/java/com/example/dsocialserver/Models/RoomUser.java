@@ -23,7 +23,14 @@ public class RoomUser {
 
     @Column(nullable = false)
     private int user_id;
-
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id", insertable=false, updatable=false)
+    private Room room_roomUsers;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    private User user_roomUsers;
     // Getters and setters
 
     public int getId() {

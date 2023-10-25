@@ -14,6 +14,7 @@ import com.example.dsocialserver.Repositories.PostCommentRepository;
 import com.example.dsocialserver.Repositories.PostImageRepository;
 import com.example.dsocialserver.Repositories.PostReactionRepository;
 import com.example.dsocialserver.Repositories.PostRepository;
+import static com.example.dsocialserver.Services.UserService.getUser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -125,22 +126,22 @@ public class PostService {
     public Map<String, Object> getPostListUser(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAllByUserId(pageable, userId);
-        return reponsDataPost(page, limit, list);
+        return reponsDataPost(page, list);
     }
 
     public Map<String, Object> getPostListGroup(int page, int limit, int groupId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAllByGroupId(pageable, groupId);
-        return reponsDataPost(page, limit, list);
+        return reponsDataPost(page, list);
     }
 
     public Map<String, Object> getPostList(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAll(pageable);
-        return reponsDataPost(page, limit, list);
+        return reponsDataPost(page, list);
     }
 
-    public Map<String, Object> reponsDataPost(int page, int limit, Page<Post> list) {
+    public Map<String, Object> reponsDataPost(int page, Page<Post> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Post o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
@@ -165,7 +166,7 @@ public class PostService {
                 dataComment.put("id", s.getId());
                 dataComment.put("post_id", s.getPost_id());
                 dataComment.put("content", s.getContent());
-                dataComment.put("create_at", s.getCreated_at());
+                dataComment.put("created_at", s.getCreated_at());
                 dataComment.put("author_id", s.getAuthor_id());
                 dataComment.put("parent_id", s.getParent_id());
                 dataComment.put("user_comment", getUser(s.getUser_postComments()));
@@ -193,13 +194,5 @@ public class PostService {
         dataResult.put("pagination", getPagination(page, list));
 
         return dataResult;
-    }
-
-    public Map<String, Object> getUser(User list) {
-        Map<String, Object> dataUser = new HashMap<>();
-        dataUser.put("id", list.getId());
-        dataUser.put("name", list.getName());
-        dataUser.put("avatar", list.getAvatar());
-        return dataUser;
     }
 }

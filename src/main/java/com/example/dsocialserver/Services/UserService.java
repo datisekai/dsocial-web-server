@@ -92,4 +92,11 @@ public class UserService {
         user.setAvatar(avatar);
         return userRepository.save(user);
     }
+    public static Map<String, Object> getUser(User list) {
+        Map<String, Object> dataUser = new HashMap<>();
+        dataUser.put("id", list.getId());
+        dataUser.put("name", list.getName());
+        dataUser.put("avatar", list.getAvatar());
+        return dataUser;
+    }
 }

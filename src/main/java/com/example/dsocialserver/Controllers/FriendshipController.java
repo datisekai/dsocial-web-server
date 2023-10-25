@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/friendship")
+@RequestMapping("/friend")
 public class FriendshipController {
 
     @Autowired
@@ -58,12 +58,32 @@ public class FriendshipController {
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Page<Friendship> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             if (gr != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    @GetMapping("/requests")
+    public ResponseEntity getAllMyFriendRequests(@RequestHeader("Authorization") String authorizationHeader, 
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = friendshipService.getMyFriendshipRequestList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            if (gr != null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -78,12 +98,12 @@ public class FriendshipController {
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
-            Page<Friendship> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             if (gr != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
-                responseData.put("data", gr.getContent());
-                responseData.put("pagination", getPagination(Integer.parseInt(page), gr));
+                responseData.put("data", gr.get("data"));
+                responseData.put("pagination", gr.get("pagination"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

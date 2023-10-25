@@ -18,10 +18,10 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int author_id;
 
-    @Column(nullable = false, insertable=false, updatable=false)
+    @Column(nullable = false)
     private int room_id;
 
     @Column(nullable = false)
@@ -40,11 +40,11 @@ public class Message {
     private Date updated_at;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id", insertable=false, updatable=false)
     private Room room_messages;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", insertable=false, updatable=false)
     private User user_messages;
 
     // Getters and setters
