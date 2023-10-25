@@ -22,6 +22,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepository extends CrudRepository<Post, Object> {
     
+    @Query(value="SELECT post.* FROM post,friendship WHERE post.html LIKE %:name% AND post.group_id = 0 AND (friendship.user_id =post.author_id OR friendship.friend_id =post.author_id) AND friendship.is_active=1", nativeQuery = true)
+    Page<Post> findAllByName(Pageable pageable, @Param("name") String name);
+    
     @Query(value="SELECT * FROM post WHERE post.author_id = :userId AND post.group_id = 0", nativeQuery = true)
     Page<Post> findAllByUserId(Pageable pageable, @Param("userId") int userId);
     

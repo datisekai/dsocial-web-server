@@ -101,6 +101,12 @@ public class GroupService {
             return false;
         }
     }
+    
+    public Map<String, Object> getSearchGroupList(int page, int limit, String name) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Groups> list = groupRepository.findAllByName(pageable, name);
+        return reponsDataGroup(page, list);
+    }
 
     public Map<String, Object> getMyGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);

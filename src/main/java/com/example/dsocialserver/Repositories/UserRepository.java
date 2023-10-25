@@ -18,11 +18,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRepository extends CrudRepository<User, Object> {
-
+    
     User findByEmail(String email);
 
     User findByEmailAndPassword(String email, String password);
-
-    @Query(value = "SELECT `user`.* FROM friendship, `user` WHERE `user`.name LIKE %:name% AND `user`.id != :userId AND (friendship.user_id = `user`.id OR friendship.friend_id = `user`.id) AND friendship.is_active=1", nativeQuery = true)
-    Page<User> findAllSearchFriendshipByUserId(Pageable pageable, @Param("userId") int userId, @Param("name") String name);
+    
+    @Query(value = "SELECT `user`.* FROM friendship, `user` WHERE `user`.name LIKE %:name% AND `user`.id != :userId AND (friendship.user_id = `user`.id OR friendship.friend_id = `user`.id) AND friendship.is_active=:isActive", nativeQuery = true)
+    Page<User> findAllByName(Pageable pageable, @Param("userId") int userId, @Param("name") String name, @Param("isActive") int isActive);
 }

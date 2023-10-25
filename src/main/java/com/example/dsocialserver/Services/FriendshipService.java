@@ -79,7 +79,7 @@ public class FriendshipService {
 
     public Map<String, Object> getSearchMyFriendshipList(int page, int limit, int userId, String name) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<User> list = userRepository.findAllSearchFriendshipByUserId(pageable, userId, name);
+        Page<User> list = userRepository.findAllByName(pageable, userId, name, 1);
         return reponsDataSearchFriendship(page, list);
     }
 

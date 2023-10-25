@@ -111,12 +111,12 @@ public class FriendshipController {
     public ResponseEntity searchFriend(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit,
-            @RequestParam(value = "name", defaultValue = "") String name) {
+            @RequestParam(value = "q", defaultValue = "") String q) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
 
-            Map<String, Object> gr = friendshipService.getSearchMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), name);
+            Map<String, Object> gr = friendshipService.getSearchMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), q);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);

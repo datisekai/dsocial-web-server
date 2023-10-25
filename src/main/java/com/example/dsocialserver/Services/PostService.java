@@ -121,6 +121,12 @@ public class PostService {
 //            return false;
 //        }
 
+    }  
+
+    public Map<String, Object> getPostListByHtml(int page, int limit, String name) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Post> list = postRepository.findAllByName(pageable, name);
+        return reponsDataPost(page, list);
     }
 
     public Map<String, Object> getPostListUser(int page, int limit, int userId) {
