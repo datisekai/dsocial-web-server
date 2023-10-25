@@ -6,16 +6,21 @@ package com.example.dsocialserver.Models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
+import lombok.Data;
 
 /**
  *
  * @author haidu
  */
+@Data
 @Entity
 @Table(name = "postreaction")
 public class PostReaction {
@@ -23,10 +28,10 @@ public class PostReaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int post_id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int author_id;
 
     @Column(nullable = false)
@@ -37,7 +42,15 @@ public class PostReaction {
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date updated_at;
-
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "post_id")
+    private Post post_postReactions;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "author_id")
+    private User user_postReactions;
+    
     // Getters and setters
 
     public int getId() {

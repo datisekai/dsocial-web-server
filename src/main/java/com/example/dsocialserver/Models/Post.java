@@ -4,18 +4,27 @@
  */
 package com.example.dsocialserver.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import lombok.Data;
 
 /**
  *
  * @author haidu
  */
+@Data
 @Entity
 @Table(name = "post")
 public class Post {
@@ -27,10 +36,10 @@ public class Post {
     @Column(nullable = false)
     private String html;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int author_id;
 
-    @Column(columnDefinition = "int default 0")
+    @Column(columnDefinition = "int default 0", insertable=false, updatable=false)
     private int group_id;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -41,6 +50,23 @@ public class Post {
 
     private int is_active;
 
+    @OneToMany(mappedBy = "post_postImages", fetch = FetchType.LAZY)
+    private List<PostImage> postImages = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "post_postComments", fetch = FetchType.LAZY)
+    private List<PostComment> postComments = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "post_postReactions", fetch = FetchType.LAZY)
+    private List<PostReaction> postReactions = new ArrayList<>();
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "author_id")
+    private User user_posts;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id")
+    private Groups group_posts;
+    
     // Getters and setters
     // Constructors
     // Other helper methods

@@ -6,15 +6,20 @@ package com.example.dsocialserver.Models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 /**
  *
  * @author haidu
  */
+@Data
 @Entity
 @Table(name = "friendship")
 public class Friendship {
@@ -23,14 +28,21 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int user_id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int friend_id;
 
     private int is_Active;
-
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    private User user_user_friendships;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "friend_id", insertable=false, updatable=false)
+    private User user_friend_friendships;
     // Getters and setters
     // Constructors
     // Other helper methods

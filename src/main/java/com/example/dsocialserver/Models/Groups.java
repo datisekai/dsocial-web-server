@@ -6,17 +6,25 @@ package com.example.dsocialserver.Models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import lombok.Data;
 
 /**
  *
  * @author haidu
  */
+@Data
 @Entity
 @Table(name = "`groups`")
 public class Groups {
@@ -26,7 +34,6 @@ public class Groups {
     private int id;
 
     @Column(nullable = false)
-    @NotBlank(message = "name is required")
     private String name;
 
     @Column(nullable = false)
@@ -34,7 +41,7 @@ public class Groups {
     
     private String cover_image;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable=false, updatable=false)
     private int user_id;
 
     private int is_active;
@@ -44,7 +51,17 @@ public class Groups {
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updated_at;
-
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user_groups;
+    
+    @OneToMany(mappedBy = "group_posts", fetch = FetchType.LAZY)
+    private List<Post> posts = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY)
+    private List<GroupUser> groupUsers = new ArrayList<>();
+    
     // Getters and setters
     // Constructors
     // Other helper methods

@@ -6,17 +6,23 @@ package com.example.dsocialserver.Models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import lombok.Data;
 
 /**
  *
  * @author haidu
  */
+@Data
 @Entity
 @Table(name = "user")
 public class User {
@@ -58,6 +64,32 @@ public class User {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updated_at;
     
+    @OneToMany(mappedBy = "user_postComments", fetch = FetchType.LAZY)
+    private List<PostComment> postComments = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_postReactions", fetch = FetchType.LAZY)
+    private List<PostReaction> postReactions = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_posts", fetch = FetchType.LAZY)
+    private List<Post> posts = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_groups", fetch = FetchType.LAZY)
+    private List<Groups> groups = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_groupUsers", fetch = FetchType.LAZY)
+    private List<GroupUser> groupUsers = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_user_friendships", fetch = FetchType.LAZY)
+    private List<Friendship> user_friendships = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_friend_friendships", fetch = FetchType.LAZY)
+    private List<Friendship> friend_friendships = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_messages", fetch = FetchType.LAZY)
+    private List<Message> messages = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user_messageReactions", fetch = FetchType.LAZY)
+    private List<MessageReaction> messageReactions = new ArrayList<>();
     // Getters and setters
     // Constructors
     // Other helper methods

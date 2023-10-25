@@ -25,10 +25,10 @@ public interface PostRepository extends CrudRepository<Post, Object> {
     @Query(value="SELECT * FROM post WHERE post.author_id = :userId AND post.group_id = 0", nativeQuery = true)
     Page<Post> findAllByUserId(Pageable pageable, @Param("userId") int userId);
     
-    @Query(value="SELECT * FROM post WHERE post.group_id = :groupId AND post.group_id = 0", nativeQuery = true)
+    @Query(value="SELECT * FROM post WHERE post.group_id = :groupId", nativeQuery = true)
     Page<Post> findAllByGroupId(Pageable pageable, @Param("groupId") int groupId);
 
-    @Query(value="SELECT * FROM post WHERE post.is_active = 1", nativeQuery = true)
+    @Query(value="SELECT * FROM Post WHERE Post.is_active = 1", nativeQuery = true)
     Page<Post> findAll(Pageable pageable);
 
     @Modifying
