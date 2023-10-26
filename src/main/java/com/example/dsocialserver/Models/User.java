@@ -92,8 +92,8 @@ public class User {
     @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY)
     private List<RoomUser> roomUsers = new ArrayList<>();
     
-    @OneToOne(mappedBy = "user")
-    private Groups groups;
+//    @OneToOne(mappedBy = "user")
+//    private Groups groups;
     // Getters and setters
     // Constructors
     // Other helper methods

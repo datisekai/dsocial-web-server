@@ -60,10 +60,11 @@ public class Groups {
     @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id", insertable=false, updatable=false)
-    private User user;
+//    @OneToOne
+//    @MapsId("id")
+//    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable=false, updatable=false)
+//    private User user;
+    
     // Getters and setters
     // Constructors
     // Other helper methods

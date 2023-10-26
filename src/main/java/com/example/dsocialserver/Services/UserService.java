@@ -115,16 +115,16 @@ public class UserService {
         return dataResult;
     }
 
-    public static Map<String, Object> getUser(User list) {
+    public static Map<String, Object> getUser(User user) {
         Map<String, Object> data = new HashMap<>();
-        data.put("id", list.getId());
-        data.put("email", list.getEmail());
-        data.put("name", list.getName());
-        data.put("avatar", list.getAvatar());
-        data.put("bio", list.getBio());
-        data.put("birthday", list.getBirthday());
-        data.put("cover_image", list.getCover_image());
-        data.put("other_name", list.getOther_name());
+        data.put("id", user.getId());
+        data.put("email", user.getEmail());
+        data.put("name", user.getName());
+        data.put("avatar", user.getAvatar());
+        data.put("bio", user.getBio());
+        data.put("birthday", user.getBirthday());
+        data.put("cover_image", user.getCover_image());
+        data.put("other_name", user.getOther_name());
         return data;
     }
 }

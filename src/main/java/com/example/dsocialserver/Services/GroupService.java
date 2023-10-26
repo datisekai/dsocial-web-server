@@ -132,7 +132,7 @@ public class GroupService {
             data.put("created_at", o.getCreated_at());
             data.put("user_id_boss", o.getUser_id());
             List<Map<String, Object>> pUser = new ArrayList<>();
-            pUser.add(getUser(o.getUser()));
+//            pUser.add(getUser(o.getUser()));
             for (GroupUser gu : o.getGroupUsers()) {
                 pUser.add(getUser(gu.getUser_groupUsers()));
             }
