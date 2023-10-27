@@ -130,9 +130,9 @@ public class GroupService {
             data.put("avatar", o.getAvatar());
             data.put("cover_image", o.getCover_image());
             data.put("created_at", o.getCreated_at());
-            data.put("user_id_boss", o.getUser_id());
+            data.put("user_boss", getUser(o.getUser_groups()));
             List<Map<String, Object>> pUser = new ArrayList<>();
-//            pUser.add(getUser(o.getUser()));
+            pUser.add(getUser(o.getUser_groups()));
             for (GroupUser gu : o.getGroupUsers()) {
                 pUser.add(getUser(gu.getUser_groupUsers()));
             }

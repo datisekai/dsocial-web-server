@@ -10,6 +10,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -74,8 +77,19 @@ public class User {
     @OneToMany(mappedBy = "user_posts", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
     
+    @OneToMany(mappedBy = "user_groups", fetch = FetchType.LAZY)
+    private List<Groups> groups = new ArrayList<>();
+    
     @OneToMany(mappedBy = "user_groupUsers", fetch = FetchType.LAZY)
     private List<GroupUser> groupUsers = new ArrayList<>();
+    
+//    @ManyToMany
+//    @JoinTable(
+//        name = "groupuser",
+//        joinColumns = @JoinColumn(name = "user_id"),
+//        inverseJoinColumns = @JoinColumn(name = "group_id")
+//    )
+//    private List<Groups> groupUsers;
     
     @OneToMany(mappedBy = "user_user_friendships", fetch = FetchType.LAZY)
     private List<Friendship> user_friendships = new ArrayList<>();
@@ -92,8 +106,8 @@ public class User {
     @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY)
     private List<RoomUser> roomUsers = new ArrayList<>();
     
-//    @OneToOne(mappedBy = "user")
-//    private Groups groups;
+//    @OneToOne(mappedBy = "userOne")
+//    private Groups groupOne;
     // Getters and setters
     // Constructors
     // Other helper methods

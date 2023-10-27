@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
@@ -60,10 +61,12 @@ public class Groups {
     @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
-//    @OneToOne
-//    @MapsId("id")
-//    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable=false, updatable=false)
-//    private User user;
+//    @ManyToMany(mappedBy = "groupUsers")
+//    private List<User> usergroups;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    private User user_groups;
     
     // Getters and setters
     // Constructors
