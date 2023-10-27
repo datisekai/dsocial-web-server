@@ -22,6 +22,6 @@ public interface PostReactionRepository extends CrudRepository<PostReaction, Obj
     @Query(value = "DELETE FROM postreaction WHERE postreaction.id= :id", nativeQuery = true)
     void deletePostReactionById(@Param("id") int id);  
     
-    @Query(value="SELECT postreaction.* FROM postreaction,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postreaction.post_id", nativeQuery = true)
+    @Query(value="SELECT postreaction.* FROM postreaction,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postreaction.post_id ORDER BY postreaction.id DESC", nativeQuery = true)
     List<PostReaction> findAllPostReactionByPostId(@Param("postId") int postId);
 }

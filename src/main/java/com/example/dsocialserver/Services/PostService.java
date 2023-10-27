@@ -121,7 +121,7 @@ public class PostService {
 //            return false;
 //        }
 
-    }  
+    }
 
     public Map<String, Object> getPostListByHtml(int page, int limit, String name) {
         Pageable pageable = PageRequest.of(page, limit);
@@ -155,7 +155,13 @@ public class PostService {
             data.put("id", o.getId());
             data.put("html", o.getHtml());
             data.put("author_id", o.getAuthor_id());
-            data.put("group_id", o.getGroup_id());
+            Map<String, Object> dataGroup = new HashMap<>();
+            if (o.getGroup_posts() != null) {
+                dataGroup.put("id", o.getGroup_posts().getId());
+                dataGroup.put("name", o.getGroup_posts().getName());
+                dataGroup.put("avatar", o.getGroup_posts().getAvatar());
+            }
+            data.put("group", dataGroup);
             data.put("created_at", o.getCreated_at());
             data.put("user_post", getUser(o.getUser_posts()));
             List<Map<String, Object>> pImage = new ArrayList<>();

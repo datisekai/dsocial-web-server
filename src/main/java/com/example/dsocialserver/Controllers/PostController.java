@@ -53,7 +53,7 @@ public class PostController {
 
     private final CustomResponse jsonRes = new CustomResponse();
 
-    // lấy ra tất cả bài viết
+    // lấy ra tất cả bài viết ở home page
     @GetMapping()
     public ResponseEntity getAllPost(@RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
