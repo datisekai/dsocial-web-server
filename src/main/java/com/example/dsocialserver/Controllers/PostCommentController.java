@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Services.PostCommentService;
 import com.example.dsocialserver.Types.PostCommentType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
@@ -61,7 +61,7 @@ public class PostCommentController {
 //        ----------------------------------
 
             Map<String, Object> postComment = commentService.createPostComment(Integer.parseInt(postId), Integer.parseInt(authorId), content, Integer.parseInt(parentId));
-            if (postComment != null) {
+            if (!postComment.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Thêm bình luận thành công");
@@ -82,7 +82,7 @@ public class PostCommentController {
             String content = pst.getContent();
 //        ----------------------------------
             Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(id), content);
-            if (postComment != null) {
+            if (!postComment.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Cập nhật bình luận thành công");

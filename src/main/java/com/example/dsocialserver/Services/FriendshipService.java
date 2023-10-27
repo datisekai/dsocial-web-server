@@ -5,7 +5,7 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Friendship;
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Models.User;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class FriendshipService {
 
     @Autowired
     private FriendshipRepository friendshipRepository;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -52,29 +52,26 @@ public class FriendshipService {
         return data;
     }
 
-    public Map<String, Object> updateFriendship(int id) {
+    public Map<String, Object> updateFriendship(int friendId, int userId) {
         Map<String, Object> data = new HashMap<>();
-        Optional<Friendship> optional = friendshipRepository.findById(id);
-        if (optional.isPresent()) {
-            Friendship gr = optional.get();
-            gr.setIs_Active(1);
-            // ...
-            Friendship list = friendshipRepository.save(gr);
-            data.put("id", list.getId());
-            data.put("user_id", list.getUser_id());
-            data.put("friendship_id", list.getFriend_id());
-            data.put("is_active", list.getIs_Active());
+        if (friendId != userId) {
+            Friendship optional = friendshipRepository.findFriendByUserIdAndFriendId(friendId, userId);
+            if (optional != null) {
+                optional.setIs_Active(1);
+                // ...
+                Friendship list = friendshipRepository.save(optional);
+                data.put("id", list.getId());
+                data.put("user_id", list.getUser_id());
+                data.put("friendship_id", list.getFriend_id());
+                data.put("is_active", list.getIs_Active());
+            }
         }
         return data;
     }
 
-    public boolean deleteFriendship(Object id) {
-        try {
-            friendshipRepository.deleteById(id);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    public boolean deleteFriendship(int friendId, int userId, int isActive) {
+        int result = friendshipRepository.deleteByUserIdAndFriendId(friendId, userId, isActive);
+        return result == 1;
     }
 
     public Map<String, Object> getSearchMyFriendshipList(int page, int limit, int userId, String name) {

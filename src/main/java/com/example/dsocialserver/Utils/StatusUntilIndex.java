@@ -4,7 +4,6 @@
  */
 package com.example.dsocialserver.Utils;
 
-import com.example.dsocialserver.Models.CustomResponse;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

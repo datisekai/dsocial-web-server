@@ -35,7 +35,7 @@ public class PostCommentService {
         gr.setContent(content);
         gr.setParent_id(parentId);
         PostComment list = commentRepository.save(gr);
-        
+
         Map<String, Object> data = new HashMap<>();
         data.put("id", list.getId());
         data.put("post_id", list.getPost_id());
@@ -64,12 +64,8 @@ public class PostCommentService {
     }
 
     public boolean deletePostComment(Object id) {
-        try {
-            commentRepository.deletePostComentById(Integer.parseInt((String) id));
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        int result = commentRepository.deletePostComentById(Integer.parseInt((String) id));
+        return result == 1;
     }
 
 //    public Page<PostComment> getPostCommentList(int page, int limit, String author_id) {

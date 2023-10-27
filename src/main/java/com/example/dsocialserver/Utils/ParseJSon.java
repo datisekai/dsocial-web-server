@@ -4,7 +4,6 @@
  */
 package com.example.dsocialserver.Utils;
 
-import com.example.dsocialserver.Models.CustomResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;

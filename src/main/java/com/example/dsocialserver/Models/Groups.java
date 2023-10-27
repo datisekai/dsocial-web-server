@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,16 +56,16 @@ public class Groups {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updated_at;
 
-    @OneToMany(mappedBy = "group_posts", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group_posts", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group_groupUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
 //    @ManyToMany(mappedBy = "groupUsers")
 //    private List<User> usergroups;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", insertable=false, updatable=false)
     private User user_groups;
     

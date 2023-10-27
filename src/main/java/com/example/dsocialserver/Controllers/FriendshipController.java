@@ -4,10 +4,10 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.Friendship;
 import com.example.dsocialserver.Models.Groups;
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Services.FriendshipService;
 import com.example.dsocialserver.Types.FriendshipType;
 import com.example.dsocialserver.Types.SearchType;
@@ -69,7 +69,6 @@ public class FriendshipController {
 //            return StatusUntilIndex.showInternal(e);
 //        }
 //    }
-
     @GetMapping("/requests")
     public ResponseEntity getAllMyFriendRequests(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
@@ -137,7 +136,7 @@ public class FriendshipController {
 //        ----------------------------------
 
             Map<String, Object> friendship = friendshipService.createFriendship(Integer.parseInt(userId), Integer.parseInt(friendId));
-            if (friendship != null) {
+            if (!friendship.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Gửi lời mời kết bạn thành công");
@@ -149,14 +148,16 @@ public class FriendshipController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity submitFriend(@PathVariable("id") String id,
+    //kết bạn
+    @PutMapping("/{frienId}")
+    public ResponseEntity submitFriend(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("frienId") String frienId,
             @RequestBody @Valid FriendshipType pst) throws IOException {
         try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
-            Map<String, Object> friendship = friendshipService.updateFriendship(Integer.parseInt(id));
-            if (friendship != null) {
+            Map<String, Object> friendship = friendshipService.updateFriendship(Integer.parseInt(frienId), Integer.parseInt(userId));
+            if (!friendship.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Kết bạn thành công");
@@ -169,16 +170,35 @@ public class FriendshipController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteFriend(@PathVariable("id") String id) throws IOException {
+    //xoa ban be
+    @DeleteMapping("/{frienId}")
+    public ResponseEntity deleteFriend(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("frienId") String frienId) throws IOException {
         try {
-            boolean friendship = friendshipService.deleteFriendship(id);
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            boolean friendship = friendshipService.deleteFriendship(Integer.parseInt(frienId), Integer.parseInt(userId), 1);
             if (friendship == true) {
                 jsonRes.setRes(true, "Xóa bạn bè thành công");
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
             }
             return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    //xoa loi moi ket ban
+    @DeleteMapping("request/{frienId}")
+    public ResponseEntity deleteRequestFriend(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("frienId") String frienId) throws IOException {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            boolean friendship = friendshipService.deleteFriendship(Integer.parseInt(frienId), Integer.parseInt(userId), 0);
+            if (friendship == true) {
+                jsonRes.setRes(true, "Xóa lời mời kết bạn thành công");
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

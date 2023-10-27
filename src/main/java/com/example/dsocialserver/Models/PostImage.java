@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +36,7 @@ public class PostImage {
     @Column(nullable = false)
     private String src;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id", insertable=false, updatable=false)
     private Post post_postImages;
 

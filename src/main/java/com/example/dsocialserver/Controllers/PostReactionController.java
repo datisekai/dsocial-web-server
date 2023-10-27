@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Services.PostReactionService;
 import com.example.dsocialserver.Types.PostReactionType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
@@ -55,7 +55,7 @@ public class PostReactionController {
 //        ----------------------------------
 
             Map<String, Object> postReaction = postReactionService.createPostReaction(Integer.parseInt(postId), Integer.parseInt(authorId), icon);
-            if (postReaction != null) {
+            if (!postReaction.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Thêm cảm xúc thành công");
@@ -75,7 +75,7 @@ public class PostReactionController {
             String icon = pst.getIcon();
 //        ----------------------------------
             Map<String, Object> postReaction = postReactionService.updatePostReaction(Integer.parseInt(id), icon);
-            if (postReaction != null) {
+            if (!postReaction.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Cập nhật cảm xúc thành công");

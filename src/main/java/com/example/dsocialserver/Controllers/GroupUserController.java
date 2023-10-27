@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.GroupUser;
 import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Services.GroupUserService;
@@ -57,7 +57,7 @@ public class GroupUserController {
 
 //        ----------------------------------
             Map<String, Object> groupUser = groupUserService.joinGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
-            if (groupUser != null) {
+            if (!groupUser.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tham gia nhóm thành công");

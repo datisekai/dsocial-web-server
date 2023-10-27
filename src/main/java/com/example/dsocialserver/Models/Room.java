@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,10 +39,10 @@ public class Room {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date updated_at;
 
-    @OneToMany(mappedBy = "room_messages", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room_messages", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Message> messages = new ArrayList<>();
     
-    @OneToMany(mappedBy = "room_roomUsers", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room_roomUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<RoomUser> roomUsers = new ArrayList<>();
     // Getters and setters
 

@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Services;
 
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
 import com.example.dsocialserver.Models.PostComment;
 import com.example.dsocialserver.Models.PostImage;
@@ -40,12 +40,6 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private PostReactionRepository postReactionRepository;
-
-    @Autowired
-    private PostCommentRepository postCommentRepository;
-
-    @Autowired
     private PostImageRepository postImageRepository;
 
     public Post findById(Object id) {
@@ -55,6 +49,14 @@ public class PostService {
             list = optional.get();
         }
         return list;
+    }
+
+    public Post findByIdAndAuthorId(int postId, int authorId) {
+        Post post = postRepository.findByIdAndAuthorId(postId, authorId);
+        if (post != null) {
+            return post;
+        }
+        return null;
     }
 
     public Map<String, Object> createPost(String html, int authorid, int group_id, List<PostImage> image) {
@@ -114,13 +116,8 @@ public class PostService {
     }
 
     public boolean deletePost(Object id) {
-//        try {
-        postRepository.deletePost(Integer.parseInt((String) id));
-        return true;
-//        } catch (NumberFormatException e) {
-//            return false;
-//        }
-
+        int result = postRepository.deletePost(Integer.parseInt((String) id));
+        return result == 1;
     }
 
     public Map<String, Object> getPostListByHtml(int page, int limit, String name) {

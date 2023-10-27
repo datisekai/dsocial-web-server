@@ -21,13 +21,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostCommentRepository extends CrudRepository<PostComment, Object> {
 
-    @Query(value="SELECT * FROM postcomment WHERE postcomment.author_id = :authorId ORDER BY postcomment.id DESC", nativeQuery = true)
-    Page<PostComment> findAllPostCommentByAuthorId(Pageable pageable, @Param("authorId") int authorId);
+//    @Query(value="SELECT * FROM postcomment WHERE postcomment.author_id = :authorId ORDER BY postcomment.id DESC", nativeQuery = true)
+//    Page<PostComment> findAllPostCommentByAuthorId(Pageable pageable, @Param("authorId") int authorId);
 
     @Modifying
     @Query(value = "DELETE FROM postcomment WHERE postcomment.id= :id", nativeQuery = true)
-    void deletePostComentById(@Param("id") int id);
+    int deletePostComentById(@Param("id") int id);
     
-    @Query(value="SELECT postcomment.* FROM postcomment,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postcomment.post_id ORDER BY postcomment.id DESC", nativeQuery = true)
-     List<PostComment> findAllPostCommentByPostId(@Param("postId") int postId);
+//    @Query(value = "SELECT postcomment.* FROM postcomment,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postcomment.post_id ORDER BY postcomment.id DESC", nativeQuery = true)
+//    List<PostComment> findAllPostCommentByPostId(@Param("postId") int postId);
 }

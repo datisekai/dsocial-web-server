@@ -50,20 +50,20 @@ public class Post {
 
     private int is_active;
 
-    @OneToMany(mappedBy = "post_postImages", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post_postImages", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostImage> postImages = new ArrayList<>();
     
-    @OneToMany(mappedBy = "post_postComments", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post_postComments", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostComment> postComments = new ArrayList<>();
     
-    @OneToMany(mappedBy = "post_postReactions", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post_postReactions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostReaction> postReactions = new ArrayList<>();
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id", insertable=false, updatable=false)
     private User user_posts;
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "group_id", insertable=false, updatable=false)
     private Groups group_posts;
     

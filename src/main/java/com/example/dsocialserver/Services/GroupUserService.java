@@ -24,13 +24,14 @@ public class GroupUserService {
 
     @Autowired
     private GroupUserRepository groupUserRepository;
-    
+
     @Autowired
     private GroupRepository groupRepository;
-    
-    public Groups findByIdAndUserId(int id, int userId){
+
+    public Groups findByIdAndUserId(int id, int userId) {
         return groupRepository.findByIdAndUserId(id, userId);
     }
+
     public Map<String, Object> joinGroupUser(int group_id, int user_id) {
         GroupUser gu = new GroupUser();
         gu.setGroup_id(group_id);
@@ -41,16 +42,12 @@ public class GroupUserService {
         data.put("id", list.getId());
         data.put("group_id", list.getGroup_id());
         data.put("user_id", list.getUser_id());
-        
+
         return data;
     }
 
     public boolean outGroupUser(int id, int userId) {
-        try {
-            groupUserRepository.deleteByGroupIdAndUserId(id, userId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        int result = groupUserRepository.deleteByGroupIdAndUserId(id, userId);
+        return result == 1;
     }
 }

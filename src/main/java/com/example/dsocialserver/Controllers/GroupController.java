@@ -4,9 +4,9 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.Groups;
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Services.GroupService;
 import com.example.dsocialserver.Types.GroupsType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
@@ -96,7 +96,7 @@ public class GroupController {
 
 //        ----------------------------------
             Map<String, Object> group = groupService.createGroup(name, Integer.parseInt(userId), avatar, coverImage);
-            if (group != null) {
+            if (!group.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tạo nhóm thành công");
@@ -119,7 +119,7 @@ public class GroupController {
 //        ----------------------------------
 
             Map<String, Object> group = groupService.updateGroup(name, id, avatar, coverImage);
-            if (group != null) {
+            if (!group.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Cập nhật nhóm thành công");

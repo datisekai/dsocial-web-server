@@ -30,7 +30,7 @@ public class PostReactionService {
         gr.setAuthor_id(authorId);
         gr.setIcon(icon);
         PostReaction list = postReactionRepository.save(gr);
-        
+
         Map<String, Object> data = new HashMap<>();
         data.put("id", list.getId());
         data.put("post_id", list.getPost_id());
@@ -57,11 +57,7 @@ public class PostReactionService {
     }
 
     public boolean deletePostReaction(Object id) {
-        try {
-            postReactionRepository.deletePostReactionById(Integer.parseInt((String) id));
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        int result = postReactionRepository.deletePostReactionById(Integer.parseInt((String) id));
+        return result == 1;
     }
 }

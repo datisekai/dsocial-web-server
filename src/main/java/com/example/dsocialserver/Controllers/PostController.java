@@ -4,9 +4,8 @@
  */
 package com.example.dsocialserver.Controllers;
 
-import com.example.dsocialserver.Models.CustomResponse;
-import static com.example.dsocialserver.Models.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
+import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Services.PostService;
 import com.example.dsocialserver.Types.PostType;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
@@ -137,7 +135,7 @@ public class PostController {
 //        ----------------------------------
 
             Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId), imagage);
-            if (post != null) {
+            if (!post.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Thêm bài viết thành công");
@@ -150,39 +148,49 @@ public class PostController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updatePost(HttpServletRequest request,
-            @PathVariable("id") String id,
+    @PutMapping("/{postId}")
+    public ResponseEntity updatePost(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postId") String postId,
             @RequestBody @Valid PostType pst) throws IOException {
         try {
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String html = pst.getHtml();
             List<PostImage> imagage = pst.getImage();
 //        ----------------------------------
-
-            Map<String, Object> post = postService.updatePost(id, html, imagage);
-            if (post != null) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Cập nhật bài viết thành công");
-                responseData.put("data", post);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            Post p = postService.findByIdAndAuthorId(Integer.parseInt(postId), Integer.parseInt(authorId));
+            if (p != null) {
+                Map<String, Object> post = postService.updatePost(postId, html, imagage);
+                if (!post.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Cập nhật bài viết thành công");
+                    responseData.put("data", post);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity groupDelete(@PathVariable("id") String id) throws IOException {
+    @DeleteMapping("/{postId}")
+    public ResponseEntity groupDelete(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postId") String postId) throws IOException {
         try {
-            boolean post = postService.deletePost(id);
-            if (post == true) {
-                jsonRes.setRes(true, "Xóa bài viết thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Post p = postService.findByIdAndAuthorId(Integer.parseInt(postId), Integer.parseInt(authorId));
+            if (p != null) {
+                boolean post = postService.deletePost(postId);
+                if (post == true) {
+                    jsonRes.setRes(true, "Xóa bài viết thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -68,19 +69,19 @@ public class User {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updated_at;
     
-    @OneToMany(mappedBy = "user_postComments", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_postComments", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostComment> postComments = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_postReactions", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_postReactions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostReaction> postReactions = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_posts", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_posts", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_groups", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_groups", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Groups> groups = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_groupUsers", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_groupUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<GroupUser> groupUsers = new ArrayList<>();
     
 //    @ManyToMany
@@ -91,19 +92,19 @@ public class User {
 //    )
 //    private List<Groups> groupUsers;
     
-    @OneToMany(mappedBy = "user_user_friendships", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_user_friendships", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Friendship> user_friendships = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_friend_friendships", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_friend_friendships", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Friendship> friend_friendships = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_messages", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_messages", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Message> messages = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_messageReactions", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_messageReactions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MessageReaction> messageReactions = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<RoomUser> roomUsers = new ArrayList<>();
     
 //    @OneToOne(mappedBy = "userOne")

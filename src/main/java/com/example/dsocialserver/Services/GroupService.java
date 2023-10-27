@@ -6,7 +6,7 @@ package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.GroupUser;
 import com.example.dsocialserver.Models.Groups;
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Models.Post;
 import com.example.dsocialserver.Models.PostComment;
 import com.example.dsocialserver.Models.PostImage;
@@ -85,23 +85,10 @@ public class GroupService {
     }
 
     public boolean deleteGroup(Object id) {
-//      Optional<Groups> optional = groupRepository.findById(id);
-//        Groups list = null;
-//        if (optional.isPresent()) {
-//            Groups gr = optional.get();
-//            // Cập nhật các trường của đối tượng user
-//            gr.setIs_active(0);
-//            // ...
-//            list = groupRepository.save(gr);
-//        }
-        try {
-            groupRepository.deleteGroups(Integer.parseInt((String) id));
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        int result = groupRepository.deleteGroups(Integer.parseInt((String) id));
+        return result == 1;
     }
-    
+
     public Map<String, Object> getSearchGroupList(int page, int limit, String name) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAllByName(pageable, name);

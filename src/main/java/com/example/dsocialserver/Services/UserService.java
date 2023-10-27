@@ -4,7 +4,7 @@
  */
 package com.example.dsocialserver.Services;
 
-import static com.example.dsocialserver.Models.Pagination.getPagination;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositories.UserRepository;
 import java.util.ArrayList;

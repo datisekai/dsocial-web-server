@@ -18,57 +18,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PostImageService {
-//
-//    @Autowired
-//    private PostImageRepository postImageRepository;
-//
-//    public PostImage findById(Object id) {
-//        Optional<PostImage> optional = postImageRepository.findById(id);
-//        Post list = null;
-//        if (optional.isPresent()) {
-//            list = optional.get();
-//        }
-//        return list;
-//    }
-//
-//    public Post createPost(String html, int authorid) {
-//        Post po = new Post();
-//        po.setHtml(html);
-//        po.setAuthor_id(authorid);
-//        po.setGroup_id(0);
-//        po.setIs_active(1);
-//        return postImageRepository.save(po);
-//    }
-//
-//    public Post updatePost(Object id, String html) {
-//        Optional<PostImage> optional = postImageRepository.findById(id);
-//        Post list = null;
-//        if (optional.isPresent()) {
-//            Post po = optional.get();
-//            // Cập nhật các trường của đối tượng user
-//            po.setHtml(html);
-//            // ...
-//            list = postImageRepository.save(po);
-//        }
-//        return list;
-//    }
-//
-//    public Post deletePostById(Object id) {
-//        Optional<PostImage> optional = postImageRepository.findById(id);
-//        Post list = null;
-//        if (optional.isPresent()) {
-//            Post po = optional.get();
-//            // Cập nhật các trường của đối tượng user
-//            po.setIs_active(0);
-//            // ...
-//            list = postImageRepository.save(po);
-//        }
-//        return list;
-//    }
-//
-//    public Page<PostImage> getPostList(int page, int limit) {
-//        Pageable pageable = PageRequest.of(page, limit);
-//        return postImageRepository.findAll(pageable);
-//    }
+
     
 }
