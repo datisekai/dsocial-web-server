@@ -22,16 +22,16 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GroupRepository extends CrudRepository<Groups, Object> {
-    @Query(value="SELECT * FROM groups  WHERE groups.user_id = :userId and groups.id= :id ORDER BY groups.id DESC", nativeQuery = true)
+    @Query(value="SELECT * FROM groups  WHERE groups.user_id = :userId and groups.id= :id ORDER BY `groups`.`id` DESC", nativeQuery = true)
     Groups findByIdAndUserId( @Param("id") int id,  @Param("userId") int usrId);
     
     @Query(value="SELECT * FROM groups  WHERE groups.name LIKE %:name% ORDER BY groups.id DESC", nativeQuery = true)
     Page<Groups> findAllByName(Pageable pageable, @Param("name") String name);
     
-    @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY groups.id DESC", nativeQuery = true)
+    @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
     Page<Groups> findAllByUserId(Pageable pageable, @Param("userId") int userId);
     
-    @Query(value="SELECT * FROM groups WHERE groups.is_active = 1 ORDER BY groups.id DESC", nativeQuery = true)
+    @Query(value="SELECT * FROM groups WHERE groups.is_active = 1 ORDER BY `groups`.`id` DESC", nativeQuery = true)
     Page<Groups> findAll(Pageable pageable);
     
     @Modifying

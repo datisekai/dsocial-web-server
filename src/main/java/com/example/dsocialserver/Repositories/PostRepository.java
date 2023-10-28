@@ -34,13 +34,17 @@ public interface PostRepository extends CrudRepository<Post, Object> {
     @Query(value = "SELECT * FROM Post WHERE Post.is_active = 1 ORDER BY post.id DESC", nativeQuery = true)
     Page<Post> findAll(Pageable pageable);
 
-    @Query(value = "SELECT * FROM Post WHERE post.group_id = :groupId AND post.author_id = :authorId ORDER BY post.id DESC", nativeQuery = true)
-    Post findByIdAndAuthorId(@Param("groupId") int groupId,  @Param("authorId") int authorId);
+    @Query(value = "SELECT * FROM Post WHERE post.id = :postId AND post.author_id = :userId ORDER BY post.id DESC", nativeQuery = true)
+    Post findByIdAndAuthorId(@Param("postId") int postId, @Param("userId") int userId);
 
+    @Query(value = "SELECT post.* FROM Post,(SELECT groups.id FROM groups WHERE groups.user_id= :userId) AS temp WHERE post.id = :postId AND post.group_id= temp.id  ORDER BY post.id DESC", nativeQuery = true)
+    Post findByUserIdBoss(@Param("postId") int postId, @Param("userId") int userId);
+    
     @Modifying
     @Query(value = "DELETE post, postimage, postreaction, postcomment "
             + "FROM post LEFT JOIN postimage ON post.id = postimage.post_id "
             + "LEFT JOIN postreaction ON post.id = postreaction.post_id LEFT "
             + "JOIN postcomment ON post.id = postcomment.post_id WHERE post.id = :id", nativeQuery = true)
+
     int deletePost(@Param("id") int id);
 }

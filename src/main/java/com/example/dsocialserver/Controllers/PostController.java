@@ -103,7 +103,7 @@ public class PostController {
 //            return StatusUntilIndex.showInternal(e);
 //        }
 //    }
-    // lấy ra tất cả bài viết của nguoi dung
+    // lấy ra tất cả bài viết của nguoi dung không trong group
     @GetMapping("/user/{userId}")
     public ResponseEntity getAllPostUser(@PathVariable("userId") String userId,
             @RequestParam(value = "page", defaultValue = "1") String page,
@@ -174,13 +174,33 @@ public class PostController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-
+    //Xóa bài viết của bản thân đăng lên
     @DeleteMapping("/{postId}")
     public ResponseEntity groupDelete(@RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("postId") String postId) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Post p = postService.findByIdAndAuthorId(Integer.parseInt(postId), Integer.parseInt(authorId));
+            if (p != null) {
+                boolean post = postService.deletePost(postId);
+                if (post == true) {
+                    jsonRes.setRes(true, "Xóa bài viết thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+                return StatusUntilIndex.showMissing();
+            }
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    //Xóa bài viết trong nhóm của chủ group
+    @DeleteMapping("/own/{postId}")
+    public ResponseEntity groupBossDelete(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postId") String postId) throws IOException {
+        try {
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Post p = postService.findByUserIdBoss(Integer.parseInt(postId), Integer.parseInt(authorId));
             if (p != null) {
                 boolean post = postService.deletePost(postId);
                 if (post == true) {

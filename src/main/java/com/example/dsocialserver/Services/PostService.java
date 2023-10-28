@@ -58,6 +58,14 @@ public class PostService {
         }
         return null;
     }
+    
+    public Post findByUserIdBoss(int postId, int authorId) {
+        Post post = postRepository.findByUserIdBoss(postId, authorId);
+        if (post != null) {
+            return post;
+        }
+        return null;
+    }
 
     public Map<String, Object> createPost(String html, int authorid, int group_id, List<PostImage> image) {
         Post po = new Post();
