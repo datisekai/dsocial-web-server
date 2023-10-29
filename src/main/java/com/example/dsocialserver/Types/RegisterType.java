@@ -13,18 +13,18 @@ import jakarta.validation.constraints.*;
 public class RegisterType {
     @Email(regexp = "[a-z0-9!#$%&'+/=?^_{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])+")
     @NotEmpty
-    @NotEmpty
+    @NotNull
     @NotBlank
     public String email;
     
     @Size(min = 6)
     @NotEmpty
-    @NotEmpty
+    @NotNull
     @NotBlank
     public String password;
     
     @NotEmpty
-    @NotEmpty
+    @NotNull
     @NotBlank
     public String name;
 

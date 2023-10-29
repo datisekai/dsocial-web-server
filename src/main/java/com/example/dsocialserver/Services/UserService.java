@@ -8,6 +8,7 @@ import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositories.UserRepository;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,26 @@ public class UserService {
         user.setName(name);
         user.setAvatar(avatar);
         return userRepository.save(user);
+    }
+    
+    public Map<String, Object> updateUser(int id, String name, String otherName, String bio, Date birthday, String avatar, String coverImage){
+        Optional<User> optional = userRepository.findById(id);
+        Map<String, Object> data = new HashMap<>();
+        if (optional.isPresent()) {
+            User u = optional.get();
+            // Cập nhật các trường của đối tượng bài viết
+            u.setName(name);
+            u.setOther_name(otherName);
+            u.setBio(bio);
+            u.setBirthday(birthday);
+            u.setAvatar(avatar);
+            u.setCover_image(coverImage);
+            
+            // ...
+            User updatedUser = userRepository.save(u);         
+            data = getUser(updatedUser);
+        }
+        return data;
     }
     public Map<String, Object> getPeopleList(int page, int limit,int userId, String name) {
         Pageable pageable = PageRequest.of(page, limit);

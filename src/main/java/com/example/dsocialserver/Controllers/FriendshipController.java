@@ -126,7 +126,7 @@ public class FriendshipController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-
+    //gửi lời mời kết bạn
     @PostMapping
     public ResponseEntity createFriendRequest(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid FriendshipType pst) throws IOException {
@@ -148,7 +148,7 @@ public class FriendshipController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    //kết bạn
+    //chấp nhận lời mời kết bạn
     @PutMapping("/{frienId}")
     public ResponseEntity submitFriend(@RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("frienId") String frienId,

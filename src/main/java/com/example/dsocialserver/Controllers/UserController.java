@@ -11,6 +11,8 @@ import com.example.dsocialserver.Types.ForgotpasswordType;
 import com.example.dsocialserver.Types.LoginType;
 import com.example.dsocialserver.Types.RegisterType;
 import com.example.dsocialserver.Types.ResetpasswordType;
+import com.example.dsocialserver.Types.UserType;
+import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.createJWT;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.decodeJWT;
 import static com.example.dsocialserver.Utils.JwtTokenProvider.generateToken;
@@ -29,6 +31,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.Date;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.env.Environment;
@@ -228,6 +231,37 @@ public class UserController {
             jsonRes.setRes(true, "Đổi mật khẩu thành công");
             return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
         } catch (Exception e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
+    @PutMapping("/edit-profile")
+    public ResponseEntity editProfile(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid UserType pst){
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String name = pst.getName();
+            String otherName = pst.getOtherName();
+            String bio = pst.getBio();
+            Date birthday = pst.getBirthday();
+            String avatar = pst.getAvatar();
+            String coverImage = pst.getCoverImage();
+            
+            if(avatar == null || avatar.isEmpty() || "".equals(avatar.trim())){
+                avatar = "https://ui-avatars.com/api/?name=" + name;
+            }
+            
+//        ----------------------------------
+            Map<String, Object> user = userService.updateUser(Integer.parseInt(userId), name, otherName, bio, birthday, avatar, coverImage);
+            if (!user.isEmpty()) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", "Cập nhật hồ sơ thành công");
+                responseData.put("data", user);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
