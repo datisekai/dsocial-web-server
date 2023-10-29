@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
+import com.example.dsocialserver.Models.PostReaction;
 import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Services.PostReactionService;
 import com.example.dsocialserver.Types.PostReactionType;
@@ -68,36 +69,48 @@ public class PostReactionController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updatePostReaction(@PathVariable("id") String id,
+    @PutMapping("/{postReactionId}")
+    public ResponseEntity updatePostReaction(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postReactionId") String postReactionId,
             @RequestBody @Valid PostReactionType pst) throws IOException {
         try {
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String icon = pst.getIcon();
 //        ----------------------------------
-            Map<String, Object> postReaction = postReactionService.updatePostReaction(Integer.parseInt(id), icon);
-            if (!postReaction.isEmpty()) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Cập nhật cảm xúc thành công");
-                responseData.put("data", postReaction);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            PostReaction isPermission = postReactionService.findByIdAndAuthorId(Integer.parseInt(postReactionId), Integer.parseInt(authorId));
+            if (isPermission != null) {
+                Map<String, Object> postReaction = postReactionService.updatePostReaction(Integer.parseInt(postReactionId), icon);
+                if (!postReaction.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Cập nhật cảm xúc thành công");
+                    responseData.put("data", postReaction);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
+            return StatusUntilIndex.showNotAuthorized();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deletePostReaction(@PathVariable("id") String id) throws IOException {
+    @DeleteMapping("/{postReactionId}")
+    public ResponseEntity deletePostReaction(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postReactionId") String postReactionId) throws IOException {
         try {
-            boolean postReaction = postReactionService.deletePostReaction(id);
-            if (postReaction == true) {
-                jsonRes.setRes(true, "Xóa cảm xúc thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            PostReaction isPermission = postReactionService.findByIdAndAuthorId(Integer.parseInt(postReactionId), Integer.parseInt(authorId));
+            if (isPermission != null) {
+                boolean postReaction = postReactionService.deletePostReaction(postReactionId);
+                if (postReaction == true) {
+                    jsonRes.setRes(true, "Xóa cảm xúc thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

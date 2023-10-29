@@ -28,6 +28,9 @@ public interface PostCommentRepository extends CrudRepository<PostComment, Objec
     @Query(value = "DELETE FROM postcomment WHERE postcomment.id= :id", nativeQuery = true)
     int deletePostComentById(@Param("id") int id);
     
+    @Query(value="SELECT * FROM postcomment  WHERE postcomment.author_id = :userId and postcomment.id= :id ORDER BY `postcomment`.`id` DESC", nativeQuery = true)
+    PostComment findByIdAndAuthorId( @Param("id") int id,  @Param("userId") int userId);
+    
 //    @Query(value = "SELECT postcomment.* FROM postcomment,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postcomment.post_id ORDER BY postcomment.id DESC", nativeQuery = true)
 //    List<PostComment> findAllPostCommentByPostId(@Param("postId") int postId);
 }

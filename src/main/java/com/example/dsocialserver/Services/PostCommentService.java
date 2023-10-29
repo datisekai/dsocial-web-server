@@ -28,6 +28,11 @@ public class PostCommentService {
     @Autowired
     private PostCommentRepository commentRepository;
 
+    public PostComment findByIdAndAuthorId(int postCommentId, int authorId) {
+        PostComment optional = commentRepository.findByIdAndAuthorId(postCommentId, authorId);
+        return optional;
+    }
+
     public Map<String, Object> createPostComment(int postId, int authorId, String content, int parentId) {
         PostComment gr = new PostComment();
         gr.setPost_id(postId);

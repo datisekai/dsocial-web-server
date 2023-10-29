@@ -18,10 +18,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PostReactionRepository extends CrudRepository<PostReaction, Object>{
+    @Query(value="SELECT * FROM postreaction  WHERE postreaction.author_id = :userId and postreaction.id= :id ORDER BY `postreaction`.`id` DESC", nativeQuery = true)
+    PostReaction findByIdAndAuthorId( @Param("id") int id,  @Param("userId") int userId);
+    
     @Modifying
     @Query(value = "DELETE FROM postreaction WHERE postreaction.id= :id", nativeQuery = true)
     int deletePostReactionById(@Param("id") int id);  
-//    
+    
 //    @Query(value="SELECT postreaction.* FROM postreaction,(SELECT * FROM post WHERE post.id = :postId) as temp WHERE temp.id = postreaction.post_id ORDER BY postreaction.id DESC", nativeQuery = true)
 //    List<PostReaction> findAllPostReactionByPostId(@Param("postId") int postId);
 }

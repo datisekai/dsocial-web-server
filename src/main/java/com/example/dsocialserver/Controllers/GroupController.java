@@ -109,40 +109,50 @@ public class GroupController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updateGroup(@PathVariable("id") String id,
+    @PutMapping("/{groupId}")
+    public ResponseEntity updateGroup(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("groupId") String groupId,
             @Valid @RequestBody GroupsType gr) throws IOException {
         try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String name = gr.getName();
             String avatar = gr.getAvatar();
             String coverImage = gr.getCoverImage();
 //        ----------------------------------
-
-            Map<String, Object> group = groupService.updateGroup(name, id, avatar, coverImage);
-            if (!group.isEmpty()) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Cập nhật nhóm thành công");
-                responseData.put("data", group);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            Groups isPermission = groupService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId));
+            if (isPermission != null) {
+                Map<String, Object> group = groupService.updateGroup(name, groupId, avatar, coverImage);
+                if (!group.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Cập nhật nhóm thành công");
+                    responseData.put("data", group);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteGroup(@PathVariable("id") String id) throws IOException {
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity deleteGroup(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("groupId") String groupId) throws IOException {
         try {
-
-            boolean group = groupService.deleteGroup(id);
-            if (group) {
-                jsonRes.setRes(true, "Xóa nhóm thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Groups isPermission = groupService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId));
+            if (isPermission != null) {
+                boolean group = groupService.deleteGroup(groupId);
+                if (group) {
+                    jsonRes.setRes(true, "Xóa nhóm thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }

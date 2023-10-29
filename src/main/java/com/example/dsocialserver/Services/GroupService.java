@@ -37,13 +37,9 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
-    public Groups findById(Object id) {
-        Optional<Groups> optional = groupRepository.findById(id);
-        Groups list = null;
-        if (optional.isPresent()) {
-            list = optional.get();
-        }
-        return list;
+    public Groups findByIdAndUserId(int groupId, int userId){
+        Groups optional = groupRepository.findByIdAndUserId(groupId,userId);
+        return optional;
     }
 
     public Map<String, Object> createGroup(String grourpName, int userId, String avatar, String coverImage) {

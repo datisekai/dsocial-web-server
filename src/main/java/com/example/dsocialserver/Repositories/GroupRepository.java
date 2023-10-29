@@ -23,7 +23,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupRepository extends CrudRepository<Groups, Object> {
     @Query(value="SELECT * FROM groups  WHERE groups.user_id = :userId and groups.id= :id ORDER BY `groups`.`id` DESC", nativeQuery = true)
-    Groups findByIdAndUserId( @Param("id") int id,  @Param("userId") int usrId);
+    Groups findByIdAndUserId( @Param("id") int id,  @Param("userId") int userId);
     
     @Query(value="SELECT * FROM groups  WHERE groups.name LIKE %:name% ORDER BY groups.id DESC", nativeQuery = true)
     Page<Groups> findAllByName(Pageable pageable, @Param("name") String name);

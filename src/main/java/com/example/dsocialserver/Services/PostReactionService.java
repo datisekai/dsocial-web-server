@@ -24,6 +24,11 @@ public class PostReactionService {
     @Autowired
     private PostReactionRepository postReactionRepository;
 
+    public PostReaction findByIdAndAuthorId(int postReactionId, int authorId){
+        PostReaction optional = postReactionRepository.findByIdAndAuthorId(postReactionId, authorId);
+        return optional;
+    }
+    
     public Map<String, Object> createPostReaction(int postId, int authorId, String icon) {
         PostReaction gr = new PostReaction();
         gr.setPost_id(postId);

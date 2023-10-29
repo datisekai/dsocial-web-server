@@ -73,11 +73,11 @@ public class GroupUserController {
     @DeleteMapping("/kick")
     public ResponseEntity kickUserGroupUser(@Valid @RequestBody GroupOwnType gr, @RequestHeader("Authorization") String authorizationHeader) throws IOException {
         try {
-            String userId_boss = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String userId_own = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String groupId = gr.getGroupId();
             String userId = gr.getUserId();
-            Groups isBoss = groupUserService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId_boss));
-            if (isBoss != null) {
+            Groups isOwn = groupUserService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId_own));
+            if (isOwn != null) {
                 boolean friend = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
                 if (friend) {
                     jsonRes.setRes(true, "Đuổi thành viên thành công");

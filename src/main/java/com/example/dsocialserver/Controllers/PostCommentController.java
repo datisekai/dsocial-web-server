@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
+import com.example.dsocialserver.Models.PostComment;
 import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Services.PostCommentService;
 import com.example.dsocialserver.Types.PostCommentType;
@@ -47,16 +48,16 @@ public class PostCommentController {
     private final CustomResponse jsonRes = new CustomResponse();
 
     @PostMapping
-    public ResponseEntity createPostComment(@RequestHeader("Authorization") String authorizationHeader, 
+    public ResponseEntity createPostComment(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid PostCommentType pst) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            String postId= pst.getPostId();
-            String parentId= pst.getParentId();
+            String postId = pst.getPostId();
+            String parentId = pst.getParentId();
             String content = pst.getContent();
-            
-           if(parentId == null || "".equals(parentId)){
-                parentId="0";
+
+            if (parentId == null || "".equals(parentId)) {
+                parentId = "0";
             }
 //        ----------------------------------
 
@@ -74,37 +75,48 @@ public class PostCommentController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updatePostComment(HttpServletRequest request,
-            @PathVariable("id") String id,
+    @PutMapping("/{postCommentId}")
+    public ResponseEntity updatePostComment(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postCommentId") String postCommentId,
             @RequestBody @Valid PostCommentType pst) throws IOException {
         try {
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String content = pst.getContent();
 //        ----------------------------------
-            Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(id), content);
-            if (!postComment.isEmpty()) {
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("success", true);
-                responseData.put("message", "Cập nhật bình luận thành công");
-                responseData.put("data", postComment);
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            PostComment isPermission = commentService.findByIdAndAuthorId(Integer.parseInt(postCommentId), Integer.parseInt(authorId));
+            if (isPermission != null) {
+                Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(postCommentId), content);
+                if (!postComment.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Cập nhật bình luận thành công");
+                    responseData.put("data", postComment);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
+            return StatusUntilIndex.showNotAuthorized();
         } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deletePostComment(@PathVariable("id") String id) throws IOException {
+    @DeleteMapping("/{postCommentId}")
+    public ResponseEntity deletePostComment(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("postCommentId") String postCommentId) throws IOException {
         try {
-            boolean post = commentService.deletePostComment(id);
-            if (post == true) {
-                jsonRes.setRes(true, "Xóa bình luận thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            PostComment isPermission = commentService.findByIdAndAuthorId(Integer.parseInt(postCommentId), Integer.parseInt(authorId));          
+            if (isPermission != null) {
+                boolean post = commentService.deletePostComment(postCommentId);
+                if (post == true) {
+                    jsonRes.setRes(true, "Xóa bình luận thành công");
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                }
+                return StatusUntilIndex.showMissing();
             }
-            return StatusUntilIndex.showMissing();
-        } catch (Exception e) {
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
             return StatusUntilIndex.showInternal(e);
         }
     }
