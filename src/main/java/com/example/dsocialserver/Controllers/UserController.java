@@ -240,9 +240,32 @@ public class UserController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-
+    
     @PutMapping("/edit-profile")
     public ResponseEntity editProfile(@RequestHeader("Authorization") String authorizationHeader,
+            @Valid @RequestBody ResetpasswordType us) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String password = us.getPassword();
+
+//        ----------------------------------
+            String hashPassword = MD5(password);
+            User user = userService.updatePasswordUser(userId, hashPassword);
+            if (user!= null) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", "Đổi mật khẩu thành công thành công");
+                responseData.put("data", user);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity changePassword(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid UserType pst) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
