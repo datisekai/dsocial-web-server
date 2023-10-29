@@ -128,7 +128,7 @@ public class FriendshipController {
         }
     }
     
-    //tìm kiếm bạn bè
+    //tìm kiếm người gửi lời mời kết bạn
     @GetMapping("not/search")
     public ResponseEntity searchNotFriend(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,

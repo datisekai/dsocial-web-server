@@ -84,6 +84,26 @@ public class GroupController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    
+    // tìm kiếm nhóm của mình
+    @GetMapping("/joined/search")
+    public ResponseEntity getSearchAllMyGroups(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit,
+            @RequestParam(value = "q", defaultValue = "") String q
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = groupService.getSearchMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), q);
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
 
     @PostMapping()
     public ResponseEntity createGroup(@RequestHeader("Authorization") String authorizationHeader,

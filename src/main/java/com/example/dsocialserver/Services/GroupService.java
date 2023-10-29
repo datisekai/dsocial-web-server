@@ -37,8 +37,8 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
-    public Groups findByIdAndUserId(int groupId, int userId){
-        Groups optional = groupRepository.findByIdAndUserId(groupId,userId);
+    public Groups findByIdAndUserId(int groupId, int userId) {
+        Groups optional = groupRepository.findByIdAndUserId(groupId, userId);
         return optional;
     }
 
@@ -94,6 +94,12 @@ public class GroupService {
     public Map<String, Object> getMyGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAllByUserId(pageable, userId);
+        return reponsDataGroup(page, list);
+    }
+
+    public Map<String, Object> getSearchMyGroupList(int page, int limit, int userId, String q) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Groups> list = groupRepository.findAllByUserIdAndName(pageable, userId, q);
         return reponsDataGroup(page, list);
     }
 

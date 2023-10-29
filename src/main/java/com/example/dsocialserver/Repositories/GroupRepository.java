@@ -31,6 +31,9 @@ public interface GroupRepository extends CrudRepository<Groups, Object> {
     @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
     Page<Groups> findAllByUserId(Pageable pageable, @Param("userId") int userId);
     
+    @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId AND groups.name LIKE %:name% UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
+    Page<Groups> findAllByUserIdAndName(Pageable pageable, @Param("userId") int userId, @Param("name") String name);
+    
     @Query(value="SELECT * FROM groups WHERE groups.is_active = 1 ORDER BY `groups`.`id` DESC", nativeQuery = true)
     Page<Groups> findAll(Pageable pageable);
     
