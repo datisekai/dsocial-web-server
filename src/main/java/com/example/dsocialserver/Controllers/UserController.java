@@ -252,13 +252,13 @@ public class UserController {
             Date birthday = pst.getBirthday();
             String avatar = pst.getAvatar();
             String coverImage = pst.getCoverImage();
-
+            String address = pst.getAddress();
             if (avatar == null || avatar.isEmpty() || "".equals(avatar.trim())) {
                 avatar = "https://ui-avatars.com/api/?name=" + name;
             }
 
 //        ----------------------------------
-            Map<String, Object> user = userService.updateUser(Integer.parseInt(userId), name, otherName, bio, birthday, avatar, coverImage);
+            Map<String, Object> user = userService.updateUser(Integer.parseInt(userId), name, otherName, bio, birthday, avatar, coverImage, address);
             if (!user.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);

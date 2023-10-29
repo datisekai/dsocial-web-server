@@ -61,6 +61,7 @@ public class User {
     private String avatar;
     
     private String cover_image;
+    private String address;
     private int is_active;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -183,6 +184,14 @@ public class User {
 
     public void setCover_image(String cover_image) {
         this.cover_image = cover_image;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public int getIs_active() {

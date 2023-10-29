@@ -80,6 +80,12 @@ public class FriendshipService {
         return reponsDataSearchFriendship(page, list);
     }
 
+    public Map<String, Object> getSearchNotMyFriendshipList(int page, int limit, int userId, String name) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<User> list = userRepository.findAllByName(pageable, userId, name, 0);
+        return reponsDataSearchFriendship(page, list);
+    }
+
     public Map<String, Object> getMyFriendshipList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Friendship> list = friendshipRepository.findAllFriendshipByUserId(pageable, userId, 1);

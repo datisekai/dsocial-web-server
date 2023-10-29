@@ -42,15 +42,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User list = optionalUser.get();
-
-            data.put("id", list.getId());
-            data.put("email", list.getEmail());
-            data.put("name", list.getName());
-            data.put("avatar", list.getAvatar());
-            data.put("bio", list.getBio());
-            data.put("birthday", list.getBirthday());
-            data.put("cover_image", list.getCover_image());
-            data.put("other_name", list.getOther_name());
+            data = getUser(list);
         }
         return data;
     }
@@ -99,7 +91,7 @@ public class UserService {
         return userRepository.save(user);
     }
     
-    public Map<String, Object> updateUser(int id, String name, String otherName, String bio, Date birthday, String avatar, String coverImage){
+    public Map<String, Object> updateUser(int id, String name, String otherName, String bio, Date birthday, String avatar, String coverImage, String address){
         Optional<User> optional = userRepository.findById(id);
         Map<String, Object> data = new HashMap<>();
         if (optional.isPresent()) {
@@ -111,7 +103,7 @@ public class UserService {
             u.setBirthday(birthday);
             u.setAvatar(avatar);
             u.setCover_image(coverImage);
-            
+            u.setAddress(address);
             // ...
             User updatedUser = userRepository.save(u);         
             data = getUser(updatedUser);
@@ -146,6 +138,7 @@ public class UserService {
         data.put("birthday", user.getBirthday());
         data.put("cover_image", user.getCover_image());
         data.put("other_name", user.getOther_name());
+        data.put("address", user.getAddress());
         return data;
     }
 }

@@ -23,6 +23,6 @@ public interface UserRepository extends CrudRepository<User, Object> {
 
     User findByEmailAndPassword(String email, String password);
     
-    @Query(value = "SELECT `user`.* FROM friendship, `user` WHERE (`user`.name LIKE % :name % OR `user`.`other_name` LIKE % :name %) AND `user`.id != :userId AND (friendship.user_id = `user`.id OR friendship.friend_id = `user`.id) AND friendship.is_active=:isActive ORDER BY user.id DESC", nativeQuery = true)
+    @Query(value = "SELECT `user`.* FROM friendship, `user` WHERE (`user`.name LIKE %:name% OR `user`.`other_name` LIKE %:name%) AND `user`.id != :userId AND (friendship.user_id = `user`.id OR friendship.friend_id = `user`.id) AND friendship.is_active=:isActive ORDER BY user.id DESC", nativeQuery = true)
     Page<User> findAllByName(Pageable pageable, @Param("userId") int userId, @Param("name") String name, @Param("isActive") int isActive);
 }

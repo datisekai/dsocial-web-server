@@ -29,6 +29,8 @@ public class UserType {
     public String avatar;
     
     public String coverImage;
+    
+    public String address;
 
     public String getName() {
         return name;
@@ -76,6 +78,14 @@ public class UserType {
 
     public void setCoverImage(String coverImage) {
         this.coverImage = coverImage;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
     
     
