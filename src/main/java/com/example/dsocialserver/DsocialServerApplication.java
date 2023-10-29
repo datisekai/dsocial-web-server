@@ -8,8 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class DsocialServerApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(DsocialServerApplication.class, args);
-	}
+
+    public static void main(String[] args) {
+        SpringApplication.run(DsocialServerApplication.class, args);
+    }
 
 }

@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
  *
  * @author haidu
  */
-public class GroupBossType {
+public class GroupOwnType {
     
     @NotEmpty
     @NotBlank

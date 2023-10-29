@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,11 +48,13 @@ public class FileStorageService {
     }
 
     public static String generateRandomFileName(String originalFileName) {
+        long currentTime = Instant.now().toEpochMilli();
         // Lấy phần mở rộng của tệp (ví dụ: .jpg)
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-
+        
+        String fileNameWithoutExtension = originalFileName.substring(0, originalFileName.lastIndexOf("."));
         // Tạo một chuỗi ngẫu nhiên và kết hợp với phần mở rộng của tệp
-        String randomFileName = UUID.randomUUID().toString() + fileExtension;
+        String randomFileName = fileNameWithoutExtension + "_" + currentTime + fileExtension;
         return randomFileName;
     }
 }

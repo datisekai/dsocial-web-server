@@ -8,7 +8,7 @@ import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.GroupUser;
 import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Services.GroupUserService;
-import com.example.dsocialserver.Types.GroupBossType;
+import com.example.dsocialserver.Types.GroupOwnType;
 import com.example.dsocialserver.Types.GroupUserType;
 import com.example.dsocialserver.Utils.JwtTokenProvider;
 import static com.example.dsocialserver.Utils.ParseJSon.ParseJSon;
@@ -71,7 +71,7 @@ public class GroupUserController {
     }
 
     @DeleteMapping("/kick")
-    public ResponseEntity kickUserGroupUser(@Valid @RequestBody GroupBossType gr, @RequestHeader("Authorization") String authorizationHeader) throws IOException {
+    public ResponseEntity kickUserGroupUser(@Valid @RequestBody GroupOwnType gr, @RequestHeader("Authorization") String authorizationHeader) throws IOException {
         try {
             String userId_boss = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String groupId = gr.getGroupId();
