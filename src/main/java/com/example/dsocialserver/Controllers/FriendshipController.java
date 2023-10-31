@@ -129,7 +129,7 @@ public class FriendshipController {
     }
     
     //tìm kiếm người gửi lời mời kết bạn
-    @GetMapping("not/search")
+    @GetMapping("request/search")
     public ResponseEntity searchNotFriend(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit,
@@ -138,7 +138,7 @@ public class FriendshipController {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
 
-            Map<String, Object> gr = friendshipService.getSearchNotMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), q);
+            Map<String, Object> gr = friendshipService.getSearchRequestFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), q);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
