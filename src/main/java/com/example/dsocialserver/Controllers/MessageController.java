@@ -23,12 +23,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +47,46 @@ public class MessageController {
     private MessageService messageService;
     
     private final CustomResponse jsonRes = new CustomResponse();
-
+    
+    @GetMapping("/{roomId}")
+    public ResponseEntity getMessage(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("roomId") String roomId,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(roomId),"");
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
+    @GetMapping("/search/{roomId}")
+    public ResponseEntity getSearchMessage(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("roomId") String roomId,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit,
+            @RequestParam(value = "q", defaultValue = "") String q
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(roomId), q);
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
     @PostMapping()
     public ResponseEntity createMessage(@RequestHeader("Authorization") String authorizationHeader,
             @Valid @RequestBody MessageType gr) throws IOException {
