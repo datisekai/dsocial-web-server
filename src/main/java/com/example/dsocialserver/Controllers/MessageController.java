@@ -109,9 +109,35 @@ public class MessageController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    @PutMapping("/seen/{messageId}")
+    public ResponseEntity updateSeenMessage(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("messageId") String messageId,
+            @Valid @RequestBody MessageType gr) throws IOException {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String content = gr.getContent();
+
+//        ----------------------------------
+            Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(userId));
+            if (isPermission != null) {
+                Map<String, Object> message = messageService.updateSeenMessage(messageId);
+                if (!message.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Cập nhật tin nhắn thành công");
+                    responseData.put("data", message);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+                }
+                return StatusUntilIndex.showMissing();
+            }
+            return StatusUntilIndex.showNotAuthorized();
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
 
     @PutMapping("/{messageId}")
-    public ResponseEntity updateGroup(@RequestHeader("Authorization") String authorizationHeader,
+    public ResponseEntity updateMessage(@RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("messageId") String messageId,
             @Valid @RequestBody MessageType gr) throws IOException {
         try {
@@ -138,7 +164,7 @@ public class MessageController {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity deleteGroup(@RequestHeader("Authorization") String authorizationHeader,
+    public ResponseEntity deleteMessage(@RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("messageId") String messageId) throws IOException {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();

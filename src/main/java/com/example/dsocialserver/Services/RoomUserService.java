@@ -4,9 +4,20 @@
  */
 package com.example.dsocialserver.Services;
 
+import com.example.dsocialserver.Models.Message;
+import com.example.dsocialserver.Models.Room;
 import com.example.dsocialserver.Models.RoomUser;
 import com.example.dsocialserver.Repositories.RoomUserReponsiitory;
+import static com.example.dsocialserver.Services.UserService.getUser;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**

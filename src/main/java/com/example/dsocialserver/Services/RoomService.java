@@ -8,11 +8,16 @@ import com.example.dsocialserver.Models.Room;
 import com.example.dsocialserver.Models.RoomUser;
 import com.example.dsocialserver.Repositories.RoomRepository;
 import com.example.dsocialserver.Repositories.RoomUserReponsiitory;
+import static com.example.dsocialserver.Services.UserService.getUser;
+import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,5 +57,31 @@ public class RoomService {
         data.put("friend_id", listRoomUserFriend.getUser_id());
 
         return data;
+    }
+        public Map<String, Object> getAllRoom(int page, int limit, int userId) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Room> list = roomRepository.findRoomByuserId(pageable, userId);
+        return reponsDataMessage(page, list);
+    }
+      public Map<String, Object> reponsDataMessage(int page, Page<Room> list) {
+        List<Map<String, Object>> listdata = new ArrayList<>();
+        for (Room o : list.getContent()) {
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("id", o.getId());
+            data.put("name", o.getName());
+            data.put("last_message_id", o.getLast_message_id());
+            List<Map<String, Object>> pUser = new ArrayList<>();
+            for(RoomUser i: o.getRoomUsers()){
+                pUser.add(getUser(i.getUser_roomUsers()));
+            }
+            data.put("users_joined", pUser);
+            listdata.add(data);
+        }
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", listdata);
+        dataResult.put("pagination", getPagination(page, list));
+
+        return dataResult;
     }
 }

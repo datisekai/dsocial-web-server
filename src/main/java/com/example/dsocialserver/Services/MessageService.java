@@ -5,7 +5,9 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Message;
+import com.example.dsocialserver.Models.Room;
 import com.example.dsocialserver.Repositories.MessageRepository;
+import com.example.dsocialserver.Repositories.RoomRepository;
 import static com.example.dsocialserver.Services.UserService.getUser;
 import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import java.util.ArrayList;
@@ -28,6 +30,9 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
+    
+    @Autowired
+    private RoomRepository roomRepository;
 
     public Message findByIdAndUserId(int groupId, int userId) {
         Message optional = messageRepository.findByIdAndUserId(groupId, userId);
@@ -51,7 +56,36 @@ public class MessageService {
         data.put("content", list.getContent());
         data.put("is_active", list.getIs_active());
         data.put("is_seen", list.getIs_seen());
+        data.put("created_at", list.getCreated_at());
+        
+        Optional<Room> optional = roomRepository.findById(roomId);
+        if (optional.isPresent()) {
+            Room room = optional.get();
+            room.setLast_message_id(list.getId());
+            // ...
+            roomRepository.save(room);
 
+        }
+        return data;
+    }
+    
+    public Map<String, Object> updateSeenMessage(Object id) {
+        Map<String, Object> data = new HashMap<>();
+        Optional<Message> optional = messageRepository.findById(id);
+        if (optional.isPresent()) {
+            Message gr = optional.get();
+            gr.setIs_seen(true);
+            // ...
+            Message list = messageRepository.save(gr);
+
+            data.put("id", list.getId());
+            data.put("author_id", list.getAuthor_id());
+            data.put("room_id", list.getRoom_id());
+            data.put("content", list.getContent());
+            data.put("is_active", list.getIs_active());
+            data.put("is_seen", list.getIs_seen());
+            data.put("created_at", list.getCreated_at());
+        }
         return data;
     }
 
@@ -70,6 +104,7 @@ public class MessageService {
             data.put("content", list.getContent());
             data.put("is_active", list.getIs_active());
             data.put("is_seen", list.getIs_seen());
+            data.put("created_at", list.getCreated_at());
         }
         return data;
     }
@@ -106,6 +141,7 @@ public class MessageService {
             data.put("content", o.getContent());
             data.put("is_active", o.getIs_active());
             data.put("is_seen", o.getIs_seen());
+            data.put("created_at", o.getCreated_at());
             data.put("user_send", getUser(o.getUser_messages()));
             listdata.add(data);
         }
