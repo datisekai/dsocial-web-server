@@ -175,8 +175,7 @@ public class FriendshipController {
     //chấp nhận lời mời kết bạn
     @PutMapping("/{frienId}")
     public ResponseEntity submitFriend(@RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable("frienId") String frienId,
-            @RequestBody @Valid FriendshipType pst) throws IOException {
+            @PathVariable("frienId") String frienId) throws IOException {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
