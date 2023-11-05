@@ -52,10 +52,12 @@ public class GroupController {
 
     // lấy ra tất cả nhóm
     @GetMapping()
-    public ResponseEntity getAllGroups(@RequestParam(value = "page", defaultValue = "1") String page,
+    public ResponseEntity getAllGroups(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Map<String, Object> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = groupService.getGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", gr.get("data"));
@@ -66,7 +68,7 @@ public class GroupController {
         }
     }
 
-    // lấy ra những nhóm của mình
+    // lấy ra những nhóm của mình tham gia
     @GetMapping("/joined")
     public ResponseEntity getAllMyGroups(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
@@ -75,6 +77,25 @@ public class GroupController {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Map<String, Object> gr = groupService.getMyGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
+    // lấy ra những nhóm của mình làm chủ
+    @GetMapping("/own")
+    public ResponseEntity getAllOwnMyGroups(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = groupService.getOwnGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", gr.get("data"));

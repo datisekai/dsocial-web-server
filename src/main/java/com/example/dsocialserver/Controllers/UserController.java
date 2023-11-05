@@ -66,7 +66,7 @@ public class UserController {
     private final CustomResponse jsonRes = new CustomResponse();
 
     // lấy thông tin người khác
-    @GetMapping("/info/{userId}")
+    @GetMapping("/profile/{userId}")
     public ResponseEntity getInfoUser(@PathVariable("userId") String userId) {
         try {
             Map<String, Object> user = userService.getInfoUser(userId);
@@ -241,8 +241,8 @@ public class UserController {
         }
     }
     
-    @PutMapping("/edit-profile")
-    public ResponseEntity editProfile(@RequestHeader("Authorization") String authorizationHeader,
+    @PutMapping("/change-password")
+    public ResponseEntity changePassword(@RequestHeader("Authorization") String authorizationHeader,
             @Valid @RequestBody ResetpasswordType us) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
@@ -264,8 +264,8 @@ public class UserController {
         }
     }
 
-    @PutMapping("/change-password")
-    public ResponseEntity changePassword(@RequestHeader("Authorization") String authorizationHeader,
+    @PutMapping("/edit-profile")
+    public ResponseEntity editProfile(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid UserType pst) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();

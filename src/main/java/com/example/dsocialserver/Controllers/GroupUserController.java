@@ -61,7 +61,7 @@ public class GroupUserController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Tham gia nhóm thành công");
-                responseData.put("data", groupUser);
+                responseData.put("data", groupUser.get("data"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

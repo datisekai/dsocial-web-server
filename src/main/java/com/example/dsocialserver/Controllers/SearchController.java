@@ -68,7 +68,7 @@ public class SearchController {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
 
-            Map<String, Object> gr = groupService.getSearchGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), q);
+            Map<String, Object> gr = groupService.getSearchGroupList(Integer.parseInt(page) - 1, Integer.parseInt(limit), q, Integer.parseInt(userId));
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);

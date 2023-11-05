@@ -85,47 +85,62 @@ public class GroupService {
         return result == 1;
     }
 
-    public Map<String, Object> getSearchGroupList(int page, int limit, String name) {
+    public Map<String, Object> getOwnGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Groups> list = groupRepository.findAllByName(pageable, name);
-        return reponsDataGroup(page, list);
+        Page<Groups> list = groupRepository.findAllOwnGroupByUserId(pageable, userId);
+        return reponsDataGroup(page, list, userId);
     }
 
     public Map<String, Object> getMyGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAllByUserId(pageable, userId);
-        return reponsDataGroup(page, list);
+        return reponsDataGroup(page, list, userId);
     }
 
     public Map<String, Object> getSearchMyGroupList(int page, int limit, int userId, String q) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAllByUserIdAndName(pageable, userId, q);
-        return reponsDataGroup(page, list);
+        return reponsDataGroup(page, list, userId);
     }
 
-    public Map<String, Object> getGroupList(int page, int limit) {
+    public Map<String, Object> getGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAll(pageable);
-        return reponsDataGroup(page, list);
+        return reponsDataGroup(page, list, userId);
     }
 
-    public Map<String, Object> reponsDataGroup(int page, Page<Groups> list) {
+    public Map<String, Object> getSearchGroupList(int page, int limit, String name, int userId) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Groups> list = groupRepository.findAllByName(pageable, name);
+        return reponsDataGroup(page, list, userId);
+    }
+
+    public Map<String, Object> reponsDataGroup(int page, Page<Groups> list, int userId) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Groups o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
-
+            boolean isJoined = false;
             data.put("id", o.getId());
             data.put("name", o.getName());
             data.put("avatar", o.getAvatar());
             data.put("cover_image", o.getCover_image());
             data.put("created_at", o.getCreated_at());
-            data.put("user_boss", getUser(o.getUser_groups()));
+            data.put("user_own", getUser(o.getUser_groups()));
+            if (o.getUser_groups().getId() == userId) {
+                isJoined = true;
+            }
             List<Map<String, Object>> pUser = new ArrayList<>();
             pUser.add(getUser(o.getUser_groups()));
             for (GroupUser gu : o.getGroupUsers()) {
                 pUser.add(getUser(gu.getUser_groupUsers()));
+                if (!isJoined) {
+                    if (gu.getUser_groupUsers().getId() == userId ) {
+                        isJoined = true;
+                    }
+                }
             }
             data.put("users_joined", pUser);
+            data.put("is_joined", isJoined);
             listdata.add(data);
         }
         Map<String, Object> dataResult = new HashMap<>();

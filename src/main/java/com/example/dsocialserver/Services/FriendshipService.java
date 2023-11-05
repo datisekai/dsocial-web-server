@@ -43,32 +43,27 @@ public class FriendshipService {
         gr.setIs_Active(0);
         Friendship list = friendshipRepository.save(gr);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("id", list.getId());
-        data.put("user_id", list.getUser_id());
-        data.put("friendship_id", list.getFriend_id());
-        data.put("is_active", list.getIs_Active());
-
-        return data;
+        return reponsDataFriend(list);
     }
 
     public Map<String, Object> updateFriendship(int friendId, int userId) {
-        Map<String, Object> data = new HashMap<>();
+        Friendship list = new Friendship();
         if (friendId != userId) {
             Friendship optional = friendshipRepository.findFriendByUserIdAndFriendId(friendId, userId);
             if (optional != null) {
                 optional.setIs_Active(1);
                 // ...
-                Friendship list = friendshipRepository.save(optional);
-                data= getUser(list.getUser_user_friendships());
+                list = friendshipRepository.save(optional);
             }
         }
-        return data;
+        return reponsDataFriend(list);
     }
 
-    public boolean deleteFriendship(int friendId, int userId, int isActive) {
-        int result = friendshipRepository.deleteByUserIdAndFriendId(friendId, userId, isActive);
-        return result == 1;
+    public Map<String, Object> deleteFriendship(int friendId, int userId, int isActive) {
+        Friendship list = friendshipRepository.findFriendByUserIdAndFriendId(friendId, userId);
+        Map<String, Object> result= reponsDataFriend(list);
+        friendshipRepository.deleteByUserIdAndFriendId(friendId, userId, isActive);
+        return result;
     }
 
     public Map<String, Object> getSearchMyFriendshipList(int page, int limit, int userId, String name) {
@@ -98,11 +93,6 @@ public class FriendshipService {
     public Map<String, Object> reponsDataFriendship(int page, Page<Friendship> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Friendship o : list.getContent()) {
-//            Map<String, Object> data = new HashMap<>();
-//
-//            data.put("id", o.getId());
-////            data.put("user_request", getUser(o.getUser_user_friendships()));
-//            data.put("friend", getUser(o.getUser_friend_friendships()));
             listdata.add(getUser(o.getUser_user_friendships()));
         }
         Map<String, Object> dataResult = new HashMap<>();
@@ -121,6 +111,12 @@ public class FriendshipService {
         Map<String, Object> dataResult = new HashMap<>();
         dataResult.put("data", listdata);
         dataResult.put("pagination", getPagination(page, list));
+
+        return dataResult;
+    }
+    public Map<String, Object> reponsDataFriend(Friendship fs) {
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", getUser(fs.getUser_user_friendships()));
 
         return dataResult;
     }
