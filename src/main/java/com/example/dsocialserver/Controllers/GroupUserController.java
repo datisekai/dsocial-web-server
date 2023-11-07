@@ -78,10 +78,13 @@ public class GroupUserController {
             String userId = gr.getUserId();
             Groups isOwn = groupUserService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId_own));
             if (isOwn != null) {
-                boolean friend = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
-                if (friend) {
-                    jsonRes.setRes(true, "Đuổi thành viên thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> friend = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
+                if (!friend.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Đuổi thành viên thành công");
+                    responseData.put("data", friend.get("data"));
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }
@@ -97,10 +100,13 @@ public class GroupUserController {
         try {
             String groupId = gr.getGroupId();
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            boolean friend = groupUserService.outGroupUser(Integer.parseInt(groupId),Integer.parseInt(userId));
-            if (friend) {
-                jsonRes.setRes(true, "Rời nhóm thành công");
-                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+            Map<String, Object> friend = groupUserService.outGroupUser(Integer.parseInt(groupId), Integer.parseInt(userId));
+            if (!friend.isEmpty()) {
+                Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Rời nhóm thành công");
+                    responseData.put("data", friend.get("data"));
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
         } catch (NumberFormatException e) {

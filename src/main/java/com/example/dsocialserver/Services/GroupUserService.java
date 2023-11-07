@@ -46,9 +46,12 @@ public class GroupUserService {
         return reponsDataGroupUser(list, userId);
     }
 
-    public boolean outGroupUser(int id, int userId) {
-        int result = groupUserRepository.deleteByGroupIdAndUserId(id, userId);
-        return result == 1;
+    public Map<String, Object> outGroupUser(int groupId, int userId) {
+        GroupUser list = groupUserRepository.findByIdAndUserId(groupId, userId);
+        Map<String, Object> result= new HashMap<>();
+        result.put("data", getUser(list.getUser_groupUsers()));
+        groupUserRepository.deleteByGroupIdAndUserId(groupId, userId);
+        return result;
     }
     
      public Map<String, Object> reponsDataGroupUser( GroupUser grUser, int userId) {

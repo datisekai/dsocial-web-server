@@ -7,6 +7,7 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.UserService;
+import com.example.dsocialserver.Types.ChangePasswordType;
 import com.example.dsocialserver.Types.ForgotpasswordType;
 import com.example.dsocialserver.Types.LoginType;
 import com.example.dsocialserver.Types.RegisterType;
@@ -50,6 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author haidu
  */
+@CrossOrigin
 @RestController
 @RequestMapping()
 public class UserController {
@@ -240,22 +242,29 @@ public class UserController {
             return StatusUntilIndex.showInternal(e);
         }
     }
-    
+
     @PutMapping("/change-password")
     public ResponseEntity changePassword(@RequestHeader("Authorization") String authorizationHeader,
-            @Valid @RequestBody ResetpasswordType us) {
+            @Valid @RequestBody ChangePasswordType us) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            String password = us.getPassword();
-
+            String oldPassword = us.getOldPassword();
+            String newPassword = us.getNewPassword();
 //        ----------------------------------
-            String hashPassword = MD5(password);
-            User user = userService.updatePasswordUser(userId, hashPassword);
-            if (user!= null) {
+            String hashOldPassword = MD5(oldPassword);
+            String hashNewPassword = MD5(newPassword);
+            User isUser = userService.findByPassword(hashOldPassword);
+            if(isUser == null){
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", false);
+                responseData.put("message", "Sai mật khẩu");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(responseData));
+            }
+            User user = userService.updatePasswordUser(userId, hashNewPassword);
+            if (user != null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Đổi mật khẩu thành công thành công");
-                responseData.put("data", user);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -301,10 +310,11 @@ public class UserController {
         try {
 //        ---------------------------------
             if (!"".equals(file.getOriginalFilename())) {
-                saveFile(file, generateRandomFileName(file.getOriginalFilename()));
+                String namefile = saveFile(file, generateRandomFileName(file.getOriginalFilename()));
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", " Upload thành công");
+                responseData.put("data", namefile);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

@@ -26,7 +26,7 @@ public class FileStorageService {
 
     private static final String uploadDir = "./uploads"; // Thư mục lưu trữ tệp
 
-    public static void saveFile(MultipartFile file, String randomFileName) throws IOException {
+    public static String saveFile(MultipartFile file, String randomFileName) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
 
         // Tạo thư mục nếu nó không tồn tại
@@ -38,6 +38,8 @@ public class FileStorageService {
         // Lưu tệp vào thư mục với tên ngẫu nhiên
         Path filePath = uploadPath.resolve(randomFileName);
         Files.copy(file.getInputStream(), filePath);
+        
+        return randomFileName;
     }
 
     public static String getRelativeUploadPath(String randomFileName) {

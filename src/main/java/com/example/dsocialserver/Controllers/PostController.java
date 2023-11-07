@@ -69,7 +69,8 @@ public class PostController {
 
     // lấy ra tất cả bài viết của group
     @GetMapping("/group/{groupId}")
-    public ResponseEntity getAllPostGroup(@PathVariable("groupId") String groupId, @RequestParam(value = "page", defaultValue = "1") String page,
+    public ResponseEntity getAllPostGroup(@PathVariable("groupId") String groupId, 
+            @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             Map<String, Object> post = postService.getPostListGroup(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(groupId));

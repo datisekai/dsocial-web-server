@@ -67,6 +67,23 @@ public class GroupController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    // lấy ra nhóm dựa theo id nhóm
+    @GetMapping("/detail/{groupId}")
+    public ResponseEntity getGroupByGroupId(@RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("groupId") String groupId,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = groupService.getGroupByGroupId(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId), Integer.parseInt(groupId));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
 
     // lấy ra những nhóm của mình tham gia
     @GetMapping("/joined")

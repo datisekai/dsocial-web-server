@@ -22,6 +22,9 @@ public interface GroupUserRepository extends CrudRepository<GroupUser, Object>{
     
     void deleteAllByIdIn(List ids);
     
+    @Query(value="SELECT * FROM `groupuser` WHERE groupuser.group_id=:groupId AND groupuser.user_id=:userId", nativeQuery = true)
+    GroupUser findByIdAndUserId(@Param("groupId") int groupId, @Param("userId") int userId);
+    
     @Modifying
     @Query(value = "DELETE FROM `groupuser` WHERE group_id= :group_id AND user_id= :user_id", nativeQuery = true)
     int deleteByGroupIdAndUserId(@Param("group_id") int group_id, @Param("user_id") int user_id);

@@ -15,6 +15,7 @@ import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositories.GroupRepository;
 import static com.example.dsocialserver.Services.UserService.getUser;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,16 @@ public class GroupService {
         return result == 1;
     }
 
+    public Map<String, Object> getGroupByGroupId(int page, int limit, int userId, int groupId) {
+        Optional<Groups> optional = groupRepository.findById(groupId);
+        Map<String, Object> result= new HashMap<>();
+        if (optional.isPresent()) {
+            Groups gr = optional.get();
+            result=reponsDataGroupById( gr, userId, groupId);
+        }
+        return result;
+    }
+
     public Map<String, Object> getOwnGroupList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Groups> list = groupRepository.findAllOwnGroupByUserId(pageable, userId);
@@ -114,6 +125,30 @@ public class GroupService {
         Page<Groups> list = groupRepository.findAllByName(pageable, name);
         return reponsDataGroup(page, list, userId);
     }
+    
+    public Map<String, Object> reponsDataGroupById(Groups o, int userId, int groupId) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", o.getId());
+            data.put("name", o.getName());
+            data.put("avatar", o.getAvatar());
+            data.put("cover_image", o.getCover_image());
+            data.put("created_at", o.getCreated_at());
+            data.put("user_own", getUserJoinedGroup(o.getUser_groups(), o.getCreated_at()));
+    
+            List<Map<String, Object>> pUser = new ArrayList<>();
+            pUser.add(getUserJoinedGroup(o.getUser_groups(), o.getCreated_at()));
+            for (GroupUser gu : o.getGroupUsers()) {
+                pUser.add(getUserJoinedGroup(gu.getUser_groupUsers(), gu.getCreated_at()));
+                
+            }
+            data.put("users_joined", pUser);
+
+        
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", data);
+
+        return dataResult;
+    }
 
     public Map<String, Object> reponsDataGroup(int page, Page<Groups> list, int userId) {
         List<Map<String, Object>> listdata = new ArrayList<>();
@@ -134,7 +169,7 @@ public class GroupService {
             for (GroupUser gu : o.getGroupUsers()) {
                 pUser.add(getUser(gu.getUser_groupUsers()));
                 if (!isJoined) {
-                    if (gu.getUser_groupUsers().getId() == userId ) {
+                    if (gu.getUser_groupUsers().getId() == userId) {
                         isJoined = true;
                     }
                 }
@@ -148,5 +183,19 @@ public class GroupService {
         dataResult.put("pagination", getPagination(page, list));
 
         return dataResult;
+    }
+    public Map<String, Object> getUserJoinedGroup(User user, Date joinedDate) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", user.getId());
+        data.put("email", user.getEmail());
+        data.put("name", user.getName());
+        data.put("avatar", user.getAvatar());
+        data.put("bio", user.getBio());
+        data.put("birthday", user.getBirthday());
+        data.put("cover_image", user.getCover_image());
+        data.put("other_name", user.getOther_name());
+        data.put("address", user.getAddress());
+        data.put("joined_date", joinedDate);
+        return data;
     }
 }
