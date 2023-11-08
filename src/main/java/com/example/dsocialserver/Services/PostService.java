@@ -151,6 +151,65 @@ public class PostService {
         Page<Post> list = postRepository.findAll(pageable);
         return reponsDataPost(page, list);
     }
+    
+    public Map<String, Object> reponsDataCreatePost(int page, Post list) {
+        List<Map<String, Object>> listdata = new ArrayList<>();
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("id", list.getId());
+            data.put("html", list.getHtml());
+            data.put("author_id", list.getAuthor_id());
+            Map<String, Object> dataGroup = new HashMap<>();
+            if (list.getGroup_posts() != null) {
+                dataGroup.put("id", list.getGroup_posts().getId());
+                dataGroup.put("name", list.getGroup_posts().getName());
+                dataGroup.put("avatar", list.getGroup_posts().getAvatar());
+            }
+            data.put("group", dataGroup);
+            data.put("created_at", list.getCreated_at());
+            data.put("user_post", getUser(list.getUser_posts()));
+            List<Map<String, Object>> pImage = new ArrayList<>();
+            for (PostImage s : list.getPostImages()) {
+                Map<String, Object> dataImage = new HashMap<>();
+                dataImage.put("id", s.getId());
+                dataImage.put("post_id", s.getPost_id());
+                dataImage.put("src", s.getSrc());
+                pImage.add(dataImage);
+            }
+            List<Map<String, Object>> pComment = new ArrayList<>();
+            for (PostComment s : list.getPostComments()) {
+                Map<String, Object> dataComment = new HashMap<>();
+                dataComment.put("id", s.getId());
+                dataComment.put("post_id", s.getPost_id());
+                dataComment.put("content", s.getContent());
+                dataComment.put("created_at", s.getCreated_at());
+                dataComment.put("author_id", s.getAuthor_id());
+                dataComment.put("parent_id", s.getParent_id());
+                dataComment.put("user_comment", getUser(s.getUser_postComments()));
+                pComment.add(dataComment);
+            }
+            List<Map<String, Object>> pReaction = new ArrayList<>();
+            for (PostReaction s : list.getPostReactions()) {
+                Map<String, Object> dataReaction = new HashMap<>();
+                dataReaction.put("id", s.getId());
+                dataReaction.put("post_id", s.getPost_id());
+                dataReaction.put("author_id", s.getAuthor_id());
+                dataReaction.put("icon", s.getIcon());
+                dataReaction.put("user_reaction", getUser(s.getUser_postReactions()));
+                pReaction.add(dataReaction);
+            }
+            data.put("images", pImage);
+            data.put("count_reaction", pReaction.size());
+            data.put("count_comment", pComment.size());
+            data.put("reactions", pReaction);
+            data.put("comments", pComment);
+            listdata.add(data);
+        
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", listdata);
+
+        return dataResult;
+    }
 
     public Map<String, Object> reponsDataPost(int page, Page<Post> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();

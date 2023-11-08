@@ -4,6 +4,7 @@
  */
 package com.example.dsocialserver.Controllers;
 
+import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Services.UserService;
@@ -38,7 +39,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
@@ -254,7 +257,7 @@ public class UserController {
             String hashOldPassword = MD5(oldPassword);
             String hashNewPassword = MD5(newPassword);
             User isUser = userService.findByPassword(hashOldPassword);
-            if(isUser == null){
+            if (isUser == null) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", false);
                 responseData.put("message", "Sai mật khẩu");
@@ -306,7 +309,7 @@ public class UserController {
 
     //upload ảnh
     @PostMapping("/upload")
-    public ResponseEntity createFriendRequest(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         try {
 //        ---------------------------------
             if (!"".equals(file.getOriginalFilename())) {
@@ -315,6 +318,37 @@ public class UserController {
                 responseData.put("success", true);
                 responseData.put("message", " Upload thành công");
                 responseData.put("data", namefile);
+                return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+            }
+            return StatusUntilIndex.showMissing();
+
+        } catch (IOException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+
+    @PostMapping("/uploads")
+    public ResponseEntity uploadImages(@RequestParam("file") MultipartFile[] files) throws IOException {
+        try {
+            List<PostImage> uploadedFiles = new ArrayList<>();
+
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String fileName = generateRandomFileName(file.getOriginalFilename());
+                    String savedFileName = saveFile(file, fileName);
+                    PostImage p = new PostImage();
+                    p.setSrc(savedFileName);
+                    uploadedFiles.add(p);
+                }
+            }
+
+//        ---------------------------------
+            if (!uploadedFiles.isEmpty()) {
+
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("success", true);
+                responseData.put("message", " Upload thành công");
+                responseData.put("data", uploadedFiles);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

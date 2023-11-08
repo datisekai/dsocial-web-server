@@ -69,7 +69,7 @@ public class PostController {
 
     // lấy ra tất cả bài viết của group
     @GetMapping("/group/{groupId}")
-    public ResponseEntity getAllPostGroup(@PathVariable("groupId") String groupId, 
+    public ResponseEntity getAllPostGroup(@PathVariable("groupId") String groupId,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
@@ -127,7 +127,7 @@ public class PostController {
         try {
             String html = pst.getHtml();
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            List<PostImage> imagage = pst.getImage();
+            List<PostImage> image = pst.getImage();
             String groupId = pst.getGroupId();
 
             if (groupId == null || "".equals(groupId)) {
@@ -135,12 +135,12 @@ public class PostController {
             }
 //        ----------------------------------
 
-            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId), imagage);
+            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId), image);
             if (!post.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Thêm bài viết thành công");
-                responseData.put("data", post);
+                responseData.put("data", post.get("data"));
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -175,6 +175,7 @@ public class PostController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     //Xóa bài viết của bản thân đăng lên
     @DeleteMapping("/{postId}")
     public ResponseEntity groupDelete(@RequestHeader("Authorization") String authorizationHeader,
@@ -195,6 +196,7 @@ public class PostController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+
     //Xóa bài viết trong nhóm của chủ group
     @DeleteMapping("/own/{postId}")
     public ResponseEntity groupBossDelete(@RequestHeader("Authorization") String authorizationHeader,
