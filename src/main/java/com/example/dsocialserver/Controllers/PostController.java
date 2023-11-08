@@ -140,7 +140,7 @@ public class PostController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Thêm bài viết thành công");
-                responseData.put("data", post.get("data"));
+                responseData.put("data", post);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

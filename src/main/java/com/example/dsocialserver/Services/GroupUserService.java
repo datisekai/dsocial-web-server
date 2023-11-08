@@ -42,41 +42,22 @@ public class GroupUserService {
         gu.setGroup_id(groupId);
         gu.setUser_id(userId);
         GroupUser list = groupUserRepository.save(gu);
-        
+
         return reponsDataGroupUser(list, userId);
     }
 
     public Map<String, Object> outGroupUser(int groupId, int userId) {
         GroupUser list = groupUserRepository.findByIdAndUserId(groupId, userId);
-        Map<String, Object> result= new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("data", getUser(list.getUser_groupUsers()));
         groupUserRepository.deleteByGroupIdAndUserId(groupId, userId);
         return result;
     }
-    
-     public Map<String, Object> reponsDataGroupUser( GroupUser grUser, int userId) {
-            Map<String, Object> data = new HashMap<>();
-            boolean isJoined = true;
-            System.out.println(">>>>"+grUser);
-//            data.put("id", grUser.getGroup_groupUsers().getId());
-//            data.put("name", grUser.getGroup_groupUsers().getName());
-//            data.put("avatar", grUser.getGroup_groupUsers().getAvatar());
-//            data.put("cover_image", grUser.getGroup_groupUsers().getCover_image());
-//            data.put("created_at", grUser.getGroup_groupUsers().getCreated_at());
-//            data.put("user_own", getUser(grUser.getGroup_groupUsers().getUser_groups()));
-//            List<Map<String, Object>> pUser = new ArrayList<>();
-//            pUser.add(getUser(grUser.getGroup_groupUsers().getUser_groups()));
-//            for (GroupUser gu : grUser.getGroup_groupUsers().getGroupUsers()) {
-//                pUser.add(getUser(gu.getUser_groupUsers()));
-//                if (!isJoined) {
-//                    if (gu.getUser_groupUsers().getId() == userId ) {
-//                        isJoined = true;
-//                    }
-//                }
-//            }
-//            data.put("users_joined", pUser);
-            data.put("is_joined", isJoined);
-//        
+
+    public Map<String, Object> reponsDataGroupUser(GroupUser grUser, int userId) {
+        Map<String, Object> data = new HashMap<>();
+        boolean isJoined = true;
+        data.put("is_joined", isJoined);
         Map<String, Object> dataResult = new HashMap<>();
         dataResult.put("data", data);
 

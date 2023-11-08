@@ -14,6 +14,7 @@ import com.example.dsocialserver.Repositories.PostCommentRepository;
 import com.example.dsocialserver.Repositories.PostImageRepository;
 import com.example.dsocialserver.Repositories.PostReactionRepository;
 import com.example.dsocialserver.Repositories.PostRepository;
+import com.example.dsocialserver.Repositories.UserRepository;
 import static com.example.dsocialserver.Services.UserService.getUser;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,9 @@ public class PostService {
     @Autowired
     private PostImageRepository postImageRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public Post findById(Object id) {
         Optional<Post> optional = postRepository.findById(id);
         Post list = null;
@@ -58,7 +62,7 @@ public class PostService {
         }
         return null;
     }
-    
+
     public Post findByUserIdBoss(int postId, int authorId) {
         Post post = postRepository.findByUserIdBoss(postId, authorId);
         if (post != null) {
@@ -83,14 +87,8 @@ public class PostService {
             listPostImage.add(pi);
         }
         postImageRepository.saveAll(listPostImage);
-        Map<String, Object> data = new HashMap<>();
-        data.put("id", list.getId());
-        data.put("html", list.getHtml());
-        data.put("author_id", list.getAuthor_id());
-        data.put("group_id", list.getGroup_id());
-        data.put("image", listPostImage);
 
-        return data;
+        return reponsDataCreatePost(list);
     }
 
     public Map<String, Object> updatePost(Object id, String html, List<PostImage> image) {
@@ -151,64 +149,82 @@ public class PostService {
         Page<Post> list = postRepository.findAll(pageable);
         return reponsDataPost(page, list);
     }
-    
-    public Map<String, Object> reponsDataCreatePost(int page, Post list) {
-        List<Map<String, Object>> listdata = new ArrayList<>();
-            Map<String, Object> data = new HashMap<>();
 
-            data.put("id", list.getId());
-            data.put("html", list.getHtml());
-            data.put("author_id", list.getAuthor_id());
-            Map<String, Object> dataGroup = new HashMap<>();
-            if (list.getGroup_posts() != null) {
-                dataGroup.put("id", list.getGroup_posts().getId());
-                dataGroup.put("name", list.getGroup_posts().getName());
-                dataGroup.put("avatar", list.getGroup_posts().getAvatar());
-            }
-            data.put("group", dataGroup);
-            data.put("created_at", list.getCreated_at());
-            data.put("user_post", getUser(list.getUser_posts()));
-            List<Map<String, Object>> pImage = new ArrayList<>();
-            for (PostImage s : list.getPostImages()) {
-                Map<String, Object> dataImage = new HashMap<>();
-                dataImage.put("id", s.getId());
-                dataImage.put("post_id", s.getPost_id());
-                dataImage.put("src", s.getSrc());
-                pImage.add(dataImage);
-            }
-            List<Map<String, Object>> pComment = new ArrayList<>();
-            for (PostComment s : list.getPostComments()) {
-                Map<String, Object> dataComment = new HashMap<>();
-                dataComment.put("id", s.getId());
-                dataComment.put("post_id", s.getPost_id());
-                dataComment.put("content", s.getContent());
-                dataComment.put("created_at", s.getCreated_at());
-                dataComment.put("author_id", s.getAuthor_id());
-                dataComment.put("parent_id", s.getParent_id());
+    public Map<String, Object> reponsDataCreatePost(Post list) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("id", list.getId());
+        data.put("html", list.getHtml());
+        data.put("author_id", list.getAuthor_id());
+        Map<String, Object> dataGroup = new HashMap<>();
+        if (list.getGroup_posts() != null) {
+            dataGroup.put("id", list.getGroup_posts().getId());
+            dataGroup.put("name", list.getGroup_posts().getName());
+            dataGroup.put("avatar", list.getGroup_posts().getAvatar());
+        }
+        data.put("group", dataGroup);
+        data.put("created_at", list.getCreated_at());
+        data.put("user_post", getUserById(list.getAuthor_id()));
+        List<Map<String, Object>> pImage = new ArrayList<>();
+        for (PostImage s : list.getPostImages()) {
+            Map<String, Object> dataImage = new HashMap<>();
+            dataImage.put("id", s.getId());
+            dataImage.put("post_id", s.getPost_id());
+            dataImage.put("src", s.getSrc());
+            pImage.add(dataImage);
+        }
+        List<Map<String, Object>> pComment = new ArrayList<>();
+        for (PostComment s : list.getPostComments()) {
+            Map<String, Object> dataComment = new HashMap<>();
+            dataComment.put("id", s.getId());
+            dataComment.put("post_id", s.getPost_id());
+            dataComment.put("content", s.getContent());
+            dataComment.put("created_at", s.getCreated_at());
+            dataComment.put("author_id", s.getAuthor_id());
+            dataComment.put("parent_id", s.getParent_id());
+            if (list.getUser_posts() != null) {
                 dataComment.put("user_comment", getUser(s.getUser_postComments()));
-                pComment.add(dataComment);
             }
-            List<Map<String, Object>> pReaction = new ArrayList<>();
-            for (PostReaction s : list.getPostReactions()) {
-                Map<String, Object> dataReaction = new HashMap<>();
-                dataReaction.put("id", s.getId());
-                dataReaction.put("post_id", s.getPost_id());
-                dataReaction.put("author_id", s.getAuthor_id());
-                dataReaction.put("icon", s.getIcon());
+            pComment.add(dataComment);
+        }
+        List<Map<String, Object>> pReaction = new ArrayList<>();
+        for (PostReaction s : list.getPostReactions()) {
+            Map<String, Object> dataReaction = new HashMap<>();
+            dataReaction.put("id", s.getId());
+            dataReaction.put("post_id", s.getPost_id());
+            dataReaction.put("author_id", s.getAuthor_id());
+            dataReaction.put("icon", s.getIcon());
+            if (list.getUser_posts() != null) {
                 dataReaction.put("user_reaction", getUser(s.getUser_postReactions()));
-                pReaction.add(dataReaction);
             }
-            data.put("images", pImage);
-            data.put("count_reaction", pReaction.size());
-            data.put("count_comment", pComment.size());
-            data.put("reactions", pReaction);
-            data.put("comments", pComment);
-            listdata.add(data);
-        
-        Map<String, Object> dataResult = new HashMap<>();
-        dataResult.put("data", listdata);
+            pReaction.add(dataReaction);
+        }
+        data.put("images", pImage);
+        data.put("count_reaction", pReaction.size());
+        data.put("count_comment", pComment.size());
+        data.put("reactions", pReaction);
+        data.put("comments", pComment);
 
-        return dataResult;
+        return data;
+    }
+
+    public Map<String, Object> getUserById(Object userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        Map<String, Object> data = new HashMap<>();
+        if (optional.isPresent()) {
+            User user = optional.get();
+            data.put("id", user.getId());
+            data.put("email", user.getEmail());
+            data.put("name", user.getName());
+            data.put("avatar", user.getAvatar());
+            data.put("bio", user.getBio());
+            data.put("birthday", user.getBirthday());
+            data.put("cover_image", user.getCover_image());
+            data.put("other_name", user.getOther_name());
+            data.put("address", user.getAddress());
+        }
+
+        return data;
     }
 
     public Map<String, Object> reponsDataPost(int page, Page<Post> list) {
