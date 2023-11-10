@@ -85,7 +85,7 @@ public class PostCommentController {
 //        ----------------------------------
             PostComment isPermission = commentService.findByIdAndAuthorId(Integer.parseInt(postCommentId), Integer.parseInt(authorId));
             if (isPermission != null) {
-                Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(postCommentId), content);
+                Map<String, Object> postComment = commentService.updatePostComment(Integer.parseInt(postCommentId), content, Integer.parseInt(authorId));
                 if (!postComment.isEmpty()) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);

@@ -6,7 +6,9 @@ package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Groups;
 import com.example.dsocialserver.Models.PostComment;
+import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositories.PostCommentRepository;
+import com.example.dsocialserver.Repositories.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +30,9 @@ public class PostCommentService {
     @Autowired
     private PostCommentRepository commentRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+    
     public PostComment findByIdAndAuthorId(int postCommentId, int authorId) {
         PostComment optional = commentRepository.findByIdAndAuthorId(postCommentId, authorId);
         return optional;
@@ -47,11 +52,12 @@ public class PostCommentService {
         data.put("parent_id", list.getParent_id());
         data.put("content", list.getContent());
         data.put("author_id", list.getAuthor_id());
-
+        data.put("create_at", list.getCreated_at());
+        data.put("user_comment", getUserById(authorId));
         return data;
     }
 
-    public Map<String, Object> updatePostComment(int id, String content) {
+    public Map<String, Object> updatePostComment(int id, String content,  int authorId) {
         Map<String, Object> data = new HashMap<>();
         Optional<PostComment> optional = commentRepository.findById(id);
         if (optional.isPresent()) {
@@ -64,6 +70,8 @@ public class PostCommentService {
             data.put("parent_id", list.getParent_id());
             data.put("content", list.getContent());
             data.put("author_id", list.getAuthor_id());
+            data.put("create_at", list.getCreated_at());
+            data.put("user_comment", getUserById(authorId));
         }
         return data;
     }
@@ -71,6 +79,24 @@ public class PostCommentService {
     public boolean deletePostComment(Object id) {
         int result = commentRepository.deletePostComentById(Integer.parseInt((String) id));
         return result == 1;
+    }
+    public Map<String, Object> getUserById(Object userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        Map<String, Object> data = new HashMap<>();
+        if (optional.isPresent()) {
+            User user = optional.get();
+            data.put("id", user.getId());
+            data.put("email", user.getEmail());
+            data.put("name", user.getName());
+            data.put("avatar", user.getAvatar());
+            data.put("bio", user.getBio());
+            data.put("birthday", user.getBirthday());
+            data.put("cover_image", user.getCover_image());
+            data.put("other_name", user.getOther_name());
+            data.put("address", user.getAddress());
+        }
+
+        return data;
     }
 
 //    public Page<PostComment> getPostCommentList(int page, int limit, String author_id) {

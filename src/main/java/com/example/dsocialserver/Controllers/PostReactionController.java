@@ -102,10 +102,13 @@ public class PostReactionController {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             PostReaction isPermission = postReactionService.findByIdAndAuthorId(Integer.parseInt(postReactionId), Integer.parseInt(authorId));
             if (isPermission != null) {
-                boolean postReaction = postReactionService.deletePostReaction(postReactionId);
-                if (postReaction == true) {
-                    jsonRes.setRes(true, "Xóa cảm xúc thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> postReaction = postReactionService.deletePostReaction(postReactionId, Integer.parseInt(authorId));
+                if (!postReaction.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Xóa cảm xúc thành công");
+                    responseData.put("data", postReaction);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }
