@@ -144,9 +144,9 @@ public class PostService {
         return reponsDataPost(page, list);
     }
 
-    public Map<String, Object> getPostList(int page, int limit) {
+    public Map<String, Object> getPostList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Post> list = postRepository.findAll(pageable);
+        Page<Post> list = postRepository.findAll(pageable, userId);
         return reponsDataPost(page, list);
     }
 

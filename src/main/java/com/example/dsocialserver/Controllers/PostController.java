@@ -53,10 +53,12 @@ public class PostController {
 
     // lấy ra tất cả bài viết ở home page
     @GetMapping()
-    public ResponseEntity getAllPost(@RequestParam(value = "page", defaultValue = "1") String page,
+    public ResponseEntity getAllPost(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
-            Map<String, Object> post = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit));
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> post = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", post.get("data"));

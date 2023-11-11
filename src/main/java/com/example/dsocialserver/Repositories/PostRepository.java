@@ -31,8 +31,8 @@ public interface PostRepository extends CrudRepository<Post, Object> {
     @Query(value = "SELECT * FROM post WHERE post.group_id = :groupId ORDER BY post.id DESC", nativeQuery = true)
     Page<Post> findAllByGroupId(Pageable pageable, @Param("groupId") int groupId);
 
-    @Query(value = "SELECT * FROM Post WHERE Post.is_active = 1 ORDER BY post.id DESC", nativeQuery = true)
-    Page<Post> findAll(Pageable pageable);
+    @Query(value = "SELECT post.* FROM Post,friendship, groups, groupuser WHERE (friendship.user_id= :userId OR friendship.friend_id= :userId AND post.author_id= friendship.user_id or post.author_id= friendship.friend_id) AND ( groups.user_id = :userId AND groups.id = post.group_id OR post.group_id = 0 OR groupuser.user_id = :userId AND groupuser.group_id= post.group_id)  GROUP BY post.id ORDER BY post.id DESC", nativeQuery = true)
+    Page<Post> findAll(Pageable pageable,  @Param("userId") int userId);
 
     @Query(value = "SELECT * FROM Post WHERE post.id = :postId AND post.author_id = :userId ORDER BY post.id DESC", nativeQuery = true)
     Post findByIdAndAuthorId(@Param("postId") int postId, @Param("userId") int userId);
