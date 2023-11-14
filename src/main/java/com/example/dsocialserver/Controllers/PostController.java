@@ -158,11 +158,11 @@ public class PostController {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String html = pst.getHtml();
-            List<PostImage> imagage = pst.getImage();
+            List<PostImage> images = pst.getImage();
 //        ----------------------------------
             Post p = postService.findByIdAndAuthorId(Integer.parseInt(postId), Integer.parseInt(authorId));
             if (p != null) {
-                Map<String, Object> post = postService.updatePost(postId, html, imagage);
+                Map<String, Object> post = postService.updatePost(postId, html, images);
                 if (!post.isEmpty()) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
@@ -186,10 +186,13 @@ public class PostController {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Post p = postService.findByIdAndAuthorId(Integer.parseInt(postId), Integer.parseInt(authorId));
             if (p != null) {
-                boolean post = postService.deletePost(postId);
-                if (post == true) {
-                    jsonRes.setRes(true, "Xóa bài viết thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> post = postService.deletePost(Integer.parseInt(postId), Integer.parseInt(authorId));
+                if (!post.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Xóa bài viết thành công");
+                    responseData.put("data", post);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }
@@ -207,10 +210,13 @@ public class PostController {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Post p = postService.findByUserIdBoss(Integer.parseInt(postId), Integer.parseInt(authorId));
             if (p != null) {
-                boolean post = postService.deletePost(postId);
-                if (post == true) {
-                    jsonRes.setRes(true, "Xóa bài viết thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> post = postService.deletePost(Integer.parseInt(postId), Integer.parseInt(authorId));
+                if (!post.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Xóa bài viết thành công");
+                    responseData.put("data", post);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }

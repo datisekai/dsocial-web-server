@@ -88,7 +88,7 @@ public class PostService {
         }
         postImageRepository.saveAll(listPostImage);
 
-        return reponsDataCreatePost(list);
+        return reponseResultPost(list, listPostImage);
     }
 
     public Map<String, Object> updatePost(Object id, String html, List<PostImage> image) {
@@ -100,57 +100,43 @@ public class PostService {
             po.setHtml(html);
             // ...
             Post updatedPost = postRepository.save(po);
-
-            List<PostImage> updatedPostImages = new ArrayList<>();
-            for (PostImage o : image) {
-                Optional<PostImage> optionalPostImage = postImageRepository.findById(o.getId());
-                if (optionalPostImage.isPresent()) {
-                    PostImage existingPostImage = optionalPostImage.get();
-                    existingPostImage.setSrc(o.getSrc());
-                    updatedPostImages.add(existingPostImage);
-                }
-            }
-            postImageRepository.saveAll(updatedPostImages);
-
-            data.put("id", updatedPost.getId());
-            data.put("html", updatedPost.getHtml());
-            data.put("author_id", updatedPost.getAuthor_id());
-            data.put("group_id", updatedPost.getGroup_id());
-            data.put("image", image);
+            data= reponseResultPost(updatedPost, updatedPost.getPostImages());
         }
         return data;
     }
 
-    public boolean deletePost(Object id) {
-        int result = postRepository.deletePost(Integer.parseInt((String) id));
-        return result == 1;
+    public Map<String, Object> deletePost(int id, int userId) {
+        Post list = postRepository.findByIdAndAuthorId(id, userId);
+        Map<String, Object> result= reponseResultPost(list, list.getPostImages());
+        postRepository.deletePost(id);
+        return result;
     }
 
     public Map<String, Object> getPostListByHtml(int page, int limit, String name) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAllByName(pageable, name);
-        return reponsDataPost(page, list);
+        return reponseDataPost(page, list);
     }
 
     public Map<String, Object> getPostListUser(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAllByUserId(pageable, userId);
-        return reponsDataPost(page, list);
+        return reponseDataPost(page, list);
     }
 
     public Map<String, Object> getPostListGroup(int page, int limit, int groupId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAllByGroupId(pageable, groupId);
-        return reponsDataPost(page, list);
+        return reponseDataPost(page, list);
     }
 
     public Map<String, Object> getPostList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Post> list = postRepository.findAll(pageable, userId);
-        return reponsDataPost(page, list);
+        return reponseDataPost(page, list);
     }
 
-    public Map<String, Object> reponsDataCreatePost(Post list) {
+    public Map<String, Object> reponseResultPost(Post list, List<PostImage> listImage) {
         Map<String, Object> data = new HashMap<>();
 
         data.put("id", list.getId());
@@ -166,7 +152,7 @@ public class PostService {
         data.put("created_at", list.getCreated_at());
         data.put("user_post", getUserById(list.getAuthor_id()));
         List<Map<String, Object>> pImage = new ArrayList<>();
-        for (PostImage s : list.getPostImages()) {
+        for (PostImage s : listImage) {
             Map<String, Object> dataImage = new HashMap<>();
             dataImage.put("id", s.getId());
             dataImage.put("post_id", s.getPost_id());
@@ -174,31 +160,7 @@ public class PostService {
             pImage.add(dataImage);
         }
         List<Map<String, Object>> pComment = new ArrayList<>();
-        for (PostComment s : list.getPostComments()) {
-            Map<String, Object> dataComment = new HashMap<>();
-            dataComment.put("id", s.getId());
-            dataComment.put("post_id", s.getPost_id());
-            dataComment.put("content", s.getContent());
-            dataComment.put("created_at", s.getCreated_at());
-            dataComment.put("author_id", s.getAuthor_id());
-            dataComment.put("parent_id", s.getParent_id());
-            if (list.getUser_posts() != null) {
-                dataComment.put("user_comment", getUser(s.getUser_postComments()));
-            }
-            pComment.add(dataComment);
-        }
         List<Map<String, Object>> pReaction = new ArrayList<>();
-        for (PostReaction s : list.getPostReactions()) {
-            Map<String, Object> dataReaction = new HashMap<>();
-            dataReaction.put("id", s.getId());
-            dataReaction.put("post_id", s.getPost_id());
-            dataReaction.put("author_id", s.getAuthor_id());
-            dataReaction.put("icon", s.getIcon());
-            if (list.getUser_posts() != null) {
-                dataReaction.put("user_reaction", getUser(s.getUser_postReactions()));
-            }
-            pReaction.add(dataReaction);
-        }
         data.put("images", pImage);
         data.put("count_reaction", pReaction.size());
         data.put("count_comment", pComment.size());
@@ -227,7 +189,7 @@ public class PostService {
         return data;
     }
 
-    public Map<String, Object> reponsDataPost(int page, Page<Post> list) {
+    public Map<String, Object> reponseDataPost(int page, Page<Post> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Post o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
