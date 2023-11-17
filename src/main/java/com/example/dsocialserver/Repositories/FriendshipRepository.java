@@ -21,11 +21,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FriendshipRepository extends CrudRepository<Friendship, Object>{
     
-    @Query(value="SELECT * FROM friendship WHERE (friendship.friend_id = :userId OR friendship.user_id = :userId) AND friendship.is_active= :isActive ORDER BY friendship.id DESC", nativeQuery = true)
-    Page<Friendship> findAllFriendshipByUserId(Pageable pageable, @Param("userId") int userId, @Param("isActive") int isActive);
+    @Query(value="SELECT * FROM friendship WHERE (friendship.friend_id = :userId OR friendship.user_id = :userId) AND friendship.is_active= 1 ORDER BY friendship.id DESC", nativeQuery = true)
+    Page<Friendship> findAllFriendByUserId(Pageable pageable, @Param("userId") int userId);
     
-//    @Query(value="SELECT * FROM friendship WHERE (friendship.user_id = :userId OR friendship.friend_id = :userId) AND friendship.is_active= :isActive ORDER BY friendship.id DESC", nativeQuery = true)
-//    Page<Friendship> findAllRequestFriendshipByUserId(Pageable pageable, @Param("userId") int userId, @Param("isActive") int isActive);
+    @Query(value="SELECT * FROM friendship WHERE  friendship.friend_id = :userId AND friendship.is_active= 0 ORDER BY friendship.id DESC", nativeQuery = true)
+    Page<Friendship> findAllRequestFriendByUserId(Pageable pageable, @Param("userId") int userId);
+    
+    @Query(value="SELECT * FROM friendship WHERE friendship.user_id = :userId AND friendship.is_active= 0 ORDER BY friendship.id DESC", nativeQuery = true)
+    Page<Friendship> findAllMyRequestFriendByUserId(Pageable pageable, @Param("userId") int userId);
     
     @Query(value="SELECT * FROM friendship WHERE (friendship.friend_id= :friendId AND friendship.user_id= :userId) OR (friendship.friend_id= :userId AND friendship.user_id= :friendId)", nativeQuery = true)
     Friendship findFriendByUserIdAndFriendId(@Param("friendId") int friendId, @Param("userId") int userId);

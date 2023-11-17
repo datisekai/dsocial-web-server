@@ -71,13 +71,32 @@ public class FriendshipController {
 //        }
 //    }
     @GetMapping("/requests")
+    public ResponseEntity getAllFriendRequests(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = friendshipService.getRequestFriendList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
+    //
+    @GetMapping("/my-requests")
     public ResponseEntity getAllMyFriendRequests(@RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> gr = friendshipService.getMyFriendshipRequestList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> gr = friendshipService.getMyRequestFriendList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", gr.get("data"));
@@ -95,7 +114,7 @@ public class FriendshipController {
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
-            Map<String, Object> gr = friendshipService.getMyFriendshipList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> gr = friendshipService.getMyFriendList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);

@@ -78,15 +78,20 @@ public class FriendshipService {
         return reponsDataSearchFriendship(page, list);
     }
 
-    public Map<String, Object> getMyFriendshipList(int page, int limit, int userId) {
+    public Map<String, Object> getMyFriendList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Friendship> list = friendshipRepository.findAllFriendshipByUserId(pageable, userId, 1);
+        Page<Friendship> list = friendshipRepository.findAllFriendByUserId(pageable, userId);
         return reponsDataFriendship(page, list, userId);
     }
 
-    public Map<String, Object> getMyFriendshipRequestList(int page, int limit, int userId) {
+    public Map<String, Object> getRequestFriendList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Friendship> list = friendshipRepository.findAllFriendshipByUserId(pageable, userId, 0);
+        Page<Friendship> list = friendshipRepository.findAllRequestFriendByUserId(pageable, userId);
+        return reponsDataFriendship(page, list, userId);
+    }
+    public Map<String, Object> getMyRequestFriendList(int page, int limit, int userId) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Friendship> list = friendshipRepository.findAllMyRequestFriendByUserId(pageable, userId);
         return reponsDataFriendship(page, list, userId);
     }
 
