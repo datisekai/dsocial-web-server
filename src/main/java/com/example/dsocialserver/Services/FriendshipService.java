@@ -36,14 +36,14 @@ public class FriendshipService {
     @Autowired
     private UserRepository userRepository;
 
-    public Map<String, Object> createFriendship(int userId, int friendshipId) {
+    public Map<String, Object> createFriendship(int userId, int friendId) {
         Friendship gr = new Friendship();
         gr.setUser_id(userId);
-        gr.setFriend_id(friendshipId);
+        gr.setFriend_id(friendId);
         gr.setIs_Active(0);
-        Friendship list = friendshipRepository.save(gr);
+        friendshipRepository.save(gr);
 
-        return reponsDataFriend(list);
+        return getUserById(friendId);
     }
 
     public Map<String, Object> updateFriendship(int friendId, int userId) {
@@ -56,12 +56,12 @@ public class FriendshipService {
                 list = friendshipRepository.save(optional);
             }
         }
-        return reponsDataFriend(list);
+        return getUserById(friendId);
     }
 
     public Map<String, Object> deleteFriendship(int friendId, int userId, int isActive) {
         Friendship list = friendshipRepository.findFriendByUserIdAndFriendId(friendId, userId);
-        Map<String, Object> result= reponsDataFriend(list);
+        Map<String, Object> result = getUserById(friendId);;
         friendshipRepository.deleteByUserIdAndFriendId(friendId, userId, isActive);
         return result;
     }
@@ -81,19 +81,24 @@ public class FriendshipService {
     public Map<String, Object> getMyFriendshipList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Friendship> list = friendshipRepository.findAllFriendshipByUserId(pageable, userId, 1);
-        return reponsDataFriendship(page, list);
+        return reponsDataFriendship(page, list, userId);
     }
 
     public Map<String, Object> getMyFriendshipRequestList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Friendship> list = friendshipRepository.findAllFriendshipByUserId(pageable, userId, 0);
-        return reponsDataFriendship(page, list);
+        return reponsDataFriendship(page, list, userId);
     }
 
-    public Map<String, Object> reponsDataFriendship(int page, Page<Friendship> list) {
+    public Map<String, Object> reponsDataFriendship(int page, Page<Friendship> list, int userId) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Friendship o : list.getContent()) {
-            listdata.add(getUser(o.getUser_user_friendships()));
+            if(o.getUser_user_friendships().getId()== userId){
+                listdata.add(getUser(o.getUser_friend_friendships()));
+            }else{
+                listdata.add(getUser(o.getUser_user_friendships()));
+            }
+            
         }
         Map<String, Object> dataResult = new HashMap<>();
         dataResult.put("data", listdata);
@@ -114,10 +119,30 @@ public class FriendshipService {
 
         return dataResult;
     }
+
     public Map<String, Object> reponsDataFriend(Friendship fs) {
         Map<String, Object> dataResult = new HashMap<>();
         dataResult.put("data", getUser(fs.getUser_user_friendships()));
 
         return dataResult;
+    }
+
+    public Map<String, Object> getUserById(Object userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        Map<String, Object> data = new HashMap<>();
+        if (optional.isPresent()) {
+            User user = optional.get();
+            data.put("id", user.getId());
+            data.put("email", user.getEmail());
+            data.put("name", user.getName());
+            data.put("avatar", user.getAvatar());
+            data.put("bio", user.getBio());
+            data.put("birthday", user.getBirthday());
+            data.put("cover_image", user.getCover_image());
+            data.put("other_name", user.getOther_name());
+            data.put("address", user.getAddress());
+        }
+
+        return data;
     }
 }

@@ -159,13 +159,12 @@ public class FriendshipController {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String friendId = pst.getFriendId();
 //        ----------------------------------
-
             Map<String, Object> friendship = friendshipService.createFriendship(Integer.parseInt(userId), Integer.parseInt(friendId));
             if (!friendship.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Gửi lời mời kết bạn thành công");
-                responseData.put("data", friendship.get("data"));
+                responseData.put("data", friendship);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -186,7 +185,7 @@ public class FriendshipController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Kết bạn thành công");
-                responseData.put("data", friendship.get("data"));
+                responseData.put("data", friendship);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -206,7 +205,7 @@ public class FriendshipController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Xóa bạn bè thành công");
-                responseData.put("data", friendship.get("data"));
+                responseData.put("data", friendship);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();
@@ -226,7 +225,7 @@ public class FriendshipController {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
                 responseData.put("message", "Xóa lời mời kết bạn thành công");
-                responseData.put("data", friendship.get("data"));
+                responseData.put("data", friendship);
                 return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
             }
             return StatusUntilIndex.showMissing();

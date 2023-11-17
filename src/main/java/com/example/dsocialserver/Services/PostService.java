@@ -112,9 +112,9 @@ public class PostService {
         return result;
     }
 
-    public Map<String, Object> getPostListByHtml(int page, int limit, String name) {
+    public Map<String, Object> getPostListByHtml(int page, int limit, String name, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Post> list = postRepository.findAllByName(pageable, name);
+        Page<Post> list = postRepository.findAllByName(pageable, name, userId);
         return reponseDataPost(page, list);
     }
 

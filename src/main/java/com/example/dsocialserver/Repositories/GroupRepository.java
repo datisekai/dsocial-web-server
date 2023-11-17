@@ -22,24 +22,39 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GroupRepository extends CrudRepository<Groups, Object> {
-    @Query(value="SELECT * FROM groups  WHERE groups.user_id = :userId and groups.id= :id ORDER BY `groups`.`id` DESC", nativeQuery = true)
-    Groups findByIdAndUserId( @Param("id") int id,  @Param("userId") int userId);
-    
-    @Query(value="SELECT * FROM groups  WHERE groups.name LIKE %:name% ORDER BY groups.id DESC", nativeQuery = true)
+
+    @Query(value = "SELECT * FROM groups  WHERE groups.user_id = :userId and groups.id= :id ORDER BY `groups`.`id` DESC", nativeQuery = true)
+    Groups findByIdAndUserId(@Param("id") int id, @Param("userId") int userId);
+
+    @Query(value = "SELECT * FROM groups  WHERE groups.name LIKE %:name% ORDER BY groups.id DESC",nativeQuery = true)
     Page<Groups> findAllByName(Pageable pageable, @Param("name") String name);
-    
-    @Query(value="SELECT * FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
+
+    @Query(value = "SELECT * FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
     Page<Groups> findAllOwnGroupByUserId(Pageable pageable, @Param("userId") int userId);
-    
-    @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
+
+    @Query(value = "(SELECT groups.* FROM groups "
+            + "INNER JOIN groupuser ON groups.id = groupuser.group_id "
+            + "WHERE groupuser.user_id = :userId) "
+            + "UNION "
+            + "(SELECT groups.* FROM groups "
+            + "WHERE groups.user_id = :userId) "
+            + "ORDER BY `id` DESC",
+            countQuery = "SELECT SUM(counts) AS total FROM ( "
+            + "    SELECT COUNT(*) AS counts FROM groups "
+            + "    INNER JOIN groupuser ON groups.id = groupuser.group_id "
+            + "    WHERE groupuser.user_id = :userId "
+            + "    UNION "
+            + "    SELECT COUNT(*) AS counts FROM groups "
+            + "    WHERE groups.user_id = :userId "
+            + ") AS subquery", nativeQuery = true)
     Page<Groups> findAllByUserId(Pageable pageable, @Param("userId") int userId);
-    
-    @Query(value="SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId AND groups.name LIKE %:name% UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
+
+    @Query(value = "SELECT groups.* FROM groups INNER JOIN groupuser ON groups.id = groupuser.group_id WHERE groupuser.user_id = :userId AND groups.name LIKE %:name% UNION SELECT groups.* FROM groups WHERE groups.user_id = :userId ORDER BY `id` DESC", nativeQuery = true)
     Page<Groups> findAllByUserIdAndName(Pageable pageable, @Param("userId") int userId, @Param("name") String name);
-    
-    @Query(value="SELECT * FROM groups WHERE groups.is_active = 1 ORDER BY `groups`.`id` DESC", nativeQuery = true)
+
+    @Query(value = "SELECT * FROM groups WHERE groups.is_active = 1 ORDER BY `groups`.`id` DESC", nativeQuery = true)
     Page<Groups> findAll(Pageable pageable);
-    
+
     @Modifying
     @Query(value = "DELETE groups, groupuser, post, postimage, postcomment, "
             + "postreaction FROM groups LEFT JOIN groupuser ON groups.id = "
@@ -48,4 +63,6 @@ public interface GroupRepository extends CrudRepository<Groups, Object> {
             + "postreaction ON post.id = postreaction.post_id LEFT JOIN postcomment "
             + "ON post.id = postcomment.post_id WHERE groups.id = :id", nativeQuery = true)
     int deleteGroups(@Param("id") int id);
+    
+    
 }

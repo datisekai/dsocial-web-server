@@ -32,7 +32,7 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-    
+
     public User findByPassword(String password) {
         return userRepository.finByPassword(password);
     }
@@ -94,8 +94,8 @@ public class UserService {
         user.setAvatar(avatar);
         return userRepository.save(user);
     }
-    
-    public Map<String, Object> updateUser(int id, String name, String otherName, String bio, Date birthday, String avatar, String coverImage, String address){
+
+    public Map<String, Object> updateUser(int id, String name, String otherName, String bio, Date birthday, String avatar, String coverImage, String address) {
         Optional<User> optional = userRepository.findById(id);
         Map<String, Object> data = new HashMap<>();
         if (optional.isPresent()) {
@@ -109,16 +109,18 @@ public class UserService {
             u.setCover_image(coverImage);
             u.setAddress(address);
             // ...
-            User updatedUser = userRepository.save(u);         
+            User updatedUser = userRepository.save(u);
             data = getUser(updatedUser);
         }
         return data;
     }
-    public Map<String, Object> getPeopleList(int page, int limit,int userId, String name) {
+
+    public Map<String, Object> getPeopleList(int page, int limit, int userId, String name) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<User> list = userRepository.findAllPeopleByName(pageable, userId, name);
         return reponsDataPeopleList(page, list);
     }
+
     public Map<String, Object> reponsDataPeopleList(int page, Page<User> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (User o : list.getContent()) {
