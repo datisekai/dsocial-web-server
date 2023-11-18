@@ -7,6 +7,7 @@ package com.example.dsocialserver.Controllers;
 import com.example.dsocialserver.Models.PostImage;
 import com.example.dsocialserver.Utils.CustomResponse;
 import com.example.dsocialserver.Models.User;
+import com.example.dsocialserver.Services.GroupService;
 import com.example.dsocialserver.Services.UserService;
 import com.example.dsocialserver.Types.ChangePasswordType;
 import com.example.dsocialserver.Types.ForgotpasswordType;
@@ -69,6 +70,8 @@ public class UserController {
     private Environment environment;
 
     private final CustomResponse jsonRes = new CustomResponse();
+    
+   
 
     // lấy thông tin người khác
     @GetMapping("/profile/{userId}")

@@ -83,7 +83,7 @@ public class GroupService {
 
     public boolean deleteGroup(Object id) {
         int result = groupRepository.deleteGroups(Integer.parseInt((String) id));
-        return result == 1;
+        return result >= 1;
     }
 
     public Map<String, Object> getGroupByGroupId(int page, int limit, int userId, int groupId) {
@@ -135,13 +135,14 @@ public class GroupService {
             data.put("created_at", o.getCreated_at());
             data.put("user_own", getUserJoinedGroup(o.getUser_groups(), o.getCreated_at()));
     
-            List<Map<String, Object>> pUser = new ArrayList<>();
-            pUser.add(getUserJoinedGroup(o.getUser_groups(), o.getCreated_at()));
-            for (GroupUser gu : o.getGroupUsers()) {
-                pUser.add(getUserJoinedGroup(gu.getUser_groupUsers(), gu.getCreated_at()));
-                
-            }
-            data.put("users_joined", pUser);
+//            List<Map<String, Object>> pUser = new ArrayList<>();
+//            pUser.add(getUserJoinedGroup(o.getUser_groups(), o.getCreated_at()));
+//            for (GroupUser gu : o.getGroupUsers()) {
+//                pUser.add(getUserJoinedGroup(gu.getUser_groupUsers(), gu.getCreated_at()));
+//                
+//            }
+//            data.put("users_joined", pUser);
+                data.put("countJoined", o.getGroupUsers().size()+1);
 
         
         Map<String, Object> dataResult = new HashMap<>();

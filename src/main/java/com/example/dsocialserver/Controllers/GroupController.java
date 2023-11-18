@@ -201,7 +201,7 @@ public class GroupController {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Groups isPermission = groupService.findByIdAndUserId(Integer.parseInt(groupId), Integer.parseInt(userId));
-            if (isPermission != null) {
+            if (isPermission != null) {          
                 boolean group = groupService.deleteGroup(groupId);
                 if (group) {
                     jsonRes.setRes(true, "Xóa nhóm thành công");
