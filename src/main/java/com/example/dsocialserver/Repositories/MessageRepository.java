@@ -21,6 +21,6 @@ public interface MessageRepository extends CrudRepository<Message, Object>{
     @Query(value="SELECT * FROM message  WHERE message.author_id = :authorId and message.id= :id ORDER BY `message`.`id` DESC", nativeQuery = true)
     Message findByIdAndUserId( @Param("id") int id,  @Param("authorId") int authorId);
     
-    @Query(value="SELECT * FROM `message` WHERE message.content LIKE %:q% AND room_id = :roomId AND is_active = 1 ORDER BY `message`.`id` DESC",nativeQuery = true)
-    Page<Message> findMessageByRoomId(Pageable pageable, @Param("roomId") int roomId, @Param("q") String q); 
+    @Query(value="SELECT * FROM `message` WHERE message.content LIKE %:q% AND author_id = :authorId AND receive_id= :receiveId ORDER BY `message`.`id` DESC",nativeQuery = true)
+    Page<Message> findMessageByRoomId(Pageable pageable, @Param("authorId") int authorId, @Param("receiveId") int receiveId, @Param("q") String q); 
 }

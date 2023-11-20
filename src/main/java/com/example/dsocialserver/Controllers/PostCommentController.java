@@ -108,10 +108,13 @@ public class PostCommentController {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             PostComment isPermission = commentService.findByIdAndAuthorId(Integer.parseInt(postCommentId), Integer.parseInt(authorId));          
             if (isPermission != null) {
-                boolean post = commentService.deletePostComment(postCommentId);
-                if (post == true) {
-                    jsonRes.setRes(true, "Xóa bình luận thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> post = commentService.deletePostComment(Integer.parseInt(postCommentId), Integer.parseInt(authorId));
+                if (!post.isEmpty()) {
+                     Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Xóa bình luận thành công");
+                    responseData.put("data", post);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }

@@ -105,8 +105,8 @@ public class User {
     @OneToMany(mappedBy = "user_messageReactions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MessageReaction> messageReactions = new ArrayList<>();
     
-    @OneToMany(mappedBy = "user_roomUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<RoomUser> roomUsers = new ArrayList<>();
+    @OneToMany(mappedBy = "receive_messages", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Message> receivemessages = new ArrayList<>();
     
 //    @OneToOne(mappedBy = "userOne")
 //    private Groups groupOne;

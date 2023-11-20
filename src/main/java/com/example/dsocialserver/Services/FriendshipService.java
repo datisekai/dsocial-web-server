@@ -89,21 +89,39 @@ public class FriendshipService {
         Page<Friendship> list = friendshipRepository.findAllRequestFriendByUserId(pageable, userId);
         return reponsDataFriendship(page, list, userId);
     }
+
     public Map<String, Object> getMyRequestFriendList(int page, int limit, int userId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Friendship> list = friendshipRepository.findAllMyRequestFriendByUserId(pageable, userId);
         return reponsDataFriendship(page, list, userId);
     }
 
+    public Map<String, Object> getAllFriendList(int userId) {
+        List<Map<String, Object>> listdata = new ArrayList<>();
+        List<Friendship> list = friendshipRepository.findAllFriend(userId);
+        if (!list.isEmpty()) {
+            for (Friendship o : list) {
+                if (o.getUser_user_friendships().getId() == userId) {
+                    listdata.add(getUser(o.getUser_friend_friendships()));
+                } else {
+                    listdata.add(getUser(o.getUser_user_friendships()));
+                }
+            }
+        }
+        Map<String, Object> dataResult = new HashMap<>();
+        dataResult.put("data", listdata);
+        return dataResult;
+    }
+
     public Map<String, Object> reponsDataFriendship(int page, Page<Friendship> list, int userId) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (Friendship o : list.getContent()) {
-            if(o.getUser_user_friendships().getId()== userId){
+            if (o.getUser_user_friendships().getId() == userId) {
                 listdata.add(getUser(o.getUser_friend_friendships()));
-            }else{
+            } else {
                 listdata.add(getUser(o.getUser_user_friendships()));
             }
-            
+
         }
         Map<String, Object> dataResult = new HashMap<>();
         dataResult.put("data", listdata);
@@ -115,7 +133,6 @@ public class FriendshipService {
     public Map<String, Object> reponsDataSearchFriendship(int page, Page<User> list) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (User o : list.getContent()) {
-            Map<String, Object> data = new HashMap<>();
             listdata.add(getUser(o));
         }
         Map<String, Object> dataResult = new HashMap<>();

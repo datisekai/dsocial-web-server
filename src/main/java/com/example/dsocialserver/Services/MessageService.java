@@ -5,9 +5,9 @@
 package com.example.dsocialserver.Services;
 
 import com.example.dsocialserver.Models.Message;
-import com.example.dsocialserver.Models.Room;
+import com.example.dsocialserver.Models.User;
 import com.example.dsocialserver.Repositories.MessageRepository;
-import com.example.dsocialserver.Repositories.RoomRepository;
+import com.example.dsocialserver.Repositories.UserRepository;
 import static com.example.dsocialserver.Services.UserService.getUser;
 import static com.example.dsocialserver.Utils.Pagination.getPagination;
 import java.util.ArrayList;
@@ -30,20 +30,21 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
-    
-    @Autowired
-    private RoomRepository roomRepository;
 
-    public Message findByIdAndUserId(int groupId, int userId) {
-        Message optional = messageRepository.findByIdAndUserId(groupId, userId);
+    @Autowired
+    private UserRepository userRepository;
+
+    public Message findByIdAndUserId(int messageId, int authorId) {
+        Message optional = messageRepository.findByIdAndUserId(messageId, authorId);
         return optional;
     }
 
-    public Map<String, Object> createMessage(int authorId, int roomId, String content) {
+    public Map<String, Object> createMessage(int authorId, int receiveId, String content, String type) {
         Message gr = new Message();
         gr.setAuthor_id(authorId);
-        gr.setRoom_id(roomId);
+        gr.setReceive_id(receiveId);
         gr.setContent(content);
+        gr.setType(type);
         gr.setIs_active(true);
         gr.setIs_seen(false);
 
@@ -52,23 +53,16 @@ public class MessageService {
         Map<String, Object> data = new HashMap<>();
         data.put("id", list.getId());
         data.put("author_id", list.getAuthor_id());
-        data.put("room_id", list.getRoom_id());
+        data.put("receive_id", getUserById(list.getReceive_id()));
         data.put("content", list.getContent());
+        data.put("type", list.getType());
         data.put("is_active", list.getIs_active());
         data.put("is_seen", list.getIs_seen());
         data.put("created_at", list.getCreated_at());
-        
-        Optional<Room> optional = roomRepository.findById(roomId);
-        if (optional.isPresent()) {
-            Room room = optional.get();
-            room.setLast_message_id(list.getId());
-            // ...
-            roomRepository.save(room);
 
-        }
         return data;
     }
-    
+
     public Map<String, Object> updateSeenMessage(Object id) {
         Map<String, Object> data = new HashMap<>();
         Optional<Message> optional = messageRepository.findById(id);
@@ -80,8 +74,9 @@ public class MessageService {
 
             data.put("id", list.getId());
             data.put("author_id", list.getAuthor_id());
-            data.put("room_id", list.getRoom_id());
+            data.put("receive_id", getUserById(list.getReceive_id()));
             data.put("content", list.getContent());
+            data.put("type", list.getType());
             data.put("is_active", list.getIs_active());
             data.put("is_seen", list.getIs_seen());
             data.put("created_at", list.getCreated_at());
@@ -89,19 +84,21 @@ public class MessageService {
         return data;
     }
 
-    public Map<String, Object> updateMessage(String content, Object id) {
+    public Map<String, Object> updateMessage(String content, Object messageId, String type) {
         Map<String, Object> data = new HashMap<>();
-        Optional<Message> optional = messageRepository.findById(id);
+        Optional<Message> optional = messageRepository.findById(messageId);
         if (optional.isPresent()) {
             Message gr = optional.get();
             gr.setContent(content);
+            gr.setType(type);
             // ...
             Message list = messageRepository.save(gr);
 
             data.put("id", list.getId());
             data.put("author_id", list.getAuthor_id());
-            data.put("room_id", list.getRoom_id());
+            data.put("receive_id", getUserById(list.getReceive_id()));
             data.put("content", list.getContent());
+            data.put("type", list.getType());
             data.put("is_active", list.getIs_active());
             data.put("is_seen", list.getIs_seen());
             data.put("created_at", list.getCreated_at());
@@ -109,8 +106,8 @@ public class MessageService {
         return data;
     }
 
-    public boolean revokeMessage(Object id) {
-        int result = 0;
+    public Map<String, Object> revokeMessage(Object id) {
+        Map<String, Object> data = new HashMap<>();
         Optional<Message> optional = messageRepository.findById(id);
         if (optional.isPresent()) {
             Message gr = optional.get();
@@ -118,15 +115,22 @@ public class MessageService {
             // ...
             Message list = messageRepository.save(gr);
             if (list != null) {
-                result = 1;
+                data.put("id", list.getId());
+                data.put("author_id", list.getAuthor_id());
+                data.put("receive_id", getUserById(list.getReceive_id()));
+                data.put("content", list.getContent());
+                data.put("type", list.getType());
+                data.put("is_active", list.getIs_active());
+                data.put("is_seen", list.getIs_seen());
+                data.put("created_at", list.getCreated_at());
             }
         }
-        return result == 1;
+        return data;
     }
 
-    public Map<String, Object> getAllMessage(int page, int limit, int authorId, String q) {
+    public Map<String, Object> getAllMessage(int page, int limit, int authorId, int receiveId, String q) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Message> list = messageRepository.findMessageByRoomId(pageable, authorId, q);
+        Page<Message> list = messageRepository.findMessageByRoomId(pageable, authorId, receiveId, q);
         return reponsDataMessage(page, list);
     }
 
@@ -137,8 +141,13 @@ public class MessageService {
 
             data.put("id", o.getId());
             data.put("author_id", o.getAuthor_id());
-            data.put("room_id", o.getRoom_id());
-            data.put("content", o.getContent());
+            data.put("receive_id", getUserById(o.getReceive_id()));
+            if (o.getIs_active()) {
+                data.put("content", o.getContent());
+            } else {
+                data.put("content", "Tin nhắn đã bị thu hồi");
+            }
+            data.put("type", o.getType());
             data.put("is_active", o.getIs_active());
             data.put("is_seen", o.getIs_seen());
             data.put("created_at", o.getCreated_at());
@@ -150,5 +159,24 @@ public class MessageService {
         dataResult.put("pagination", getPagination(page, list));
 
         return dataResult;
+    }
+
+    public Map<String, Object> getUserById(Object userId) {
+        Optional<User> optional = userRepository.findById(userId);
+        Map<String, Object> data = new HashMap<>();
+        if (optional.isPresent()) {
+            User user = optional.get();
+            data.put("id", user.getId());
+            data.put("email", user.getEmail());
+            data.put("name", user.getName());
+            data.put("avatar", user.getAvatar());
+            data.put("bio", user.getBio());
+            data.put("birthday", user.getBirthday());
+            data.put("cover_image", user.getCover_image());
+            data.put("other_name", user.getOther_name());
+            data.put("address", user.getAddress());
+        }
+
+        return data;
     }
 }

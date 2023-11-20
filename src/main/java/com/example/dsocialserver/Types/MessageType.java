@@ -18,7 +18,12 @@ public class MessageType {
     @NotBlank
     public String content;
     
-    public String roomId;
+    public String receiveId;
+    
+    @NotNull
+    @NotEmpty
+    @NotBlank
+    public String type;
 
     public String getContent() {
         return content;
@@ -28,13 +33,19 @@ public class MessageType {
         this.content = content;
     }
 
-    public String getRoomId() {
-        return roomId;
+    public String getReceiveId() {
+        return receiveId;
     }
 
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
+    public void setReceiveId(String receiveId) {
+        this.receiveId = receiveId;
     }
     
-    
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

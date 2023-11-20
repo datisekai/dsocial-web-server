@@ -48,15 +48,15 @@ public class MessageController {
     
     private final CustomResponse jsonRes = new CustomResponse();
     
-    @GetMapping("/{roomId}")
+    @GetMapping("/{receiveId}")
     public ResponseEntity getMessage(@RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable("roomId") String roomId,
+            @PathVariable("receiveId") String receiveId,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit
     ) {
         try {
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(roomId),"");
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit),Integer.parseInt(authorId), Integer.parseInt(receiveId),"");
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", gr.get("data"));
@@ -67,16 +67,16 @@ public class MessageController {
         }
     }
     
-    @GetMapping("/search/{roomId}")
+    @GetMapping("/search/{receiveId}")
     public ResponseEntity getSearchMessage(@RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable("roomId") String roomId,
+            @PathVariable("receiveId") String receiveId,
             @RequestParam(value = "page", defaultValue = "1") String page,
             @RequestParam(value = "limit", defaultValue = "10") String limit,
             @RequestParam(value = "q", defaultValue = "") String q
     ) {
         try {
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(roomId), q);
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = messageService.getAllMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(authorId), Integer.parseInt(receiveId), q);
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", gr.get("data"));
@@ -92,11 +92,12 @@ public class MessageController {
             @Valid @RequestBody MessageType gr) throws IOException {
         try {
             String content = gr.getContent();
-            String roomId = gr.getRoomId();
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String type = gr.getType();
+            String receiveId = gr.getReceiveId();
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 
 //        ----------------------------------
-            Map<String, Object> message = messageService.createMessage(Integer.parseInt(userId), Integer.parseInt(roomId), content);
+            Map<String, Object> message = messageService.createMessage(Integer.parseInt(authorId), Integer.parseInt(receiveId), content, type);
             if (!message.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -114,11 +115,9 @@ public class MessageController {
             @PathVariable("messageId") String messageId,
             @Valid @RequestBody MessageType gr) throws IOException {
         try {
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            String content = gr.getContent();
-
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
 //        ----------------------------------
-            Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(userId));
+            Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(authorId));
             if (isPermission != null) {
                 Map<String, Object> message = messageService.updateSeenMessage(messageId);
                 if (!message.isEmpty()) {
@@ -141,13 +140,14 @@ public class MessageController {
             @PathVariable("messageId") String messageId,
             @Valid @RequestBody MessageType gr) throws IOException {
         try {
-            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String content = gr.getContent();
+            String type= gr.getType();
 
 //        ----------------------------------
-            Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(userId));
+            Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(authorId));
             if (isPermission != null) {
-                Map<String, Object> message = messageService.updateMessage(content, messageId);
+                Map<String, Object> message = messageService.updateMessage(content, messageId, type);
                 if (!message.isEmpty()) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
@@ -170,10 +170,13 @@ public class MessageController {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Message isPermission = messageService.findByIdAndUserId(Integer.parseInt(messageId), Integer.parseInt(userId));
             if (isPermission != null) {
-                boolean message = messageService.revokeMessage(messageId);
-                if (message) {
-                    jsonRes.setRes(true, "Xóa tin nhắn thành công");
-                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(jsonRes));
+                Map<String, Object> message = messageService.revokeMessage(messageId);
+                if (!message.isEmpty()) {
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("success", true);
+                    responseData.put("message", "Xóa tin nhắn thành công");
+                    responseData.put("data", message);
+                    return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
                 }
                 return StatusUntilIndex.showMissing();
             }

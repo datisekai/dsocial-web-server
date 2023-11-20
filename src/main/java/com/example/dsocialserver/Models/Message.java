@@ -3,9 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.example.dsocialserver.Models;
+
 import jakarta.persistence.*;
 import java.util.Date;
 import lombok.Data;
+
 /**
  *
  * @author haidu
@@ -14,6 +16,7 @@ import lombok.Data;
 @Entity
 @Table(name = "message")
 public class Message {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -22,10 +25,13 @@ public class Message {
     private int author_id;
 
     @Column(nullable = false)
-    private int room_id;
+    private int receive_id;
 
     @Column(nullable = false)
     private String content;
+    
+    @Column(nullable = false)
+    private String type;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean is_seen;
@@ -38,17 +44,16 @@ public class Message {
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date updated_at;
-    
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_id", insertable=false, updatable=false)
-    private Room room_messages;
-    
+    @JoinColumn(name = "receive_id", insertable = false, updatable = false)
+    private User receive_messages;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "author_id", insertable=false, updatable=false)
+    @JoinColumn(name = "author_id", insertable = false, updatable = false)
     private User user_messages;
 
     // Getters and setters
-
     public int getId() {
         return id;
     }
@@ -65,12 +70,12 @@ public class Message {
         this.author_id = author_id;
     }
 
-    public int getRoom_id() {
-        return room_id;
+    public int getReceive_id() {
+        return receive_id;
     }
 
-    public void setRoom_id(int room_id) {
-        this.room_id = room_id;
+    public void setReceive_id(int receive_id) {
+        this.receive_id = receive_id;
     }
 
     public String getContent() {
@@ -79,6 +84,14 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+    
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Boolean getIs_seen() {
@@ -112,6 +125,5 @@ public class Message {
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
     }
-    
-    
+
 }

@@ -106,6 +106,20 @@ public class FriendshipController {
             return StatusUntilIndex.showInternal(e);
         }
     }
+    @GetMapping("/all")
+    public ResponseEntity getAllMyFriend(@RequestHeader("Authorization") String authorizationHeader
+    ) {
+        try {
+            String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = friendshipService.getAllFriendList( Integer.parseInt(userId));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
 
     // lấy danh sách bạn bè của người khác
     @GetMapping("/{userId}")

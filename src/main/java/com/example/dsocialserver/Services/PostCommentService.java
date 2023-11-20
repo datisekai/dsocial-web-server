@@ -32,7 +32,7 @@ public class PostCommentService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     public PostComment findByIdAndAuthorId(int postCommentId, int authorId) {
         PostComment optional = commentRepository.findByIdAndAuthorId(postCommentId, authorId);
         return optional;
@@ -57,7 +57,7 @@ public class PostCommentService {
         return data;
     }
 
-    public Map<String, Object> updatePostComment(int id, String content,  int authorId) {
+    public Map<String, Object> updatePostComment(int id, String content, int authorId) {
         Map<String, Object> data = new HashMap<>();
         Optional<PostComment> optional = commentRepository.findById(id);
         if (optional.isPresent()) {
@@ -76,10 +76,20 @@ public class PostCommentService {
         return data;
     }
 
-    public boolean deletePostComment(Object id) {
-        int result = commentRepository.deletePostComentById(Integer.parseInt((String) id));
-        return result == 1;
+    public Map<String, Object> deletePostComment(int id, int authorId) {
+        PostComment list = commentRepository.findByIdAndAuthorId(id, authorId);
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", list.getId());
+        data.put("post_id", list.getPost_id());
+        data.put("parent_id", list.getParent_id());
+        data.put("content", list.getContent());
+        data.put("author_id", list.getAuthor_id());
+        data.put("create_at", list.getCreated_at());
+        data.put("user_comment", getUserById(authorId));
+        commentRepository.deletePostComentById( id);
+        return data;
     }
+
     public Map<String, Object> getUserById(Object userId) {
         Optional<User> optional = userRepository.findById(userId);
         Map<String, Object> data = new HashMap<>();
