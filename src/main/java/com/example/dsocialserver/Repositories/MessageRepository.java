@@ -17,10 +17,13 @@ import org.springframework.stereotype.Repository;
  * @author haidu
  */
 @Repository
-public interface MessageRepository extends CrudRepository<Message, Object>{
-    @Query(value="SELECT * FROM message  WHERE message.author_id = :authorId and message.id= :id ORDER BY `message`.`id` DESC", nativeQuery = true)
-    Message findByIdAndUserId( @Param("id") int id,  @Param("authorId") int authorId);
-    
-    @Query(value="SELECT * FROM `message` WHERE message.content LIKE %:q% AND author_id = :authorId AND receive_id= :receiveId ORDER BY `message`.`id` DESC",nativeQuery = true)
-    Page<Message> findMessageByRoomId(Pageable pageable, @Param("authorId") int authorId, @Param("receiveId") int receiveId, @Param("q") String q); 
+public interface MessageRepository extends CrudRepository<Message, Object> {
+
+    @Query(value = "SELECT * FROM message  WHERE message.author_id = :authorId and message.id= :id ORDER BY `message`.`id` DESC", nativeQuery = true)
+    Message findByIdAndUserId(@Param("id") int id, @Param("authorId") int authorId);
+
+    @Query(value = "SELECT * FROM `message` WHERE message.content LIKE %:q% AND author_id = :authorId AND receive_id= :receiveId ORDER BY `message`.`id` DESC", nativeQuery = true)
+    Page<Message> findMessage(Pageable pageable, @Param("authorId") int authorId, @Param("receiveId") int receiveId, @Param("q") String q);
+
+ 
 }

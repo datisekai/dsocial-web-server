@@ -48,6 +48,24 @@ public class MessageController {
     
     private final CustomResponse jsonRes = new CustomResponse();
     
+    @GetMapping("/user")
+    public ResponseEntity getUserMessage(@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "limit", defaultValue = "10") String limit
+    ) {
+        try {
+            String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
+            Map<String, Object> gr = messageService.getUserMessage(Integer.parseInt(page) - 1, Integer.parseInt(limit),Integer.parseInt(authorId));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("data", gr.get("data"));
+            responseData.put("pagination", gr.get("pagination"));
+            return ResponseEntity.status(HttpStatus.OK).body(ParseJSon(responseData));
+        } catch (NumberFormatException e) {
+            return StatusUntilIndex.showInternal(e);
+        }
+    }
+    
     @GetMapping("/{receiveId}")
     public ResponseEntity getMessage(@RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("receiveId") String receiveId,
