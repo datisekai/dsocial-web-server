@@ -131,7 +131,8 @@ public class MessageService {
     public Map<String, Object> getUserMessage(int page, int limit, int authorId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<User> list = userRepository.findMessageUser(pageable, authorId);
-        return reponsUserMessage(page, list);
+        Page<String> list2 = messageRepository.findLastMessage(pageable, authorId);
+        return reponsUserMessage(page, list, list2);
     }
 
     public Map<String, Object> getAllMessage(int page, int limit, int authorId, int receiveId, String q) {
@@ -140,11 +141,12 @@ public class MessageService {
         return reponsDataMessage(page, list);
     }
     
-     public Map<String, Object> reponsUserMessage(int page, Page<User> list) {
+     public Map<String, Object> reponsUserMessage(int page, Page<User> list, Page<String> list2) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (User o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
             data.put("user_send", getUser(o));
+            data.put("last_message",list2.getContent().get(0));
             listdata.add(data);
         }
         Map<String, Object> dataResult = new HashMap<>();
