@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class UploadConfig implements WebMvcConfigurer {
-    String uploadDir="C:/Users/haidu/Documents/j2ee/dsocial-web-server/uploads";
+    String uploadDir="C:/Users/datly/Documents/NetBeansProjects/dsocial-server/uploads";
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")

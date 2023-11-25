@@ -23,7 +23,7 @@ public interface MessageRepository extends CrudRepository<Message, Object> {
     @Query(value = "SELECT * FROM message  WHERE message.author_id = :authorId and message.id= :id ORDER BY `message`.`id` DESC", nativeQuery = true)
     Message findByIdAndUserId(@Param("id") int id, @Param("authorId") int authorId);
 
-    @Query(value = "SELECT * FROM `message` WHERE message.content LIKE %:q% AND author_id = :authorId AND receive_id= :receiveId ORDER BY `message`.`id` DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM `message` WHERE message.content LIKE %:q% AND author_id = :authorId AND receive_id= :receiveId ORDER BY `message`.`id` ASC", nativeQuery = true)
     Page<Message> findMessage(Pageable pageable, @Param("authorId") int authorId, @Param("receiveId") int receiveId, @Param("q") String q);
 
     @Query(value = "SELECT temp.last_message FROM ( SELECT subquery.user_id, MAX(message.content) AS last_message FROM ( SELECT receive_id AS user_id FROM message WHERE author_id = :authorId OR receive_id = :authorId UNION SELECT author_id AS user_id FROM message WHERE author_id = :authorId OR receive_id = :authorId ) AS subquery JOIN message ON (subquery.user_id = message.receive_id OR subquery.user_id = message.author_id) WHERE subquery.user_id <> :authorId GROUP BY subquery.user_id ) AS temp ORDER BY temp.user_id DESC;", nativeQuery = true)
