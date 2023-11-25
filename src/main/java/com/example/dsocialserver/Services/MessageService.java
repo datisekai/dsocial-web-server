@@ -171,7 +171,7 @@ public class MessageService {
             if (o.getIs_active()) {
                 data.put("content", o.getContent());
             } else {
-                data.put("content", "Tin nhắn đã bị thu hồi");
+                data.put("content", "Tin nhắn đã được thu hồi");
             }
             data.put("type", o.getType());
             data.put("is_active", o.getIs_active());
