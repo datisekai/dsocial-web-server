@@ -127,11 +127,11 @@ public class MessageService {
         }
         return data;
     }
-    
+
     public Map<String, Object> getUserMessage(int page, int limit, int authorId) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<User> list = userRepository.findMessageUser(pageable, authorId);
-        Page<String> list2 = messageRepository.findLastMessage(pageable, authorId);
+        Page<Message> list2 = messageRepository.findLastMessage(pageable, authorId);
         return reponsUserMessage(page, list, list2);
     }
 
@@ -140,13 +140,17 @@ public class MessageService {
         Page<Message> list = messageRepository.findMessage(pageable, authorId, receiveId, q);
         return reponsDataMessage(page, list);
     }
-    
-     public Map<String, Object> reponsUserMessage(int page, Page<User> list, Page<String> list2) {
+
+    public Map<String, Object> reponsUserMessage(int page, Page<User> list, Page<Message> list2) {
         List<Map<String, Object>> listdata = new ArrayList<>();
         for (User o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
             data.put("user_send", getUser(o));
-            data.put("last_message",list2.getContent().get(0));
+            listdata.add(data);
+        }
+        for (Message o : list2.getContent()) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("last_message", getMessage(o));
             listdata.add(data);
         }
         Map<String, Object> dataResult = new HashMap<>();
@@ -167,7 +171,7 @@ public class MessageService {
             if (o.getIs_active()) {
                 data.put("content", o.getContent());
             } else {
-                data.put("content", "Tin nhắn đã bị thu hồi");
+                data.put("content", "Tin nhắn đã được thu hồi");
             }
             data.put("type", o.getType());
             data.put("is_active", o.getIs_active());
@@ -181,6 +185,19 @@ public class MessageService {
         dataResult.put("pagination", getPagination(page, list));
 
         return dataResult;
+    }
+
+    public Map<String, Object> getMessage(Message list) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", list.getId());
+        data.put("author_id", list.getAuthor_id());
+        data.put("receive_id", getUserById(list.getReceive_id()));
+        data.put("content", list.getContent());
+        data.put("type", list.getType());
+        data.put("is_active", list.getIs_active());
+        data.put("is_seen", list.getIs_seen());
+        data.put("created_at", list.getCreated_at());
+        return data;
     }
 
     public Map<String, Object> getUserById(Object userId) {
