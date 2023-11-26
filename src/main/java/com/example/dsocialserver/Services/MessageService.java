@@ -130,9 +130,8 @@ public class MessageService {
 
     public Map<String, Object> getUserMessage(int page, int limit, int authorId) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<User> list = userRepository.findMessageUser(pageable, authorId);
-        Page<Message> list2 = messageRepository.findLastMessage(pageable, authorId);
-        return reponsUserMessage(page, list, list2);
+        Page<Message> list = messageRepository.findLastMessage(pageable, authorId);
+        return reponsUserMessage(page, list, authorId);
     }
 
     public Map<String, Object> getAllMessage(int page, int limit, int authorId, int receiveId, String q) {
@@ -141,16 +140,17 @@ public class MessageService {
         return reponsDataMessage(page, list);
     }
 
-    public Map<String, Object> reponsUserMessage(int page, Page<User> list, Page<Message> list2) {
+    public Map<String, Object> reponsUserMessage(int page, Page<Message> list, int authorId) {
         List<Map<String, Object>> listdata = new ArrayList<>();
-        for (User o : list.getContent()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("user_send", getUser(o));
-            listdata.add(data);
-        }
-        for (Message o : list2.getContent()) {
+        for (Message o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
             data.put("last_message", getMessage(o));
+            if(o.getAuthor_id() != authorId){
+                data.put("user_send", getUser(o.getUser_messages()));
+            }
+            if(o.getReceive_id() != authorId){
+                data.put("user_send", getUser(o.getReceive_messages()));
+            }
             listdata.add(data);
         }
         Map<String, Object> dataResult = new HashMap<>();
@@ -191,7 +191,7 @@ public class MessageService {
         Map<String, Object> data = new HashMap<>();
         data.put("id", list.getId());
         data.put("author_id", list.getAuthor_id());
-        data.put("receive_id", getUserById(list.getReceive_id()));
+        data.put("receive_id", list.getReceive_id());
         data.put("content", list.getContent());
         data.put("type", list.getType());
         data.put("is_active", list.getIs_active());
