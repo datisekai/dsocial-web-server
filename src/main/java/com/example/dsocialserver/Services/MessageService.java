@@ -145,10 +145,10 @@ public class MessageService {
         for (Message o : list.getContent()) {
             Map<String, Object> data = new HashMap<>();
             data.put("last_message", getMessage(o));
-            if(o.getAuthor_id() != authorId){
+            if (o.getAuthor_id() != authorId) {
                 data.put("user_send", getUser(o.getUser_messages()));
             }
-            if(o.getReceive_id() != authorId){
+            if (o.getReceive_id() != authorId) {
                 data.put("user_send", getUser(o.getReceive_messages()));
             }
             listdata.add(data);
@@ -192,7 +192,11 @@ public class MessageService {
         data.put("id", list.getId());
         data.put("author_id", list.getAuthor_id());
         data.put("receive_id", list.getReceive_id());
-        data.put("content", list.getContent());
+       if(list.getIs_active()){
+           data.put("content", list.getContent());
+       }else{
+           data.put("content", "Tin nhắn đã được thu hồi");
+       }
         data.put("type", list.getType());
         data.put("is_active", list.getIs_active());
         data.put("is_seen", list.getIs_seen());
