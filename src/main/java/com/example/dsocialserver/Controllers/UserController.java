@@ -217,7 +217,7 @@ public class UserController {
             message.setFrom("haiduong09876@gmail.com");
             message.setTo(email);
             message.setText("Nhấn vào link để đổi mật khẩu: " + environment.getProperty("fe.url")
-                    + "/resetpassword?token=" + codeEmail
+                    + "/forgot-password?token=" + codeEmail
                     + "\nGặp vấn đề liên hệ với Dsocial.");
             message.setSubject("[" + currentDate + "] Dsocial | Website mạng xã hội");
             mailSender.send(message);
