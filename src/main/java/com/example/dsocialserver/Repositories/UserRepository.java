@@ -38,4 +38,7 @@ public interface UserRepository extends CrudRepository<User, Object> {
     @Query(value = "SELECT * FROM user, (SELECT DISTINCT user_id FROM ( SELECT receive_id AS user_id FROM message WHERE message.author_id = :authorId OR receive_id = :authorId UNION SELECT message.author_id AS user_id FROM message WHERE message.author_id = :authorId OR receive_id = :authorId ) AS subquery WHERE user_id <> :authorId ORDER BY user_id DESC) AS temp WHERE temp.user_id=user.id", nativeQuery = true)
     Page<User> findMessageUser(Pageable pageable, @Param("authorId") int authorId);
 
+    @Query(value = "SELECT u.* FROM user u JOIN friendship f ON (u.id = f.user_id OR u.id = f.friend_id) WHERE (f.user_id = :userId OR f.friend_id = :userId) AND f.is_active = 1 AND (u.name LIKE %:q% OR u.other_name LIKE %:q% OR u.address LIKE %:q% OR u.email LIKE %:q%) AND u.id != :userId ORDER BY u.id DESC", nativeQuery = true)
+    Page<User> findAllFriendByName(Pageable pageable, @Param("userId") int userId, @Param("q") String q);
+
 }
