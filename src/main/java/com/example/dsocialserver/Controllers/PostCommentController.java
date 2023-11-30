@@ -61,7 +61,9 @@ public class PostCommentController {
             }
 //        ----------------------------------
 
-            Map<String, Object> postComment = commentService.createPostComment(Integer.parseInt(postId), Integer.parseInt(authorId), content, Integer.parseInt(parentId));
+            Map<String, Object> postComment = commentService.createPostComment(
+                    Integer.parseInt(postId), 
+                    Integer.parseInt(authorId), content, Integer.parseInt(parentId));
             if (!postComment.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -106,9 +108,11 @@ public class PostCommentController {
             @PathVariable("postCommentId") String postCommentId) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            PostComment isPermission = commentService.findByIdAndAuthorId(Integer.parseInt(postCommentId), Integer.parseInt(authorId));          
+            PostComment isPermission = commentService.findByIdAndAuthorId(
+                    Integer.parseInt(postCommentId), Integer.parseInt(authorId));          
             if (isPermission != null) {
-                Map<String, Object> post = commentService.deletePostComment(Integer.parseInt(postCommentId), Integer.parseInt(authorId));
+                Map<String, Object> post = commentService.deletePostComment(
+                        Integer.parseInt(postCommentId), Integer.parseInt(authorId));
                 if (!post.isEmpty()) {
                      Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);

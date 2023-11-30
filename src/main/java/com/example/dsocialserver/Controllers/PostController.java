@@ -58,7 +58,8 @@ public class PostController {
             @RequestParam(value = "limit", defaultValue = "10") String limit) {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> post = postService.getPostList(Integer.parseInt(page) - 1, Integer.parseInt(limit), Integer.parseInt(userId));
+            Map<String, Object> post = postService.getPostList(Integer.parseInt(page) - 1, 
+                    Integer.parseInt(limit), Integer.parseInt(userId));
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             responseData.put("data", post.get("data"));
@@ -137,7 +138,8 @@ public class PostController {
             }
 //        ----------------------------------
 
-            Map<String, Object> post = postService.createPost(html, Integer.parseInt(authorId), Integer.parseInt(groupId), image);
+            Map<String, Object> post = postService.createPost(html,
+                    Integer.parseInt(authorId), Integer.parseInt(groupId), image);
             if (!post.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);

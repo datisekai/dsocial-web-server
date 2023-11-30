@@ -192,7 +192,8 @@ public class FriendshipController {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             String friendId = pst.getFriendId();
 //        ----------------------------------
-            Map<String, Object> friendship = friendshipService.createFriendship(Integer.parseInt(userId), Integer.parseInt(friendId));
+            Map<String, Object> friendship = friendshipService.createFriendship(
+                    Integer.parseInt(userId), Integer.parseInt(friendId));
             if (!friendship.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -253,7 +254,8 @@ public class FriendshipController {
             @PathVariable("frienId") String frienId) throws IOException {
         try {
             String userId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            Map<String, Object> friendship = friendshipService.deleteFriendship(Integer.parseInt(frienId), Integer.parseInt(userId), 0);
+            Map<String, Object> friendship = friendshipService.deleteFriendship(
+                    Integer.parseInt(frienId), Integer.parseInt(userId), 0);
             if (!friendship.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
