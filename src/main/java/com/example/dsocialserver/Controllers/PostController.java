@@ -210,7 +210,7 @@ public class PostController {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
             Post p = postService.findByUserIdBoss(Integer.parseInt(postId), Integer.parseInt(authorId));
             if (p != null) {
-                Map<String, Object> post = postService.deletePost(Integer.parseInt(postId), Integer.parseInt(authorId));
+                Map<String, Object> post = postService.deletePostOwn(Integer.parseInt(postId), Integer.parseInt(authorId));
                 if (!post.isEmpty()) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);
