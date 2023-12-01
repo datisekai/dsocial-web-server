@@ -55,7 +55,8 @@ public class PostReactionController {
             String icon = pst.getIcon();
 //        ----------------------------------
 
-            Map<String, Object> postReaction = postReactionService.createPostReaction(Integer.parseInt(postId), Integer.parseInt(authorId), icon);
+            Map<String, Object> postReaction = postReactionService.createPostReaction(
+                    Integer.parseInt(postId), Integer.parseInt(authorId), icon);
             if (!postReaction.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("success", true);
@@ -100,9 +101,11 @@ public class PostReactionController {
             @PathVariable("postReactionId") String postReactionId) throws IOException {
         try {
             String authorId = JwtTokenProvider.getIDByBearer(authorizationHeader).getSubject();
-            PostReaction isPermission = postReactionService.findByIdAndAuthorId(Integer.parseInt(postReactionId), Integer.parseInt(authorId));
+            PostReaction isPermission = postReactionService.findByIdAndAuthorId(
+                    Integer.parseInt(postReactionId), Integer.parseInt(authorId));
             if (isPermission != null) {
-                Map<String, Object> postReaction = postReactionService.deletePostReaction(postReactionId, Integer.parseInt(authorId));
+                Map<String, Object> postReaction = postReactionService.deletePostReaction(
+                        postReactionId, Integer.parseInt(authorId));
                 if (!postReaction.isEmpty()) {
                     Map<String, Object> responseData = new HashMap<>();
                     responseData.put("success", true);

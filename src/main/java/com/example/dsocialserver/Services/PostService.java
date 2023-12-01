@@ -56,7 +56,7 @@ public class PostService {
     }
 
     public Post findByIdAndAuthorId(int postId, int authorId) {
-        Post post = postRepository.findByIdAndAuthorId(postId, authorId);
+        Post post = postRepository.findPostByIdAndAuthorId(postId, authorId);
         if (post != null) {
             return post;
         }
@@ -106,7 +106,14 @@ public class PostService {
     }
 
     public Map<String, Object> deletePost(int id, int userId) {
-        Post list = postRepository.findByIdAndAuthorId(id, userId);
+        Post list = postRepository.findPostByIdAndAuthorId(id, userId);
+        Map<String, Object> result= reponseResultPost(list, list.getPostImages());
+        postRepository.deletePost(id);
+        return result;
+    }
+    
+    public Map<String, Object> deletePostOwn(int id, int userId) {
+        Post list = postRepository.findPostById(id);
         Map<String, Object> result= reponseResultPost(list, list.getPostImages());
         postRepository.deletePost(id);
         return result;

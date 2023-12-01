@@ -117,19 +117,14 @@ public class UserController {
             String email = user.getEmail();
             String password = user.getPassword();
             String name = user.getName();
-            // ----------------------------------
             User isExist = userService.findByEmail(email);
             if (isExist != null) {
                 jsonRes.setRes(false, "Email đã được sử dụng");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ParseJSon(jsonRes));
             }
-
-            // ----------------------------------
             String avatar = "https://ui-avatars.com/api/?name=" + name;
             String hashPassword = MD5(password);
             User u = userService.createUser(email, hashPassword, name, avatar);
-
-            // ----------------------------------
             if (u != null) {
                 String codeEmail = createJWT(u.getId());
                 Date currentDate = new Date();
